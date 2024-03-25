@@ -88,6 +88,7 @@ export default class CustomIconPlugin extends Plugin {
 
 class CustomIconSettingTab extends PluginSettingTab {
     plugin: CustomIconPlugin;
+    previewEl: HTMLDivElement;
 
     constructor(app: App, plugin: CustomIconPlugin) {
         super(app, plugin);
@@ -99,9 +100,12 @@ class CustomIconSettingTab extends PluginSettingTab {
         containerEl.empty();
 
         containerEl.createEl('h2', { text: '自定义图标设置' });
+        
 
         // 图标设置列表
         this.plugin.settings.customIcons.forEach((icon, index) => {
+            let previewEl: HTMLDivElement;
+
             const iconSetting = new Setting(containerEl)
                 .setName(`图标 #${index + 1}`)
                 .setDesc('请输入SVG的XML内容');
@@ -109,22 +113,27 @@ class CustomIconSettingTab extends PluginSettingTab {
             iconSetting.addText(text =>
                 text
                     .setValue(icon.label)
-                    .setPlaceholder('图标名称')
+                    .setPlaceholder('文件名称')
                     .onChange(async (value) => {
                         icon.label = value;
                         await this.plugin.saveSettings();
                         this.plugin.refreshIcons();
-                    })),
+                        
+                        
+                    }));
+            previewEl = containerEl.createDiv('custom-icon-preview');
             iconSetting.addTextArea(textArea =>
                 textArea
                     .setValue(icon.svgData)
-                    .setPlaceholder('在这里粘贴SVG内部元素')
+                    .setPlaceholder('在这里粘贴SVG代码')
                     .onChange(async (value) => {
                         icon.svgData = value;
                         await this.plugin.saveSettings();
                         this.plugin.refreshIcons();
+                        // updatePreview(previewEl, value);
                     })
             );
+
             iconSetting.addButton(button =>
                 button
                     .setButtonText('移除')
@@ -154,24 +163,21 @@ class CustomIconSettingTab extends PluginSettingTab {
     }
 }
 
-function encodeURIComponentWithNonASCII(str: string): string {
-    const asciiPattern = /[!'()*]/g;
-    return encodeURIComponent(str).replace(asciiPattern, c =>
-        '%' + c.charCodeAt(0).toString(16).toUpperCase()
-    );
+function updatePreview(previewEl: HTMLDivElement, svgData: string): void {
+    previewEl.empty();
+
+    if (svgData) {
+        const svgWrapper = document.createElement('div');
+        svgData = svgData.replace(/width="[^"]*"/g, '').replace(/height="[^"]*"/g, '');
+        svgWrapper.innerHTML = svgData;
+        svgWrapper.addClass('svg-preview-wrapper');
+        svgWrapper.setAttr('style', 'border-radius: 50%; overflow: hidden; display: inline-block; height: 40px; width: 40px;');
+        previewEl.appendChild(svgWrapper);
+    }
 }
 
-function svgToBase64(svgString: string): string {
-    // 移除SVG标签中不必要的属性，比如width和height
-    svgString = svgString
-        .replace(/width="[^"]*"/g, '')
-        .replace(/height="[^"]*"/g, '');
-
-    // 使用encodeURIComponentWithNonASCII函数进行编码
-    const encodedSVG = encodeURIComponentWithNonASCII(svgString);
-
-    // 转换为base64格式
-    const base64SVG = btoa(encodedSVG);
-
-    return base64SVG;
+function svgTObase64(svgData: string): string {
+    svgData = svgData.replace(/width="[^"]*"|height="[^"]*"/g, '');
+    const Base64 = unescape(encodeURIComponent(svgData));
+    return `data:image/svg+xml;base64,${window.btoa(Base64)}`;
 }

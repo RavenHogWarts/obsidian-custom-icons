@@ -13,8 +13,8 @@ export function updatePreview(previewEl: HTMLDivElement, svgBase64: string): voi
 
 export function svgToBase64(svgData: string): string {
     // 移除SVG的width和height属性
-    svgData = svgData.replace(/width="[^"]*"|height="[^"]*"/g, '');
-
+    svgData = svgData.replace(/\bwidth="[^"]*"\b|\bheight="[^"]*"\b/g, '');
+    // console.log(svgData);
     // 编码为base64
     const encodedSvgData = window.btoa(unescape(encodeURIComponent(svgData)));
     return `data:image/svg+xml;base64,${encodedSvgData}`;

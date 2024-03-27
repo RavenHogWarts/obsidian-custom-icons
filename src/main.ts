@@ -54,9 +54,15 @@ export default class CustomIconPlugin extends Plugin {
                     display: inline-block;
                     width: 1em;
                     height: 1em;
-                    background-color: var(--text-normal);
-                    -webkit-mask-image: url('${svgBase64}');
-                    mask-image: url('${svgBase64}');
+                    // background-color: var(--text-normal);
+                    // -webkit-mask-image: url('${svgBase64}');
+                    // mask-image: url('${svgBase64}');
+                    background-color: transparent; /* 确保背景透明 */
+                    background-blend-mode: normal; /* 正常的背景合成模式 */
+                    background-image: url('${svgBase64}');
+                    background-size: contain;
+                    background-repeat: no-repeat;
+                    background-position: center;
                 }
             `;
 

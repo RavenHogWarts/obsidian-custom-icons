@@ -1,4 +1,4 @@
-name: Release plugin
+name: Release Obsidian plugin
 
 on:
   push:
@@ -75,7 +75,7 @@ jobs:
           asset_path: ./manifest.json
           asset_name: manifest.json
           asset_content_type: application/json
-          
+
       - name: Upload styles.css
         id: upload-styles
         uses: actions/upload-release-asset@v1

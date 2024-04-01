@@ -1,11 +1,11 @@
 import CustomIconPlugin from '../main';
 import { App, PluginSettingTab, Setting } from 'obsidian';
-import { updatePreview, svgToBase64 } from '../utils/utils';
-
+import { updatePreview, getResourcePath } from '../utils/utils';
+import { Locals } from 'src/i18n/i18n';
+import { EMPTY_PNG_DATA_URL } from 'src/types';
 
 export class CustomIconSettingTab extends PluginSettingTab {
     plugin: CustomIconPlugin;
-    previewEl: HTMLDivElement;
     private iconIdCounter: number = 0;
 
     constructor(app: App, plugin: CustomIconPlugin) {
@@ -15,52 +15,52 @@ export class CustomIconSettingTab extends PluginSettingTab {
 
     display(): void {
         const { containerEl } = this;
+        const t = Locals.get();
+
         containerEl.empty();
-
-        containerEl.createEl('h2', { text: '自定义图标设置' });
+        containerEl.createEl('h2', { text: t.settings });
+        new Setting(containerEl).setDesc(t.settingsDesc);
         
-
-        // 图标设置列表
+        
         this.plugin.settings.customIcons.forEach((icon, index) => {
             let previewEl: HTMLDivElement;
 
             const iconSetting = new Setting(containerEl)
-                .setName(`图标 #${index + 1}`)
-                .setDesc('请输入SVG的XML内容');
+                .setName(t.iconLabel.replace('{num}', `${index + 1}`))
+                // .setDesc(t.svgXmlContent);
 
             iconSetting.addText(text =>
                 text
                     .setValue(icon.label)
-                    .setPlaceholder('文件名称')
+                    .setPlaceholder(t.fileNamePlaceholder)
                     .onChange(async (value) => {
                         icon.label = value;
                         await this.plugin.saveSettings();
-                        this.plugin.refreshIcons();
-                        
-                        
+                        this.plugin.refreshIcons();                        
                     }));
             iconSetting.addTextArea(textArea => {
                 previewEl = createDiv({
                     attr: {
                       style:
-                        "width: 32px;height: 32px;border-radius: 50%;border:1px solid var(--background-modifier-border)",
+                        "display: inline-flex; width: 32px; height: 32px; align-items: center; justify-content: center; margin-right: 2px; border-radius: 50%; border: 1px solid var(--background-modifier-border);",
                     },
                   });
                 textArea.inputEl.parentElement?.prepend(previewEl);
                 textArea
-                    .setValue(icon.svgData)
-                    .setPlaceholder('在这里粘贴SVG代码')
+                    .setValue(icon.image)
+                    // .setPlaceholder(t.svgCodePlaceholder)
+                    .setPlaceholder(t.imagePlaceholder)
                     .onChange(async (value) => {
-                        icon.svgData = value;
+                        icon.image = value;
                         await this.plugin.saveSettings();
                         this.plugin.refreshIcons();
-                        updatePreview(previewEl, svgToBase64(value));
+                        updatePreview(previewEl, getResourcePath(icon.image.trim() || EMPTY_PNG_DATA_URL));
                     })
-                updatePreview(previewEl, svgToBase64(icon.svgData)); 
+                updatePreview(previewEl, getResourcePath(icon.image.trim() || EMPTY_PNG_DATA_URL)); 
             });
             iconSetting.addButton(button => {
                 button
-                    .setButtonText('移除')
+                    .setButtonText(t.removeButton)
                     .setCta()
                     .onClick(async () => {
                         const styleElToRemove = document.querySelector(`#style-${icon.id}`);
@@ -73,16 +73,15 @@ export class CustomIconSettingTab extends PluginSettingTab {
             });
         });
 
-        // 添加图标按钮
         new Setting(containerEl)
             .addButton(button =>
                 button
-                    .setButtonText('添加新图标')
+                    .setButtonText(t.addNewIcon)
                     .onClick(async () => {
                         this.plugin.settings.customIcons.push({
                             id: 'icon-' + this.iconIdCounter++,
                             label: '',
-                            svgData: ''
+                            image: ''
                         });
                         await this.plugin.saveSettings();
                         this.display();

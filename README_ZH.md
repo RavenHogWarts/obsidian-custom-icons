@@ -32,3 +32,7 @@
 - `npm i`  安装依赖。
 - `npm run dev` 开启实时编译。
 - `npm run build` 构建生产版本。
+
+## 鸣谢
+
+在开发`Custom Sidebar Icons`插件的过程中，我借鉴并使用了[Benature](https://github.com/Benature)的[obsidian-metadata-icon](https://github.com/Benature/obsidian-metadata-icon)项目中的一些灵感和代码构建。我要特别感谢这个项目及其贡献者们对于开源社区的贡献，他的工作极大地促进了Obsidian插件生态系的发展。如果你也对他的项目感兴趣，请支持和关注[obsidian-metadata-icon](https://github.com/Benature/obsidian-metadata-icon)。

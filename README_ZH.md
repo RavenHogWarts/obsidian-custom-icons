@@ -8,7 +8,7 @@
 如果你觉得这个插件对你有用，并且想支持它的发展，你可以通过以下方式赞助我：微信，支付宝或[爱发电](https://afdian.net/a/ravenhogwarts)。任何金额都是受欢迎的，谢谢你！
 
 <p align="center">
-<img src="https://s2.loli.net/2024/04/02/wKRoN72myJ6tnr5.png" width="500px">
+<img src="https://s2.loli.net/2024/04/02/4lCUdaSf5bOXEPM.png" width="500px">
 </p>
 
 ## 安装

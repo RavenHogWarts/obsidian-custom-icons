@@ -1,5 +1,5 @@
 {
-	"name": "obsidian-custom-sidebar-icons",
+	"name": "custom-sidebar-icons",
 	"version": "0.1.0",
 	"description": "Customize sidebar workspace document icons.",
 	"main": "main.js",

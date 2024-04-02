@@ -17,7 +17,7 @@ This plugin allows you to customize the icons for pinned files in your Obsidian 
 If you find this plugin useful and would like to support its development, you can sponsor me through the following methods: WeChat, Alipay, or [Love Power Donation](https://afdian.net/a/ravenhogwarts). Any amount is welcome, thank you!
 
 <p align="center">
-<img src="https://s2.loli.net/2024/04/02/wKRoN72myJ6tnr5.png" width="500px">
+<img src="https://s2.loli.net/2024/04/02/4lCUdaSf5bOXEPM.png" width="500px">
 </p>
 
 ## Installation

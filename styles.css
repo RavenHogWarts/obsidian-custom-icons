@@ -1,8 +1,55 @@
-/*
+.icon-preview {
+    display: inline-flex;
+    width: 32px;
+    height: 32px;
+    align-items: center;
+    justify-content: center;
+    margin-right: 2px;
+    border-radius: 50%;
+    border: 1px solid var(--background-modifier-border);
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}
 
-This CSS file will be included with your plugin, and
-available in the app when your plugin is enabled.
+[data-icon-url] {
+    background-image: url(attr(data-icon-url));
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}
 
-If your plugin does not need CSS, delete this file.
+.workspace-tab-header[data-icon-id] .workspace-tab-header-inner-icon > svg {
+    display: none;
+}
 
+.workspace-tab-header[data-icon-id] .workspace-tab-header-inner-icon::before {
+    content: ' ';
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    background-color: transparent;
+    background-blend-mode: normal;
+    background-image: url(attr(data-icon-url));
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+/* 
+.workspace-tab-header[aria-label="${icon.label}"] .workspace-tab-header-inner-icon > svg {
+    display: none;
+}
+.workspace-tab-header[aria-label="${icon.label}"] .workspace-tab-header-inner-icon::before {
+    content: " ";
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    background-color: transparent;
+    background-blend-mode: normal;
+    background-image: url('${url}');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+} 
 */

@@ -1,22 +1,3 @@
-import * as internal from "stream";
-
-export function updatePreview(previewEl: HTMLDivElement, image: string): void {
-    previewEl.empty();
-
-    if (image) {
-        previewEl.style.backgroundImage = `url(${image})`;
-        previewEl.style.backgroundSize = "contain";
-        previewEl.style.backgroundRepeat = 'no-repeat';
-        previewEl.style.backgroundPosition = 'center';
-    }
-}
-
-export function svgToBase64(image: string): string {
-    image = image.replace(/\bwidth="[^"]*"\b|\bheight="[^"]*"\b/g, '');
-    const encodedSvgData = window.btoa(unescape(encodeURIComponent(image)));
-    return `data:image/svg+xml;base64,${encodedSvgData}`;
-}
-
 export function getResourcePath(path: string): string {
     if (/^(https?:\/\/|data:)/.test(path)) {
         return path;

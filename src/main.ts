@@ -16,13 +16,13 @@ export default class CustomIconPlugin extends Plugin {
             })
         );
         this.addSettingTab(new CustomIconSettingTab(this.app, this));
-        this.loadStyles();
+        // this.loadStyles();
     }
 
     onunload() {
-        if (this.styleTag && this.styleTag.parentNode) {
-            this.styleTag.parentNode.removeChild(this.styleTag);
-        }
+        // if (this.styleTag && this.styleTag.parentNode) {
+        //     this.styleTag.parentNode.removeChild(this.styleTag);
+        // }
         // console.log('Custom Icon Plugin unloaded');
     }
 
@@ -34,34 +34,29 @@ export default class CustomIconPlugin extends Plugin {
         await this.saveData(this.settings);
     }
 
-    async loadStyles() {
-        const cssPath = this.manifest.dir + "/styles.css";
-        const cssUrl = this.app.vault.adapter.getResourcePath(cssPath);
-        this.styleTag = document.createElement('style');
-        this.styleTag.id = 'custom-icon-styles';
+    // async loadStyles() {
+    //     const cssPath = this.manifest.dir + "/styles.css";
+    //     const cssUrl = this.app.vault.adapter.getResourcePath(cssPath);
+    //     this.styleTag = document.createElement('style');
+    //     this.styleTag.id = 'custom-icon-styles';
         
-        document.head.appendChild(this.styleTag);
+    //     document.head.appendChild(this.styleTag);
         
-        fetch(cssUrl)
-            .then((response) => response.text())
-            .then((css) => {
-                this.styleTag.textContent = css;
-            });
-    }
+    //     fetch(cssUrl)
+    //         .then((response) => response.text())
+    //         .then((css) => {
+    //             this.styleTag.textContent = css;
+    //         });
+    // }
 
     refreshIcons() {
-        // console.log('Refreshing icons', this.settings.customIcons);
         this.settings.customIcons.forEach(icon => {
-            // console.log(`Updating icon: ${icon.label}`);
             document.querySelectorAll(`.workspace-tab-header[aria-label="${icon.label}"]`)
                 .forEach(tabHeader => {
                     tabHeader.classList.add('custom-icon');
-                    // const iconPath = getResourcePath(icon.image);
-                    // console.log(`Icon path for ${icon.label}: ${iconPath}`);
                     tabHeader.setAttribute('data-icon-id', icon.id);
                     const iconUrl = getResourcePath(icon.image);
                     tabHeader.querySelector('.workspace-tab-header-inner-icon')?.setAttribute('style', `background-image: url('${iconUrl}')`);
-                    // tabHeader.querySelector('.workspace-tab-header-inner-icon').style.backgroundImage = `url('${iconUrl}')`;
                 });
         });
     }
@@ -111,10 +106,8 @@ export class CustomIconSettingTab extends PluginSettingTab {
                         icon.image = value;
                         await this.plugin.saveSettings();
                         this.plugin.refreshIcons();
-                        // previewEl.dataset.iconUrl = getResourcePath(icon.image.trim() || EMPTY_PNG_DATA_URL);
                         updatePreview(previewEl, getResourcePath(icon.image.trim() || EMPTY_PNG_DATA_URL) );
                     })
-                // previewEl.dataset.iconUrl = getResourcePath(icon.image.trim() || EMPTY_PNG_DATA_URL);
                 updatePreview(previewEl, getResourcePath(icon.image.trim() || EMPTY_PNG_DATA_URL) );
             });
             iconSetting.addButton(button => {

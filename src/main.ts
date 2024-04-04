@@ -60,7 +60,7 @@ export default class CustomIconPlugin extends Plugin {
                     // console.log(`Icon path for ${icon.label}: ${iconPath}`);
                     tabHeader.setAttribute('data-icon-id', icon.id);
                     const iconUrl = getResourcePath(icon.image);
-                    tabHeader.querySelector('.workspace-tab-header-inner-icon').setAttribute('style', `background-image: url('${iconUrl}')`);
+                    tabHeader.querySelector('.workspace-tab-header-inner-icon')?.setAttribute('style', `background-image: url('${iconUrl}')`);
                     // tabHeader.querySelector('.workspace-tab-header-inner-icon').style.backgroundImage = `url('${iconUrl}')`;
                 });
         });

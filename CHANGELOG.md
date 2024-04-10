@@ -1,5 +1,9 @@
 # Changelog
 
+## Version 0.3.2 (2024-04-10)
+- [changed] 依据官方要求优化代码
+- [fix] bug: Windows无法使用绝对路径添加图标
+
 ## Version 0.3.1 (2024-04-04)
 - [changed] 优化代码结构,样式修改至styles.css
 

@@ -1,7 +1,22 @@
 # Custom Sidebar Icons
+
 自定义固定在Obsidian侧边栏的文件的图标。
 
 这款插件让你可以为Obsidian侧边栏中的固定文件自定义图标，使你的工作空间更个性化，也更易于导航。
+
+## 使用
+
+图片支持在线URL、本地相对(绝对)文件路径、base64编码、svg标签
+- 在线URL
+  - 如：`https://www.baidu.com/favicon.ico`
+- 本地图片
+  - 相对路径：`.obsidian/svg/RavenHogwarts.svg`
+  - 绝对路径（类Unix风格）：`/Users/RavenHogwarts/Pictures/RavenHogwarts.jpg`
+  - 绝对路径（Windows风格）：`D:\RavenHogwarts.png`,`D:/RavenHogwarts.png`
+- base64编码
+  - 以`data:`开头
+- svg标签
+  - 被`<svg></svg>`标签包裹
 
 ## 支持
 
@@ -13,6 +28,14 @@
 
 ## 安装
 
+<!-- ### 从插件社区安装
+
+[点击安装](https://obsidian.md/plugins?id=custom-sidebar-icons)，或者：
+
+- 打开Obsidian，进入 设置 > 社区插件
+- 搜索 `Custom Sidebar Icons`
+- 点击 `安装`
+ -->
 ### 通过 [BRAT 插件](https://obsidian.md/plugins?id=obsidian42-brat) 安装
 
 - 首先安装 [BRAT 插件](https://obsidian.md/plugins?id=obsidian42-brat)：

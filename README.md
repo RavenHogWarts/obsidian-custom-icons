@@ -1,4 +1,5 @@
 # Custom Sidebar Icons
+
 Customize icons for pinned files in the Obsidian sidebar.
 
 <div align="center">
@@ -12,6 +13,20 @@ Customize icons for pinned files in the Obsidian sidebar.
 
 This plugin allows you to customize the icons for pinned files in your Obsidian sidebar, making your workspace more personalized and easier to navigate.
 
+## Usage
+
+Images can be loaded from online URLs, local relative (or absolute) file paths, base64 encoding, or inline SVG tags:
+- Online URL
+  - Example: `https://www.baidu.com/favicon.ico`
+- Local images
+  - Relative path: `.obsidian/svg/RavenHogwarts.svg`
+  - Absolute path (Unix-style): `/Users/RavenHogwarts/Pictures/RavenHogwarts.jpg`
+  - Absolute path (Windows-style): `D:\RavenHogwarts.png`, `D:/RavenHogwarts.png`
+- Base64 encoding
+  - Starting with `data:`
+- SVG tags
+  - Enclosed within `<svg></svg>` tags
+
 ## Support
 
 If you find this plugin useful and would like to support its development, you can sponsor me through the following methods: WeChat, Alipay, or [Love Power Donation](https://afdian.net/a/ravenhogwarts). Any amount is welcome, thank you!
@@ -22,6 +37,14 @@ If you find this plugin useful and would like to support its development, you ca
 
 ## Installation
 
+<!-- ### Install from plugin community
+
+[click to install](https://obsidian.md/plugins?id=custom-sidebar-icons), or:
+
+- Open Obsidian and go to Settings > Community Plugins
+- Search for `Custom Sidebar Icons`
+- Click `Install` 
+ -->
 ### Install via [BRAT plugin](https://obsidian.md/plugins?id=obsidian42-brat)
 
 - First, install the [BRAT plugin](https://obsidian.md/plugins?id=obsidian42-brat):

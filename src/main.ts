@@ -1,13 +1,17 @@
 import { App, Plugin, PluginSettingTab, Setting } from 'obsidian';
 import { CustomIconSettings, DEFAULT_SETTINGS, EMPTY_PNG_DATA_URL } from './types';
-import { generateUniqueId, getResourcePath,updatePreview } from './utils/utils';
+import { generateUniqueId, updatePreview } from './utils/utils';
 import { Locals } from './i18n/i18n';
 
 export default class CustomIconPlugin extends Plugin {
     settings: CustomIconSettings;
     styleTag: HTMLStyleElement;
+    resourceBase: string;
     
     async onload() {
+        let resourcePath = this.app.vault.adapter.getResourcePath("");
+		this.resourceBase = resourcePath.match(/(app:\/\/\w*?)\//)?.[1] as string;
+
         await this.loadSettings();
 
         this.registerEvent(
@@ -16,14 +20,10 @@ export default class CustomIconPlugin extends Plugin {
             })
         );
         this.addSettingTab(new CustomIconSettingTab(this.app, this));
-        // this.loadStyles();
     }
 
     onunload() {
-        // if (this.styleTag && this.styleTag.parentNode) {
-        //     this.styleTag.parentNode.removeChild(this.styleTag);
-        // }
-        // console.log('Custom Icon Plugin unloaded');
+        console.log('Custom Icon Plugin unloaded');
     }
 
     async loadSettings() {
@@ -34,20 +34,26 @@ export default class CustomIconPlugin extends Plugin {
         await this.saveData(this.settings);
     }
 
-    // async loadStyles() {
-    //     const cssPath = this.manifest.dir + "/styles.css";
-    //     const cssUrl = this.app.vault.adapter.getResourcePath(cssPath);
-    //     this.styleTag = document.createElement('style');
-    //     this.styleTag.id = 'custom-icon-styles';
-        
-    //     document.head.appendChild(this.styleTag);
-        
-    //     fetch(cssUrl)
-    //         .then((response) => response.text())
-    //         .then((css) => {
-    //             this.styleTag.textContent = css;
-    //         });
-    // }
+    getResourcePath(path: string): string {
+        if (/^(https?:\/\/|data:)/.test(path)) {
+            return path;
+        }
+    
+        if (path.startsWith("<svg")) {
+            const encodedSVG = encodeURIComponent(path);
+            return 'data:image/svg+xml;charset=utf-8,' + encodedSVG;
+        }
+    
+        const adapter = this.app.vault.adapter;
+    
+        if (path.startsWith("/")) {
+            return this.resourceBase + path;
+        } else if (/^[c-zC-Z]:[\/\\]/.test(path)) {
+            return this.resourceBase +path.replace(/\\/g, '/').replace(/^([c-zC-Z]):/, '/$1:')
+        } else {
+            return adapter.getResourcePath(path);
+        }
+    }
 
     refreshIcons() {
         this.settings.customIcons.forEach(icon => {
@@ -55,7 +61,7 @@ export default class CustomIconPlugin extends Plugin {
                 .forEach(tabHeader => {
                     tabHeader.classList.add('custom-icon');
                     tabHeader.setAttribute('data-icon-id', icon.id);
-                    const iconUrl = getResourcePath(icon.image);
+                    const iconUrl = this.getResourcePath(icon.image);
                     tabHeader.querySelector('.workspace-tab-header-inner-icon')?.setAttribute('style', `background-image: url('${iconUrl}')`);
                 });
         });
@@ -100,15 +106,14 @@ export class CustomIconSettingTab extends PluginSettingTab {
                 textArea.inputEl.parentElement?.prepend(previewEl);
                 textArea
                     .setValue(icon.image)
-                    // .setPlaceholder(t.svgCodePlaceholder)
                     .setPlaceholder(t.imagePlaceholder)
                     .onChange(async (value) => {
                         icon.image = value;
                         await this.plugin.saveSettings();
                         this.plugin.refreshIcons();
-                        updatePreview(previewEl, getResourcePath(icon.image.trim() || EMPTY_PNG_DATA_URL) );
+                        updatePreview(previewEl, this.plugin.getResourcePath(icon.image.trim() || EMPTY_PNG_DATA_URL) );
                     })
-                updatePreview(previewEl, getResourcePath(icon.image.trim() || EMPTY_PNG_DATA_URL) );
+                updatePreview(previewEl, this.plugin.getResourcePath(icon.image.trim() || EMPTY_PNG_DATA_URL) );
             });
             iconSetting.addButton(button => {
                 button

@@ -4,7 +4,6 @@ export interface LocalProperty {
     iconLabel: string;
     svgXmlContent: string;
     fileNamePlaceholder: string;
-    svgCodePlaceholder: string;
     imagePlaceholder: string;
     removeButton: string;
     addNewIcon: string;

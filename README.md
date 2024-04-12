@@ -37,14 +37,14 @@ If you find this plugin useful and would like to support its development, you ca
 
 ## Installation
 
-<!-- ### Install from plugin community
+### Install from plugin community
 
 [click to install](https://obsidian.md/plugins?id=custom-sidebar-icons), or:
 
 - Open Obsidian and go to Settings > Community Plugins
 - Search for `Custom Sidebar Icons`
 - Click `Install` 
- -->
+
 ### Install via [BRAT plugin](https://obsidian.md/plugins?id=obsidian42-brat)
 
 - First, install the [BRAT plugin](https://obsidian.md/plugins?id=obsidian42-brat):

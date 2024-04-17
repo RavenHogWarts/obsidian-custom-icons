@@ -55,13 +55,27 @@ export default class CustomIconPlugin extends Plugin {
         }
     }
 
+    getResourcePathwithType(path: string, type: string): string {
+        let PATH = path.trim();
+        switch(type){
+            case 'custom':
+                PATH = this.getResourcePath(path);
+                break;
+            case 'lucide':
+                PATH = this.getResourcePath(EMPTY_PNG_DATA_URL);
+                break;
+        }
+        return PATH;
+    }
+
     refreshIcons() {
         this.settings.customIcons.forEach(icon => {
             document.querySelectorAll(`.workspace-tab-header[aria-label="${icon.label}"]`)
                 .forEach(tabHeader => {
                     tabHeader.classList.add('custom-icon');
                     tabHeader.setAttribute('data-icon-id', icon.id);
-                    const iconUrl = this.getResourcePath(icon.image);
+                    // const iconUrl = this.getResourcePath(icon.image);
+                    const iconUrl = this.getResourcePathwithType(icon.image, icon.type);
                     tabHeader.querySelector('.workspace-tab-header-inner-icon')?.setAttribute('style', `background-image: url('${iconUrl}')`);
                 });
         });
@@ -92,7 +106,7 @@ export class CustomIconSettingTab extends PluginSettingTab {
                 .setName(t.iconLabel.replace('{num}', `${index + 1}`))
                 // .setDesc(t.svgXmlContent);
 
-            iconSetting.addText(text =>
+            iconSetting.addText(text => {
                 text
                     .setValue(icon.label)
                     .setPlaceholder(t.fileNamePlaceholder)
@@ -100,7 +114,20 @@ export class CustomIconSettingTab extends PluginSettingTab {
                         icon.label = value;
                         await this.plugin.saveSettings();
                         this.plugin.refreshIcons();                        
-                    }));
+                    })
+            });
+            iconSetting.addDropdown(dropdown => {
+                dropdown
+                    .addOption('custom', "自定义")
+                    .addOption('lucide', "lucide图标")
+                    .setValue(icon.type || 'custom')
+                    .onChange(async (value) => {
+                        icon.type = value;
+                        // console.log(icon.type);
+                        let image = icon.image || EMPTY_PNG_DATA_URL;
+                        updatePreview(previewEl, this.plugin.getResourcePathwithType(image, icon.type) );
+                    })
+            });
             iconSetting.addTextArea(textArea => {
                 previewEl = createDiv({ cls: 'icon-preview' });
                 textArea.inputEl.parentElement?.prepend(previewEl);
@@ -111,9 +138,11 @@ export class CustomIconSettingTab extends PluginSettingTab {
                         icon.image = value;
                         await this.plugin.saveSettings();
                         this.plugin.refreshIcons();
-                        updatePreview(previewEl, this.plugin.getResourcePath(icon.image.trim() || EMPTY_PNG_DATA_URL) );
+                        // updatePreview(previewEl, this.plugin.getResourcePath(icon.image.trim() || EMPTY_PNG_DATA_URL) );
+                        updatePreview(previewEl, this.plugin.getResourcePathwithType((icon.image.trim() || EMPTY_PNG_DATA_URL), icon.type) );
                     })
-                updatePreview(previewEl, this.plugin.getResourcePath(icon.image.trim() || EMPTY_PNG_DATA_URL) );
+                // updatePreview(previewEl, this.plugin.getResourcePath(icon.image.trim() || EMPTY_PNG_DATA_URL) );
+                updatePreview(previewEl, this.plugin.getResourcePathwithType((icon.image.trim() || EMPTY_PNG_DATA_URL), icon.type) );
             });
             iconSetting.addButton(button => {
                 button
@@ -141,7 +170,8 @@ export class CustomIconSettingTab extends PluginSettingTab {
                         this.plugin.settings.customIcons.push({
                             id: generateUniqueId(),
                             label: '',
-                            image: ''
+                            image: '',
+                            type: ''
                         });
                         await this.plugin.saveSettings();
                         this.display();

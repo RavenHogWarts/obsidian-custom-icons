@@ -23,7 +23,7 @@
     height: 1em;
     background-color: transparent;
     background-blend-mode: normal;
-    background-image: inherit;
+    background-image: var(--bg);
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;

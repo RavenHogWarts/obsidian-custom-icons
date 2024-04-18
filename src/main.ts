@@ -64,6 +64,9 @@ export default class CustomIconPlugin extends Plugin {
             case 'lucide':
                 PATH = this.getResourcePath(EMPTY_PNG_DATA_URL);
                 break;
+            default:
+                // PATH = this.getResourcePath(path);
+                break;
         }
         return PATH;
     }
@@ -122,7 +125,9 @@ export class CustomIconSettingTab extends PluginSettingTab {
                     // .addOption('lucide', "lucide图标")
                     .setValue(icon.type || 'custom')
                     .onChange(async (value) => {
+                        // value===''? value='custom': value=value;
                         icon.type = value;
+                        await this.plugin.saveSettings();
                         let image = icon.image || EMPTY_PNG_DATA_URL;
                         updatePreview(previewEl, this.plugin.getResourcePathwithType(image, icon.type) );
                     })
@@ -170,7 +175,7 @@ export class CustomIconSettingTab extends PluginSettingTab {
                             id: generateUniqueId(),
                             label: '',
                             image: '',
-                            type: ''
+                            type: "custom"
                         });
                         await this.plugin.saveSettings();
                         this.display();

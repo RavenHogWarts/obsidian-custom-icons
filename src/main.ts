@@ -122,7 +122,7 @@ export class CustomIconSettingTab extends PluginSettingTab {
             iconSetting.addDropdown(dropdown => {
                 dropdown
                     .addOption('custom', "自定义")
-                    // .addOption('lucide', "lucide图标")
+                    .addOption('lucide', "lucide图标")
                     .setValue(icon.type || 'custom')
                     .onChange(async (value) => {
                         // value===''? value='custom': value=value;

@@ -28,10 +28,26 @@ export default class CustomIconPlugin extends Plugin {
 
     async loadSettings() {
         this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+        this.migrateSettings();
     }
 
     async saveSettings() {
         await this.saveData(this.settings);
+    }
+
+    async migrateSettings() {
+        let migrated = false;
+    
+        for (let icon of this.settings.customIcons) {
+            if (!icon.type) {
+                icon.type = 'custom';
+                migrated = true;
+            }
+        }
+        
+        if (migrated) {
+            await this.saveSettings();
+        }
     }
 
     getResourcePath(path: string): string {

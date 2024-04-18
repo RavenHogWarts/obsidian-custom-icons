@@ -1,6 +1,10 @@
 # Changelog
 
-## Version 0.3.3.1 (2024-04-18)
+## Version 0.3.3 (2024-04-18)
+### 0.3.3.2
+- [updated] 增加数据迁移功能,确保用户之前的数据能够使用
+
+### 0.3.3.1
 - [changed] customIcons增加type类型, CustomIconSettingTab增加Dropdown类型选择
 - [fix] bug: 图标后面会叠加图片
 

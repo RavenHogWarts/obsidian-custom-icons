@@ -1,5 +1,10 @@
 export interface CustomIconSettings {
-    customIcons: Array<{id: string; label: string; image: string;}>;
+    customIcons: Array<{
+        id: string; 
+        label: string; 
+        image: string;
+        type: string;
+    }>;
 }
   
 export const DEFAULT_SETTINGS: CustomIconSettings = {

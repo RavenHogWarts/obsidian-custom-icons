@@ -4,7 +4,7 @@ Customize icons for pinned files in the Obsidian sidebar.
 
 <div align="center">
 
-![Obsidian Downloads](https://img.shields.io/badge/dynamic/json?logo=obsidian&color=%23483699&label=downloads&query=%24%5B%22obsidian-custom-sidebar-icons%22%5D.downloads&url=https%3A%2F%2Fraw.githubusercontent.com%2Fobsidianmd%2Fobsidian-releases%2Fmaster%2Fcommunity-plugin-stats.json) ![GitHub stars](https://img.shields.io/github/stars/RavenHogWarts/obsidian-custom-sidebar-icons?style=flat) ![latest download](https://img.shields.io/github/downloads/RavenHogWarts/obsidian-custom-sidebar-icons/latest/total?style=plastic) 
+![Obsidian Downloads](https://img.shields.io/badge/dynamic/json?logo=obsidian&color=%23483699&label=downloads&query=%24%5B%22custom-sidebar-icons%22%5D.downloads&url=https%3A%2F%2Fraw.githubusercontent.com%2Fobsidianmd%2Fobsidian-releases%2Fmaster%2Fcommunity-plugin-stats.json) ![GitHub stars](https://img.shields.io/github/stars/RavenHogWarts/obsidian-custom-sidebar-icons?style=flat) ![latest download](https://img.shields.io/github/downloads/RavenHogWarts/obsidian-custom-sidebar-icons/latest/total?style=plastic) 
 [![Github release](https://img.shields.io/github/manifest-json/v/RavenHogWarts/obsidian-custom-sidebar-icons?color=blue)](https://github.com/RavenHogWarts/obsidian-custom-sidebar-icons/releases/latest) ![GitHub release (latest by date including pre-releases)](https://img.shields.io/github/v/release/RavenHogWarts/obsidian-custom-sidebar-icons?include_prereleases&label=BRAT%20beta)
 
 [ [中文](https://github.com/RavenHogWarts/obsidian-custom-sidebar-icons/blob/master/README_ZH.md) | English ]
@@ -37,14 +37,14 @@ If you find this plugin useful and would like to support its development, you ca
 
 ## Installation
 
-<!-- ### Install from plugin community
+### Install from plugin community
 
 [click to install](https://obsidian.md/plugins?id=custom-sidebar-icons), or:
 
 - Open Obsidian and go to Settings > Community Plugins
 - Search for `Custom Sidebar Icons`
 - Click `Install` 
- -->
+
 ### Install via [BRAT plugin](https://obsidian.md/plugins?id=obsidian42-brat)
 
 - First, install the [BRAT plugin](https://obsidian.md/plugins?id=obsidian42-brat):

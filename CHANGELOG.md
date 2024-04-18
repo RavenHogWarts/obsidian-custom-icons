@@ -1,5 +1,9 @@
 # Changelog
 
+## Version 0.3.3 (2024-04-18)
+- [changed] customIcons增加type类型, CustomIconSettingTab增加Dropdown类型选择
+- [fix] bug: 图标后面会叠加图片
+
 ## Version 0.3.2 (2024-04-10)
 - [changed] 依据官方要求优化代码
 - [fix] bug: Windows无法使用绝对路径添加图标

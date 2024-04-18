@@ -76,7 +76,7 @@ export default class CustomIconPlugin extends Plugin {
                     tabHeader.setAttribute('data-icon-id', icon.id);
                     // const iconUrl = this.getResourcePath(icon.image);
                     const iconUrl = this.getResourcePathwithType(icon.image, icon.type);
-                    tabHeader.querySelector('.workspace-tab-header-inner-icon')?.setAttribute('style', `background-image: url('${iconUrl}')`);
+                    tabHeader.querySelector('.workspace-tab-header-inner-icon')?.setAttribute('style', `--bg: url('${iconUrl}')`);
                 });
         });
     }
@@ -119,11 +119,10 @@ export class CustomIconSettingTab extends PluginSettingTab {
             iconSetting.addDropdown(dropdown => {
                 dropdown
                     .addOption('custom', "自定义")
-                    .addOption('lucide', "lucide图标")
+                    // .addOption('lucide', "lucide图标")
                     .setValue(icon.type || 'custom')
                     .onChange(async (value) => {
                         icon.type = value;
-                        // console.log(icon.type);
                         let image = icon.image || EMPTY_PNG_DATA_URL;
                         updatePreview(previewEl, this.plugin.getResourcePathwithType(image, icon.type) );
                     })

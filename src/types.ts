@@ -12,3 +12,7 @@ export const DEFAULT_SETTINGS: CustomIconSettings = {
 }
 
 export const EMPTY_PNG_DATA_URL = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII="
+
+export interface Icons {
+    [key: string]: string;
+}

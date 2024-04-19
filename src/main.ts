@@ -1,7 +1,8 @@
 import { App, Plugin, PluginSettingTab, Setting } from 'obsidian';
 import { CustomIconSettings, DEFAULT_SETTINGS, EMPTY_PNG_DATA_URL } from './types';
-import { generateUniqueId, updatePreview } from './utils/utils';
+import { generateUniqueId, updatePreview, convertToCamelCase } from './utils/utils';
 import { Locals } from './i18n/i18n';
+import * as lucideIcons from 'lucide-static';
 
 export default class CustomIconPlugin extends Plugin {
     settings: CustomIconSettings;
@@ -9,9 +10,6 @@ export default class CustomIconPlugin extends Plugin {
     resourceBase: string;
     
     async onload() {
-        let resourcePath = this.app.vault.adapter.getResourcePath("");
-		this.resourceBase = resourcePath.match(/(app:\/\/\w*?)\//)?.[1] as string;
-
         await this.loadSettings();
 
         this.registerEvent(
@@ -50,14 +48,22 @@ export default class CustomIconPlugin extends Plugin {
         }
     }
 
+    svgToDataURI(svgContent: string): string {
+        const encodedSVG = encodeURIComponent(svgContent);
+        const dataURI = `data:image/svg+xml;charset=utf-8,${encodedSVG}`;
+        return dataURI;
+      }
+    
     getResourcePath(path: string): string {
+        let resourcePath = this.app.vault.adapter.getResourcePath("");
+		this.resourceBase = resourcePath.match(/(app:\/\/\w*?)\//)?.[1] as string;
+
         if (/^(https?:\/\/|data:)/.test(path)) {
             return path;
         }
     
         if (path.startsWith("<svg")) {
-            const encodedSVG = encodeURIComponent(path);
-            return 'data:image/svg+xml;charset=utf-8,' + encodedSVG;
+            return this.svgToDataURI(path);
         }
     
         const adapter = this.app.vault.adapter;
@@ -71,6 +77,12 @@ export default class CustomIconPlugin extends Plugin {
         }
     }
 
+    getLucidePath(iconName: string): string {
+        const camelCaseIconName = convertToCamelCase(iconName);
+        const iconSvg = lucideIcons[camelCaseIconName as keyof typeof lucideIcons];
+        return this.svgToDataURI(iconSvg);
+    }
+
     getResourcePathwithType(path: string, type: string): string {
         let PATH = path.trim();
         switch(type){
@@ -78,10 +90,10 @@ export default class CustomIconPlugin extends Plugin {
                 PATH = this.getResourcePath(path);
                 break;
             case 'lucide':
-                PATH = this.getResourcePath(EMPTY_PNG_DATA_URL);
+                PATH = this.getLucidePath(path);
                 break;
             default:
-                // PATH = this.getResourcePath(path);
+                PATH = this.getResourcePath(EMPTY_PNG_DATA_URL);
                 break;
         }
         return PATH;
@@ -138,7 +150,7 @@ export class CustomIconSettingTab extends PluginSettingTab {
             iconSetting.addDropdown(dropdown => {
                 dropdown
                     .addOption('custom', "自定义")
-                    // .addOption('lucide', "lucide图标")
+                    .addOption('lucide', "lucide图标")
                     .setValue(icon.type || 'custom')
                     .onChange(async (value) => {
                         // value===''? value='custom': value=value;

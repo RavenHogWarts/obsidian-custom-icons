@@ -15,7 +15,15 @@ This plugin allows you to customize the icons for pinned files in your Obsidian 
 
 ## Usage
 
-Images can be loaded from online URLs, local relative (or absolute) file paths, base64 encoding, or inline SVG tags:
+Currently, there are two ways to set the icons, one is custom, and the other is using lucide source icons
+- Custom
+  - Custom includes using online URL, local relative (absolute) file path, base64 encoding, svg tags
+- Lucide icons
+  - This method only requires the icon name obtained from [lucide](https://lucide.dev/icons/)
+  - Importantly, the official icons also use lucide icons
+
+### Examples
+
 - Online URL
   - Example: `https://www.baidu.com/favicon.ico`
 - Local images
@@ -26,6 +34,10 @@ Images can be loaded from online URLs, local relative (or absolute) file paths, 
   - Starting with `data:`
 - SVG tags
   - Enclosed within `<svg></svg>` tags
+- Lucide source icons
+  - Icon name from [lucide](https://lucide.dev/icons/)
+
+![Usage](attachment/Usage_EN.png)
 
 ## Support
 

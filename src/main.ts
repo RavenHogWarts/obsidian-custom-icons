@@ -126,16 +126,16 @@ export class CustomIconSettingTab extends PluginSettingTab {
         const t = Locals.get();
 
         containerEl.empty();
-        containerEl.createEl('h2', { text: t.settings });
-        new Setting(containerEl).setDesc(t.settingsDesc);
-        
+        containerEl.createEl('h2', { text: t.custom_settings });
+        t.custom_settingsDesc.forEach(description => {
+            containerEl.createEl('p', { text: description });
+        });
         
         this.plugin.settings.customIcons.forEach((icon, index) => {
             let previewEl: HTMLDivElement;
 
             const iconSetting = new Setting(containerEl)
                 .setName(t.iconLabel.replace('{num}', `${index + 1}`))
-                // .setDesc(t.svgXmlContent);
 
             iconSetting.addText(text => {
                 text
@@ -149,11 +149,10 @@ export class CustomIconSettingTab extends PluginSettingTab {
             });
             iconSetting.addDropdown(dropdown => {
                 dropdown
-                    .addOption('custom', "自定义")
-                    .addOption('lucide', "lucide图标")
+                    .addOption('custom', t.type_custom)
+                    .addOption('lucide', t.type_lucide)
                     .setValue(icon.type || 'custom')
                     .onChange(async (value) => {
-                        // value===''? value='custom': value=value;
                         icon.type = value;
                         await this.plugin.saveSettings();
                         let image = icon.image || EMPTY_PNG_DATA_URL;
@@ -170,10 +169,8 @@ export class CustomIconSettingTab extends PluginSettingTab {
                         icon.image = value;
                         await this.plugin.saveSettings();
                         this.plugin.refreshIcons();
-                        // updatePreview(previewEl, this.plugin.getResourcePath(icon.image.trim() || EMPTY_PNG_DATA_URL) );
                         updatePreview(previewEl, this.plugin.getResourcePathwithType((icon.image.trim() || EMPTY_PNG_DATA_URL), icon.type) );
                     })
-                // updatePreview(previewEl, this.plugin.getResourcePath(icon.image.trim() || EMPTY_PNG_DATA_URL) );
                 updatePreview(previewEl, this.plugin.getResourcePathwithType((icon.image.trim() || EMPTY_PNG_DATA_URL), icon.type) );
             });
             iconSetting.addButton(button => {

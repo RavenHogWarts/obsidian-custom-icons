@@ -15,7 +15,14 @@
 
 ## 使用
 
-图片支持在线URL、本地相对(绝对)文件路径、base64编码、svg标签
+目前图标的设置分为两种方式,一种是自定义,一种是lucide源图标
+- 自定义
+  - 自定义包括了使用在线URL、本地相对(绝对)文件路径、base64编码、svg标签
+- lucide图标
+  - 这种方法只需要输入在[lucide](https://lucide.dev/icons/)得到的图标名称
+  - 重要的是官方的图标使用的也是lucide的图标
+
+### 示例
 - 在线URL
   - 如：`https://www.baidu.com/favicon.ico`
 - 本地图片
@@ -26,6 +33,10 @@
   - 以`data:`开头
 - svg标签
   - 被`<svg></svg>`标签包裹
+- lucide源图标
+  - [lucide](https://lucide.dev/icons/)的icon名称
+
+![Usage](attachment/Usage_ZH.png)
 
 ## 支持
 

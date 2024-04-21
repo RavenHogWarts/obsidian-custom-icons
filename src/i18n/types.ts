@@ -1,6 +1,6 @@
 export interface LocalProperty {
     custom_settings: string;
-    custom_settingsDesc: string[];
+    custom_settingsDesc: string;
     iconLabel: string;
     fileNamePlaceholder: string;
     imagePlaceholder: string;

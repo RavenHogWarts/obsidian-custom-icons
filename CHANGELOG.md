@@ -3,6 +3,9 @@
 ## Version 0.4.0 (2024-04-20)
 - [feature] 支持lucide源图标 [#2](https://github.com/RavenHogWarts/obsidian-custom-sidebar-icons/issues/2)
 
+### 0.4.0.1 (2024-04-21)
+- [fix] 设置界面补丁
+
 ## Version 0.3.3 (2024-04-18)
 ### 0.3.3.2
 - [updated] 增加数据迁移功能,确保用户之前的数据能够使用

@@ -105,7 +105,6 @@ export default class CustomIconPlugin extends Plugin {
                 .forEach(tabHeader => {
                     tabHeader.classList.add('custom-icon');
                     tabHeader.setAttribute('data-icon-id', icon.id);
-                    // const iconUrl = this.getResourcePath(icon.image);
                     const iconUrl = this.getResourcePathwithType(icon.image, icon.type);
                     tabHeader.querySelector('.workspace-tab-header-inner-icon')?.setAttribute('style', `--bg: url('${iconUrl}')`);
                 });
@@ -127,9 +126,9 @@ export class CustomIconSettingTab extends PluginSettingTab {
 
         containerEl.empty();
         containerEl.createEl('h2', { text: t.custom_settings });
-        t.custom_settingsDesc.forEach(description => {
-            containerEl.createEl('p', { text: description });
-        });
+        const pEl = containerEl.createEl('div');
+        pEl.setAttribute("style", "color: gray; font-size: 12px;");
+        pEl.innerHTML = t.custom_settingsDesc;
         
         this.plugin.settings.customIcons.forEach((icon, index) => {
             let previewEl: HTMLDivElement;

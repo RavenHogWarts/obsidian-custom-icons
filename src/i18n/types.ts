@@ -1,11 +1,15 @@
 export interface LocalProperty {
-    custom_settings: string;
-    custom_settingsDesc: string;
-    iconLabel: string;
-    fileNamePlaceholder: string;
-    imagePlaceholder: string;
-    type_custom: string;
-    type_lucide: string;
-    removeButton: string;
-    addNewIcon: string;
+    Tab_Title: string;
+    Tab_SidebarIcons: string;
+    SidebarIcons_FileName: string;
+    Tab_FolderIcons: string;
+    FolderIcons_FileName: string;
+    Tab_About: string;
+    About: string;
+    IconID: string;
+    IconImg: string;
+    Type_Custom: string;
+    Type_Lucide: string;
+    RemoveIconButton: string;
+    AddIconButton: string;
 }

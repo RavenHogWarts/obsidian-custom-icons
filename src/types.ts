@@ -1,18 +1,29 @@
 export interface CustomIconSettings {
-    customIcons: Array<{
-        id: string; 
-        label: string; 
-        image: string;
-        type: string;
-    }>;
+    customIcons: Array<SidebarIcons>;
+    SidebarIcons: Array<SidebarIcons>;
+    FolderIcons: Array<FolderIcons>;
+}
+
+export interface SidebarIcons {
+    id: string;
+    label: string;
+    image: string;
+    type: string;
+}
+
+export interface FolderIcons {
+    id: string;
+    path: string;
+    image: string;
+    type: string;
 }
   
 export const DEFAULT_SETTINGS: CustomIconSettings = {
+    SidebarIcons: [],
+    FolderIcons: [],
     customIcons: []
 }
 
 export const EMPTY_PNG_DATA_URL = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII="
 
-export interface Icons {
-    [key: string]: string;
-}
+export const DEFAULT_FOLDER_ICON = "data:image/svg+xml;charset=utf-8;base64,PHN2ZyB0PSIxNzE0NDkzNzM0NTk5IiBjbGFzcz0iaWNvbiIgdmlld0JveD0iMCAwIDEwMjQgMTAyNCIgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHAtaWQ9IjM4MTgiIHdpZHRoPSIyNTYiIGhlaWdodD0iMjU2Ij48cGF0aCBkPSJNNDI1LjA2MjQgMjA2LjQ2NGM5LjcyOCAwIDE4Ljg2NzIgNC40Mjg4IDI0LjkwODggMTEuOTA0bDIuMTI0OCAyLjk0NCA0NS4yODY0IDcxLjQyNGgyNDIuMzU1MmM2Ni4wNDggMCAxMTguODYwOCA1NS41MDA4IDEyMS42NTEyIDEyMy45Mjk2bDAuMTI4IDUuNzM0NHYyODEuNmMwIDY5LjEyLTUxLjAyMDggMTI2LjQ2NC0xMTYuMzAwOCAxMjkuNTM2bC01LjQ3ODQgMC4xMDI0SDI4NC4yNjI0Yy02Ni4wNDggMC0xMTguODYwOC01NS40NzUyLTEyMS42NTEyLTEyMy45MDRsLTAuMTI4LTUuNzM0NHYtNTcuOTMyOGEzMiAzMiAwIDAgMSA2My44NDY0LTMuMjUxMmwwLjE1MzYgMy4yNTEyVjcwNGMwIDM1LjM1MzYgMjQuNDIyNCA2My4zMzQ0IDU0LjA0MTYgNjUuNTEwNGwzLjczNzYgMC4xMjhoNDU1LjQ3NTJjMzAuMDI4OCAwIDU1LjY1NDQtMjYuNTQ3MiA1Ny42NTEyLTYxLjI2MDhsMC4xMjgtNC4zNzc2di0yODEuNmMwLTM1LjM1MzYtMjQuNDIyNC02My4zMzQ0LTU0LjA0MTYtNjUuNTEwNGwtMy43Mzc2LTAuMTI4SDQ3OS44MjA4YTMyIDMyIDAgMCAxLTI0LjkzNDQtMTEuOTA0bC0yLjA5OTItMi45Njk2LTQ1LjMzNzYtNzEuNDQ5Ni0xMTAuNTY2NCAwLjAyNTZhNzAuNCA3MC40IDAgMCAwLTcwLjI3MiA2Ni4wOTkybC0wLjEyOCA0LjMwMDh2MTk4LjMyMzJhMzIgMzIgMCAwIDEtNjMuODIwOCAzLjI3NjhsLTAuMTc5Mi0zLjI3Njh2LTE5OC4zMjMyYTEzNC40IDEzNC40IDAgMCAxIDEyOC44NzA0LTEzNC4yOTc2bDUuNTI5Ni0wLjEwMjRoMTI4LjE3OTJ6IiBmaWxsPSIjMTI5NmRiIiBwLWlkPSIzODE5Ij48L3BhdGg+PHBhdGggZD0iTTcxOS4zNiA0NDEuNmEzMiAzMiAwIDAgMSAzLjI3NjggNjMuODQ2NGwtMy4yNzY4IDAuMTUzNkgzMDQuNjRhMzIgMzIgMCAwIDEtMy4yNzY4LTYzLjg0NjRsMy4yNzY4LTAuMTUzNmg0MTQuNzJ6IiBmaWxsPSIjMTI5NmRiIiBwLWlkPSIzODIwIj48L3BhdGg+PC9zdmc+"

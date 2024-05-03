@@ -1,20 +1,24 @@
 import { LocalProperty } from './types';
 
 export const EN: LocalProperty = {
-  custom_settings: "Add Custom Icons",
-  custom_settingsDesc: 
-    `
-    <h5>Brief Description</h5>
-    <ul>
-      <li>Custom icons support: Online URL or Local relative (absolute) file path or base64 encoding or svg tags. For details, see <a href="https://github.com/RavenHogWarts/obsidian-custom-sidebar-icons/blob/master/README.md" target="_blank">README</a>.</li>
-      <li>Lucide source icons support direct use of lucide icon names. For details, see <a href="https://lucide.dev/icons/" target="_blank">lucide</a>.</li>
-    </ul>
-    `,
-  iconLabel: "Icon #{num}",
-  fileNamePlaceholder: "Enter file name",
-  imagePlaceholder: "Enter icon path",
-  type_custom: "Custom Icons",
-  type_lucide: "Lucide Original Icons",
-  removeButton: "Remove",
-  addNewIcon: "Add New Icon"
+  "Tab_Title": "Custom Icons",
+  "Tab_SidebarIcons": "Sidebar Workspace Icons",
+  "SidebarIcons_FileName": "Enter File Name",
+  "Tab_FolderIcons": "Folder Icons",
+  "FolderIcons_FileName": "Enter Folder Path",
+  "Tab_About": "About",
+  "IconID": "{num}",
+  "IconImg": "Enter Icon Path",
+  "Type_Custom": "Custom",
+  "Type_Lucide": "lucide",
+  "RemoveIconButton": "Remove",
+  "AddIconButton": "Add New Icon",
+  "About": 
+  `
+  <h5>Brief Introduction</h5>
+  <ul>
+    <li>Support for custom icons: Online URLs or local relative (absolute) file paths or base64 encoding or SVG tags. For more details, see <a href="https://github.com/RavenHogWarts/obsidian-custom-sidebar-icons/blob/master/README_ZH.md" target="_blank">README</a>.</li>
+    <li>Direct use of lucide source icon names is supported. For more details, see <a href="https://lucide.dev/icons/" target="_blank">lucide</a>.</li>
+  </ul>
+  `
 };

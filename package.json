@@ -4,6 +4,7 @@
 	"description": "Customize sidebar workspace document icons.",
 	"main": "main.js",
 	"scripts": {
+		"test": "node scripts/esbuild.config.test.mjs",
 		"dev": "node scripts/esbuild.config.mjs",
 		"build": "tsc -noEmit -skipLibCheck && node scripts/esbuild.config.mjs production",
 		"version": "node scripts/version-bump.mjs && git add manifest.json versions.json"
@@ -22,6 +23,8 @@
 		"typescript": "4.7.4"
 	},
 	"dependencies": {
+		"@popperjs/core": "^2.11.8",
+		"dotenv": "^16.4.5",
 		"lucide-static": "^0.372.0"
 	}
 }

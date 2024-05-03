@@ -1,14 +1,14 @@
 {
-	"id": "custom-sidebar-icons",
-	"name": "Custom Sidebar Icons",
-	"version": "0.4.0.1",
-	"minAppVersion": "1.5.0",
-	"description": "Customize sidebar workspace document icons.",
-	"author": "RavenHogWarts",
-	"authorUrl": "https://github.com/RavenHogWarts",
-	"fundingUrl": {
-		"爱发电": "https://afdian.net/a/ravenhogwarts",
-		"微信/支付宝": "https://s2.loli.net/2024/04/02/4lCUdaSf5bOXEPM.png"
-	},
-	"isDesktopOnly": false
+  "id": "custom-sidebar-icons",
+  "name": "Custom Icons",
+  "version": "0.5.0",
+  "minAppVersion": "1.5.0",
+  "description": "Customize sidebar workspace document and folder icons to personalize your Obsidian experience.",
+  "author": "RavenHogWarts",
+  "authorUrl": "https://github.com/RavenHogWarts",
+  "fundingUrl": {
+    "爱发电": "https://afdian.net/a/ravenhogwarts",
+    "微信/支付宝": "https://s2.loli.net/2024/04/02/4lCUdaSf5bOXEPM.png"
+  },
+  "isDesktopOnly": false
 }

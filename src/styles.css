@@ -54,36 +54,3 @@
     display: none;
     visibility: hidden;
 }
-
-/* .custom-icon.workspace-tab-header[data-icon-id] .workspace-tab-header-inner-icon::before {
-    content: ' ';
-    display: inline-block;
-    width: 1em;
-    height: 1em;
-    background-color: transparent;
-    background-blend-mode: normal;
-    background-image: var(--bg);
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center;
-} */
-
-/* .custom-icon.nav-folder-title[data-icon-id] .nav-folder-title-content::before {
-    content: '';
-    display: inline-block;
-    width: 16px;
-    height: 16px;
-    margin: -2px 0px -4px 0px;
-    background-color: transparent;
-    background-blend-mode: normal;
-    background-image: var(--icon);
-    background-size: contain;
-    background-repeat: no-repeat;
-} */
-/* .custom-icon.nav-folder-title[data-icon-id] .custom-icon-folder {
-    display: flex;
-    align-items: center;
-    margin: 0 4px 0 0;
-    width: 16px;
-    height: 16px;
-} */

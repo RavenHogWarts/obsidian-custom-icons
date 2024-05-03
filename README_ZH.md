@@ -1,6 +1,6 @@
 # Custom Sidebar Icons
 
-自定义固定在Obsidian侧边栏的文件的图标。
+定制侧边栏工作区文件和文件夹图标，个性化您的 Obsidian 体验。
 
 <div align="center">
 

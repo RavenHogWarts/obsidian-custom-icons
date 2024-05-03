@@ -1,5 +1,5 @@
-import { App, Plugin, PluginSettingTab, Setting, debounce } from 'obsidian';
-import { CustomIconSettings, SidebarIcons, FolderIcons, DEFAULT_SETTINGS, EMPTY_PNG_DATA_URL, DEFAULT_FOLDER_ICON } from './types';
+import { App, DropdownComponent, Plugin, PluginSettingTab, Setting, TextAreaComponent, debounce } from 'obsidian';
+import { CustomIconSettings, SidebarIcons, FolderIcons, DefaultFolderIcon, DEFAULT_SETTINGS, EMPTY_PNG_DATA_URL, DEFAULT_FOLDER_ICON } from './types';
 import { generateUniqueId, updatePreview, convertToCamelCase } from './utils/utils';
 import { Locals } from './i18n/i18n';
 import { LocalProperty } from './i18n/types';
@@ -105,7 +105,7 @@ export default class CustomIconPlugin extends Plugin {
             `display: inline-block;`,
             `width: 16px;`,
             `height: 16px;`,
-            `margin: -2px 0px -4px 0px;`,
+            `margin: 0px 2px -4px 0px;`,
             `background-color: transparent;`,
             `background-blend-mode: normal;`,
             `background-image: url("${iconUrl}");`,
@@ -285,7 +285,7 @@ export class CustomIconSettingTab extends PluginSettingTab {
             });
             iconSetting.addButton(button => {
                 button
-                    .setButtonText(t.RemoveIconButton)
+                    .setIcon("trash-2")
                     .setCta()
                     .onClick(async () => {
                         const tabHeaderElement = document.querySelector(`.workspace-tab-header[data-icon-id="${icon.id}"]`);
@@ -303,7 +303,7 @@ export class CustomIconSettingTab extends PluginSettingTab {
         new Setting(containerEl)
             .addButton(button =>
                 button
-                    .setButtonText(t.AddIconButton)
+                    .setIcon("plus")
                     .onClick(async () => {
                         this.plugin.settings.SidebarIcons.push({
                             id: generateUniqueId(),
@@ -317,9 +317,60 @@ export class CustomIconSettingTab extends PluginSettingTab {
         );
     }
 
+
+    DefaultFolderIcon(containerEl: HTMLElement, t: LocalProperty): void {
+        let previewEl: HTMLDivElement;
+        let dropdownComponent: DropdownComponent;
+        let textAreaComponent: TextAreaComponent;
+        const icon = this.plugin.settings.DefaultFolderIcon[0];
+    
+        const iconSetting = new Setting(containerEl)
+            .setName(t.FolderIcons_Default);
+    
+        iconSetting.addDropdown(dropdown => {
+            dropdownComponent =  dropdown;
+            dropdown
+                .addOption('custom', t.Type_Custom)
+                .addOption('lucide', t.Type_Lucide)
+                .setValue(icon.type || 'custom')
+                .onChange(async (value) => {
+                    icon.type = value;
+                    let image = icon.image || DEFAULT_FOLDER_ICON;
+                    updatePreview(previewEl, this.plugin.getResourcePathwithType(image, icon.type));
+                    await this.plugin.saveSettings();
+                });
+        });
+        iconSetting.addTextArea(textArea => {
+            textAreaComponent = textArea;
+            previewEl = createDiv({ cls: 'icon-preview' });
+            textArea.inputEl.parentElement?.prepend(previewEl);
+            textArea
+                .setValue(icon.image)
+                .setPlaceholder(t.IconImg)
+                .onChange(async (value) => {
+                    icon.image = value;
+                    updatePreview(previewEl, this.plugin.getResourcePathwithType((icon.image.trim() || DEFAULT_FOLDER_ICON), icon.type));
+                    await this.plugin.saveSettings();
+                });
+            updatePreview(previewEl, this.plugin.getResourcePathwithType((icon.image.trim() || DEFAULT_FOLDER_ICON), icon.type));
+        });
+        iconSetting.addButton(button => {
+            button
+                .setIcon("rotate-cw")
+                .setCta()
+                .onClick(async () => {
+                    icon.type = DEFAULT_SETTINGS.DefaultFolderIcon[0].type;
+                    icon.image = DEFAULT_SETTINGS.DefaultFolderIcon[0].image;
+                    dropdownComponent.setValue(icon.type);
+                    textAreaComponent.setValue(icon.image);
+                    updatePreview(previewEl, this.plugin.getResourcePathwithType(icon.image, icon.type));
+                    await this.plugin.saveSettings();
+                });
+        });
+    }
+
     displayFolderIcons(containerEl: HTMLElement, t: LocalProperty): void {
-
-
+        this.DefaultFolderIcon(containerEl,t);
         this.plugin.settings.FolderIcons.forEach((icon, index) => {
             let previewEl: HTMLDivElement;
 
@@ -369,7 +420,7 @@ export class CustomIconSettingTab extends PluginSettingTab {
             });
             iconSetting.addButton(button => {
                 button
-                    .setButtonText(t.RemoveIconButton)
+                    .setIcon("trash-2")
                     .setCta()
                     .onClick(async () => {
                         const tabHeaderElement = document.querySelector(`.nav-folder-title[data-icon-id="${icon.id}"]`);
@@ -387,13 +438,13 @@ export class CustomIconSettingTab extends PluginSettingTab {
         new Setting(containerEl)
             .addButton(button =>
                 button
-                    .setButtonText(t.AddIconButton)
+                    .setIcon("plus")
                     .onClick(async () => {
                         this.plugin.settings.FolderIcons.push({
                             id: generateUniqueId(),
                             path: '',
-                            image: `${DEFAULT_FOLDER_ICON}`,
-                            type: "custom"
+                            image: this.plugin.settings.DefaultFolderIcon[0].image,
+                            type: this.plugin.settings.DefaultFolderIcon[0].type
                         });
                         await this.plugin.saveSettings();
                         this.display();

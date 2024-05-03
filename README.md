@@ -1,6 +1,6 @@
-# Custom Sidebar Icons
+# Custom Icons
 
-Customize icons for pinned files in the Obsidian sidebar.
+Customize sidebar workspace document and folder icons to personalize your Obsidian experience.
 
 <div align="center">
 

@@ -2,9 +2,8 @@
 
 ## Version 0.5.0 (2024-05-03)
 - [feature] 增加修改文件夹图标功能
-- [changed] 修改数据结构,自动迁移customIcons数据至SidebarIcons
+- [changed] 修改数据结构,数据自动从customIcons迁移至SidebarIcons
 - [changed] 修改插件设置界面
-- [changed] 修改插件名称为Custom Icons
 
 ## Version 0.4.0 (2024-04-20)
 - [feature] 支持lucide源图标 [#2](https://github.com/RavenHogWarts/obsidian-custom-sidebar-icons/issues/2)

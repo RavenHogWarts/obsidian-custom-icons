@@ -1,6 +1,6 @@
 # Custom Icons
 
-Customize sidebar workspace document and folder icons to personalize your Obsidian experience.
+Enhance your workspace with customizable icons for documents and folders.
 
 <div align="center">
 
@@ -54,20 +54,20 @@ If you find this plugin useful and would like to support its development, you ca
 [click to install](https://obsidian.md/plugins?id=custom-sidebar-icons), or:
 
 - Open Obsidian and go to Settings > Community Plugins
-- Search for `Custom Sidebar Icons`
+- Search for `Custom Icons`
 - Click `Install` 
 
 ### Install via [BRAT plugin](https://obsidian.md/plugins?id=obsidian42-brat)
 
 - First, install the [BRAT plugin](https://obsidian.md/plugins?id=obsidian42-brat):
 - In the BRAT plugin, click `Add Beta plugin`
-- Enter https://github.com/RavenHogWarts/obsidian-custom-sidebar-icons
+- Enter https://github.com/RavenHogWarts/obsidian-custom-icons
 - Enable `Custom Sidebar Icons` in `Third-party Plugins`
 
 ### Manual Installation
 
-- Download the latest release from the [releases page](https://github.com/RavenHogWarts/obsidian-custom-sidebar-icons/releases/latest)
-- Copy `main.js` and `manifest.json` to your vault folder `VaultFolder/.obsidian/plugins/custom-sidebar-icons/`
+- Download the latest release from the [releases page](https://github.com/RavenHogWarts/obsidian-custom-icons/releases/latest)
+- Copy `main.js` and `manifest.json` to your vault folder `VaultFolder/.obsidian/plugins/custom-icons/`
 - Reload plugins and enable `Custom Sidebar Icons` in `Third-party Plugins`
 
 ## How to Build

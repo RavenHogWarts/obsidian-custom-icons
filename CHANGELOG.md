@@ -2,7 +2,7 @@
 
 ## Version 0.6.0 (2024-05-04)
 - [changed] 正式修改插件名称为"Custom Icons"
-- [feature] 增加修改文件图标功能
+- [feature] 增加修改文件图标功能 [#7](https://github.com/RavenHogWarts/obsidian-custom-icons/issues/7)
 - [changed] 修改插件设置界面
 
 ## Version 0.5.0 (2024-05-03)
@@ -11,7 +11,7 @@
 - [changed] 修改插件设置界面
 
 ## Version 0.4.0 (2024-04-20)
-- [feature] 支持lucide源图标 [#2](https://github.com/RavenHogWarts/obsidian-custom-sidebar-icons/issues/2)
+- [feature] 支持lucide源图标 [#2](https://github.com/RavenHogWarts/obsidian-custom-icons/issues/2)
 
 ### 0.4.0.1 (2024-04-21)
 - [fix] 设置界面补丁

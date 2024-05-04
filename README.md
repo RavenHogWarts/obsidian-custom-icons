@@ -62,13 +62,13 @@ If you find this plugin useful and would like to support its development, you ca
 - First, install the [BRAT plugin](https://obsidian.md/plugins?id=obsidian42-brat):
 - In the BRAT plugin, click `Add Beta plugin`
 - Enter https://github.com/RavenHogWarts/obsidian-custom-icons
-- Enable `Custom Sidebar Icons` in `Third-party Plugins`
+- Enable `Custom Icons` in `Third-party Plugins`
 
 ### Manual Installation
 
 - Download the latest release from the [releases page](https://github.com/RavenHogWarts/obsidian-custom-icons/releases/latest)
-- Copy `main.js` and `manifest.json` to your vault folder `VaultFolder/.obsidian/plugins/custom-icons/`
-- Reload plugins and enable `Custom Sidebar Icons` in `Third-party Plugins`
+- Copy `main.js` and `manifest.json` to your vault folder `VaultFolder/.obsidian/plugins/custom-sidebar-icons/`
+- Reload plugins and enable `Custom Icons` in `Third-party Plugins`
 
 ## How to Build
 

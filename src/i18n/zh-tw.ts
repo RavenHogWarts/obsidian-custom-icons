@@ -2,16 +2,20 @@ import { LocalProperty } from "./types";
 
 export const ZHtw: LocalProperty = {
   Tab_Title: "自定義圖標",
-  Tab_SidebarIcons: "側邊工作區圖標",
+  Tab_SidebarIcons: "側邊工作區",
   SidebarIcons_FileName: "輸入檔案名稱",
-  Tab_FolderIcons: "資料夾圖標",
+  Tab_FolderIcons: "資料夾",
+  FolderIcons_Title: "設定資料夾圖標",
   FolderIcons_Default: "設定新建檔案夾圖標預設值",
   FolderIcons_FileName: "輸入資料夾路徑",
+  FileIcons_Title: "設定檔案圖標",
+  FileIcons_Default: "設定新建檔案圖標預設值",
+  FileIcons_FileExt: "輸入文件後綴名",
   Tab_About: "關於",
   IconID: "{num}",
   IconImg: "輸入圖標路徑",
   Type_Custom: "自定義",
-  Type_Lucide: "lucide",
+  Type_Lucide: "Lucide",
   About: 
   `
   <h5>簡要說明</h5>

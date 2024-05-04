@@ -45,12 +45,11 @@
     margin-right: 2px;
     border-radius: 50%;
     border: 1px solid var(--background-modifier-border);
-    background-size: contain;
+    background-size: 24px 24px;
     background-repeat: no-repeat;
     background-position: center;
 }
 
 .custom-icon.workspace-tab-header[data-icon-id] .workspace-tab-header-inner-icon > svg {
     display: none;
-    visibility: hidden;
 }

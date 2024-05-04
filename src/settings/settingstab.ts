@@ -152,10 +152,10 @@ export class CustomIconSettingTab extends PluginSettingTab {
   }
 
   displayFolderIcons(containerEl: HTMLElement, t: LocalProperty): void {
-      this.DefaultFolderIcon(containerEl,t);
-      this.FolderIconsSetting(containerEl,t);
       this.DefaultFileIcon(containerEl,t);
       this.FileIconsSetting(containerEl,t);
+      this.DefaultFolderIcon(containerEl,t);
+      this.FolderIconsSetting(containerEl,t);
   }
 
   DefaultFolderIcon(containerEl: HTMLElement, t: LocalProperty): void {

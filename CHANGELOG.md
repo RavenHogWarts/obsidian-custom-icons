@@ -1,5 +1,10 @@
 # Changelog
 
+## Version 0.6.0 (2024-05-04)
+- [changed] 正式修改插件名称为"Custom Icons"
+- [feature] 增加修改文件图标功能
+- [changed] 修改插件设置界面
+
 ## Version 0.5.0 (2024-05-03)
 - [feature] 增加修改文件夹图标功能
 - [changed] 修改数据结构,数据自动从customIcons迁移至SidebarIcons

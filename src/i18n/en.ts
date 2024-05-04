@@ -2,16 +2,20 @@ import { LocalProperty } from './types';
 
 export const EN: LocalProperty = {
   Tab_Title: "Custom Icons",
-  Tab_SidebarIcons: "Sidebar Workspace Icons",
+  Tab_SidebarIcons: "Sidebar Workspace",
   SidebarIcons_FileName: "Enter File Name",
-  Tab_FolderIcons: "Folder Icons",
+  Tab_FolderIcons: "Folder",
+  FolderIcons_Title: "Set Folder Icon",
   FolderIcons_Default: "Set Default Icon for New Folders",
   FolderIcons_FileName: "Enter Folder Path",
+  FileIcons_Title: "Set File Icon",
+  FileIcons_Default: "Set Default Icon for New Files",
+  FileIcons_FileExt: "Enter file extension",
   Tab_About: "About",
   IconID: "{num}",
   IconImg: "Enter Icon Path",
   Type_Custom: "Custom",
-  Type_Lucide: "lucide",
+  Type_Lucide: "Lucide",
   About: 
   `
   <h5>Brief Introduction</h5>

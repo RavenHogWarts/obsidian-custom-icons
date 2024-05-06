@@ -4,79 +4,79 @@ Enhance your workspace with customizable icons for documents and folders.
 
 <div align="center">
 
-![Obsidian Downloads](https://img.shields.io/badge/dynamic/json?logo=obsidian&color=%23483699&label=downloads&query=%24%5B%22custom-sidebar-icons%22%5D.downloads&url=https%3A%2F%2Fraw.githubusercontent.com%2Fobsidianmd%2Fobsidian-releases%2Fmaster%2Fcommunity-plugin-stats.json) ![GitHub stars](https://img.shields.io/github/stars/RavenHogWarts/obsidian-custom-icons?style=flat) ![latest download](https://img.shields.io/github/downloads/RavenHogWarts/obsidian-custom-icons/latest/total?style=plastic) 
-[![Github release](https://img.shields.io/github/manifest-json/v/RavenHogWarts/obsidian-custom-icons?color=blue)](https://github.com/RavenHogWarts/obsidian-custom-icons/releases/latest) ![GitHub release (latest by date including pre-releases)](https://img.shields.io/github/v/release/RavenHogWarts/obsidian-custom-icons?include_prereleases&label=BRAT%20beta)
+![Obsidian Downloads](https://img.shields.io/badge/dynamic/json?logo=obsidian&color=%23483699&label=downloads&query=%24%5B%22custom-sidebar-icons%22%5D.downloads&url=https%3A%2F%2Fraw.githubusercontent.com%2Fobsidianmd%2Fobsidian-releases%2Fmaster%2Fcommunity-plugin-stats.json)
+![GitHub stars](https://img.shields.io/github/stars/RavenHogWarts/obsidian-custom-icons?style=flat)
+![latest download](https://img.shields.io/github/downloads/RavenHogWarts/obsidian-custom-icons/latest/total?style=plastic)
+[![Github release](https://img.shields.io/github/manifest-json/v/RavenHogWarts/obsidian-custom-icons?color=blue)](https://github.com/RavenHogWarts/obsidian-custom-icons/releases/latest)
+![GitHub release (latest by date including pre-releases)](https://img.shields.io/github/v/release/RavenHogWarts/obsidian-custom-icons?include_prereleases&label=BRAT%20beta)
 
-[ [中文](https://github.com/RavenHogWarts/obsidian-custom-icons/blob/master/README_ZH.md) | English ]
+[中文](https://github.com/RavenHogWarts/obsidian-custom-icons/blob/master/README_ZH.md) | [English](README.md)
 
 </div>
 
-This plugin allows you to customize the icons for pinned files in your Obsidian sidebar, making your workspace more personalized and easier to navigate.
-
 ## Usage
 
-Currently, there are two ways to set the icons, one is custom, and the other is using lucide source icons
-- Custom
-  - Custom includes using online URL, local relative (absolute) file path, base64 encoding, svg tags
-- Lucide icons
-  - This method only requires the icon name obtained from [lucide](https://lucide.dev/icons/)
-  - Importantly, the official icons also use lucide icons
+Currently, there are two ways to set the icons:
+
+- Custom: This includes using online URLs, local relative or absolute file paths, Base64 encodings, or SVG tags.
+- Lucide icons: This method requires only the name of the icon from [Lucide](https://lucide.dev/icons/). Note that the official Obsidian icons also use Lucide icons.
 
 ### Examples
 
-- Online URL
-  - Example: `https://www.baidu.com/favicon.ico`
-- Local images
-  - Relative path: `.obsidian/svg/RavenHogwarts.svg`
-  - Absolute path (Unix-style): `/Users/RavenHogwarts/Pictures/RavenHogwarts.jpg`
-  - Absolute path (Windows-style): `D:\RavenHogwarts.png`, `D:/RavenHogwarts.png`
-- Base64 encoding
-  - Starting with `data:`
-- SVG tags
-  - Enclosed within `<svg></svg>` tags
-- Lucide source icons
-  - Icon name from [lucide](https://lucide.dev/icons/)
+- Online URL: `https://www.example.com/favicon.ico`
+- Local images:
+  - Relative path: `.obsidian/svg/example.svg`
+  - Absolute path (Unix-style): `/Users/YourUsername/Pictures/example.jpg`
+  - Absolute path (Windows-style): `D:\Pictures\example.png`
+- Base64 encoding: Starting with `data:`
+- SVG tags: Enclosed within `<svg></svg>` tags
+- Lucide source icons: Directly use the icon name from Lucide.
 
 ![Usage](attachment/Usage_EN.png)
 
-## Support
-
-If you find this plugin useful and would like to support its development, you can sponsor me through the following methods: WeChat, Alipay, or [Love Power Donation](https://afdian.net/a/ravenhogwarts). Any amount is welcome, thank you!
-
-<p align="center">
-<img src="https://s2.loli.net/2024/04/02/4lCUdaSf5bOXEPM.png" width="500px">
-</p>
-
 ## Installation
 
-### Install from plugin community
+### Install from Community Plugins
 
-[click to install](https://obsidian.md/plugins?id=custom-sidebar-icons), or:
+[Click to install](obsidian://show-plugin?id=custom-sidebar-icons), or:
 
-- Open Obsidian and go to Settings > Community Plugins
-- Search for `Custom Icons`
-- Click `Install` 
+1. Open Obsidian and go to `Settings > Community Plugins`.
+2. Search for "Custom Icons".
+3. Click "Install".
 
-### Install via [BRAT plugin](https://obsidian.md/plugins?id=obsidian42-brat)
+### Install via BRAT Plugin
 
-- First, install the [BRAT plugin](https://obsidian.md/plugins?id=obsidian42-brat):
-- In the BRAT plugin, click `Add Beta plugin`
-- Enter https://github.com/RavenHogWarts/obsidian-custom-icons
-- Enable `Custom Icons` in `Third-party Plugins`
+1. Install the [BRAT plugin](obsidian://show-plugin?id=obsidian42-brat) from Community Plugins.
+2. In the BRAT plugin settings, click "Add Beta Plugin".
+3. Enter the URL `https://github.com/RavenHogWarts/obsidian-custom-icons`.
+4. Enable "Custom Icons" in "Third-party Plugins".
 
 ### Manual Installation
 
-- Download the latest release from the [releases page](https://github.com/RavenHogWarts/obsidian-custom-icons/releases/latest)
-- Copy `main.js` and `manifest.json` to your vault folder `VaultFolder/.obsidian/plugins/custom-sidebar-icons/`
-- Reload plugins and enable `Custom Icons` in `Third-party Plugins`
+1. Download the latest release from [Releases](https://github.com/RavenHogWarts/obsidian-custom-icons/releases/latest).
+2. Copy `main.js`, `styles.css` and `manifest.json` to `VaultFolder/.obsidian/plugins/custom-sidebar-icons/`.
+3. Reload plugins and enable "Custom Icons" in "Third-party Plugins".
 
 ## How to Build
 
-- `git clone https://github.com/RavenHogWarts/obsidian-custom-sidebar-icons` to clone the repository.
-- `npm i` to install dependencies.
-- `npm run dev` to start real-time compilation.
-- `npm run build` to build for production.
+1. Clone the repository: `git clone https://github.com/RavenHogWarts/obsidian-custom-icons`.
+2. Install dependencies: `npm install`.
+3. Start development: `npm run dev`.
+4. Build for production: `npm run build`.
+
+## License
+
+[Custom Icons](https://github.com/RavenHogWarts/obsidian-custom-icons) is licensed under the MIT License. See [LICENSE](https://github.com/RavenHogWarts/obsidian-custom-icons/blob/master/LICENSE) for more information.
 
 ## Acknowledgements
 
-During the development of the `Custom Sidebar Icons` plugin, I drew inspiration and incorporated some code constructs from [Benature](https://github.com/Benature)'s project [obsidian-metadata-icon](https://github.com/Benature/obsidian-metadata-icon). I would like to especially thank this project and its contributors for their contributions to the open-source community, which have greatly facilitated the development of the Obsidian plugin ecosystem. If you are also interested in their project, please support and follow [obsidian-metadata-icon](https://github.com/Benature/obsidian-metadata-icon).
+- [obsidian-metadata-icon](https://github.com/Benature/obsidian-metadata-icon)
+- [Templater](https://github.com/SilentVoid13/Templater)
+
+## Support
+
+If you find this plugin useful and wish to support its development, you can do so through the following methods: [Buy Me a Coffee](https://buymeacoffee.com/ravenhogwart), WeChat, Alipay, or [Love Power Donation](https://afdian.net/a/ravenhogwarts). Any amount of support is appreciated. Thank you!
+
+<p align="center">
+<img src="https://s2.loli.net/2024/05/06/eoYO8vg9Ktbw21J.png" width="500px">
+</p>

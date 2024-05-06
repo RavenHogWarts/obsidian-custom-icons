@@ -6,7 +6,7 @@ export interface CustomIconSettings {
     customIcons: Array<SidebarIcons>;
     SidebarIcons: Array<SidebarIcons>;
     FolderIcons: Array<FolderIcons>;
-    FileIcons: Array<FolderIcons>;
+    FileIcons: Array<FileIcons>;
     DefaultFolderIcon: Array<DefaultIcon>;
     DefaultFileIcon: Array<DefaultIcon>;
 }
@@ -26,6 +26,13 @@ export interface SidebarIcons {
 export interface FolderIcons {
     id: string;
     path: string;
+    image: string;
+    type: string;
+}
+
+export interface FileIcons {
+    id: string;
+    path: string[];
     image: string;
     type: string;
 }

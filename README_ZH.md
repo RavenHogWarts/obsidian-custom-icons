@@ -74,8 +74,8 @@
 
 ## 支持
 
-如果您觉得这个插件有用，并希望支持其开发，您可以通过以下方式赞助我：[Buy Me a Coffee](https://buymeacoffee.com/ravenhogwart)，微信，支付宝，或 [爱发电](https://afdian.net/a/ravenhogwarts)。感谢您的任何支持！
+如果您觉得这个插件有用，并希望支持其开发，您可以通过以下方式赞助我：微信，支付宝，[爱发电](https://afdian.net/a/ravenhogwarts) 或 [Paypal](https://www.paypal.com/paypalme/RavenHogwarts)。感谢您的任何支持！
 
 <p align="center">
-<img src="https://s2.loli.net/2024/05/06/eoYO8vg9Ktbw21J.png" width="500px">
+<img src="https://s2.loli.net/2024/05/06/lWBj3ObszUXSV2f.png" width="500px">
 </p>

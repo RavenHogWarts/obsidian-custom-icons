@@ -355,9 +355,9 @@ export class CustomIconSettingTab extends PluginSettingTab {
           iconSetting.addText(text => {
               text
                   .setPlaceholder(t.FileIcons_FileExt)
-                  .setValue(icon.path)
+                  .setValue(icon.path.join(','))
                   .onChange(async (value) => {
-                      icon.path = value;
+                      icon.path = value.split(',').map(ext => ext.trim());;
                       await this.plugin.saveSettings();
                       this.plugin.refreshSidebarIcons();
                       this.debouncedGenerate();    
@@ -416,7 +416,7 @@ export class CustomIconSettingTab extends PluginSettingTab {
                   .onClick(async () => {
                       this.plugin.settings.FileIcons.push({
                           id: generateUniqueId("file-icon"),
-                          path: '',
+                          path: [''],
                           image: this.plugin.settings.DefaultFileIcon[0].image,
                           type: this.plugin.settings.DefaultFileIcon[0].type
                       });
@@ -428,7 +428,7 @@ export class CustomIconSettingTab extends PluginSettingTab {
 
   displayAbout(containerEl: HTMLElement, t: LocalProperty): void {
       const pEl = containerEl.createEl('div');
-      pEl.setAttribute("style", "color: gray; font-size: 12px;");
+      pEl.addClass("csbi-setting-about");
       pEl.innerHTML = t.About;
   }
 }

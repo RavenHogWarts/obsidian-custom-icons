@@ -35,6 +35,9 @@
     border: 2px solid #0000;
     width: 100%;
 }
+.csbi-setting-about {
+    font-size: 12px;
+}
 
 .icon-preview {
     display: inline-flex;

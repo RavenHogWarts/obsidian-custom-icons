@@ -1,5 +1,9 @@
 # Changelog
 
+## Version 0.6.1 (2024-05-06)
+- [updated] 文件图标修改功能可同时为多个后缀设置相同图标 [#9](https://github.com/RavenHogWarts/obsidian-custom-icons/issues/9)
+- [changed] 修改插件设置about页面
+
 ## Version 0.6.0 (2024-05-04)
 - [changed] 正式修改插件名称为"Custom Icons"
 - [feature] 增加修改文件图标功能 [#7](https://github.com/RavenHogWarts/obsidian-custom-icons/issues/7)

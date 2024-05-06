@@ -18,13 +18,31 @@ export const ZHtw: LocalProperty = {
   Type_Lucide: "Lucide",
   About: 
   `
-  <h5>簡要說明</h5>
+  <h3>簡要說明</h3>
   <ul>
     <li>插件會自動在snippets文件夾中生成CustomIcon-AutoGen.css文件。請勿對此文件進行修改，因為修改了也沒用（doge）</li>
   </ul>
   <ul>
-    <li>支持自定義圖標：在線URL 或 本地相對（絕對）文件路徑 或 base64編碼 或 svg標籤。詳情查看<a href="https://github.com/RavenHogWarts/obsidian-custom-sidebar-icons/blob/master/README_ZH.md" target="_blank">README</a>。</li>
-    <li>支持直接使用lucide源圖標名稱。詳情查看<a href="https://lucide.dev/icons/" target="_blank">lucide</a>。</li>
+    <li>自定義圖標支持：在線URL 或 本地相對(絕對)文件路徑 或 base64編碼 或 svg標籤。 詳情查看<a href="https://github.com/RavenHogWarts/obsidian-custom-sidebar-icons/blob/master/README_ZH.md" target="_blank">README</a>。</li>
+    <li>lucide源圖標支持直接使用lucide圖標名稱。 詳情查看<a href="https://lucide.dev/icons/" target="_blank">lucide</a>。</li>
   </ul>
+  <h3>Tips</h3>
+  <h4>側邊工作區</h4>
+  <h5>文件圖標</h5>
+  <h4>文件夾區</h4>
+  <h5>文件圖標</h5>
+  <ul>
+    <li>多個後綴名使用英文逗號隔開，可以為多個後綴名文件設置相同圖標</li>
+  </ul>
+  <h5>文件夾圖標</h5>
+  <h3>支持</h3>
+  <p>
+  如果您覺得這個插件有用，並希望支持其開發，您可以通過以下方式贊助我：</br>
+  微信，支付寶，
+  <a href="https://afdian.net/a/ravenhogwarts">愛發電</a>
+  <a href="https://www.paypal.com/paypalme/RavenHogwarts">Paypal</a>。</br>
+  感謝您的任何支持！
+  </p>
+  <p align="center"><img src="https://s2.loli.net/2024/05/06/lWBj3ObszUXSV2f.png" width="500px"></p>
   `
 };

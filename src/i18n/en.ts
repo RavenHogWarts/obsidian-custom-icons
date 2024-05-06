@@ -18,13 +18,31 @@ export const EN: LocalProperty = {
   Type_Lucide: "Lucide",
   About: 
   `
-  <h5>Brief Introduction</h5>
+  <h3>Brief Description</h3>
   <ul>
-    <li>The plugin will automatically generate the CustomIcon-AutoGen.css file in the snippets folder. Please do not modify this file as any changes will be futile (doge).</li>
+    <li>The plugin will automatically generate a CustomIcon-AutoGen.css file in the snippets folder. Please do not modify this file as modifications will have no effect (doge).</li>
   </ul>
   <ul>
-    <li>Support for custom icons: Online URLs or local relative (absolute) file paths or base64 encoding or SVG tags. For more details, see <a href="https://github.com/RavenHogWarts/obsidian-custom-sidebar-icons/blob/master/README_ZH.md" target="_blank">README</a>.</li>
-    <li>Direct use of lucide source icon names is supported. For more details, see <a href="https://lucide.dev/icons/" target="_blank">lucide</a>.</li>
+    <li>Custom icon support: Online URL or local relative (absolute) file path or base64 encoding or svg tags. For details, see<a href="https://github.com/RavenHogWarts/obsidian-custom-sidebar-icons/blob/master/README_ZH.md" target="_blank">README</a>.</li>
+    <li>Direct use of lucide source icons by name is supported. For details, see<a href="https://lucide.dev/icons/" target="_blank">lucide</a>.</li>
   </ul>
+  <h3>Tips</h3>
+  <h4>Sidebar Workspace</h4>
+  <h5>File Icons</h5>
+  <h4>Folder Area</h4>
+  <h5>File Icons</h5>
+  <ul>
+    <li>Use commas to separate multiple file extensions, allowing the same icon to be set for multiple file extensions</li>
+  </ul>
+  <h5>Folder Icons</h5>
+  <h3>Support</h3>
+  <p>
+  If you find this plugin useful and wish to support its development, you can sponsor me through the following methods:</br>
+  WeChat, Alipay,
+  <a href="https://afdian.net/a/ravenhogwarts">Afdian</a>,
+  <a href="https://www.paypal.com/paypalme/RavenHogwarts">Paypal</a>.</br>
+  Thank you for any support!
+  </p>
+  <p align="center"><img src="https://s2.loli.net/2024/05/06/lWBj3ObszUXSV2f.png" width="500px"></p>
   `
 };

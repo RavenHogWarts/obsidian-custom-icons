@@ -1,5 +1,5 @@
 import { Plugin } from 'obsidian';
-import { CustomIconSettings, SidebarIcons, FolderIcons, DEFAULT_SETTINGS} from './types';
+import { CustomIconSettings, SidebarIcons, FolderIcons, FileIcons, DEFAULT_SETTINGS} from './types';
 import { EMPTY_PNG_DATA_URL } from './types';
 import { generateUniqueId, updatePreview, convertToCamelCase } from './utils/utils';
 import * as lucideIcons from 'lucide-static';
@@ -45,18 +45,29 @@ export default class CustomIconPlugin extends Plugin {
             delete (this.settings as { customIcons?: unknown }).customIcons;
             this.saveSettings();
         }
+    
         this.settings.SidebarIcons.forEach(icon => {
             if (icon.id.startsWith('icon')) {
                 icon.id = generateUniqueId("sidebar-icon");
                 this.saveSettings();
             }
         });
+    
         this.settings.FolderIcons.forEach(icon => {
             if (icon.id.startsWith('icon')) {
                 icon.id = generateUniqueId("folder-icon");
                 this.saveSettings();
             }
         });
+    
+        if (this.settings.FileIcons && this.settings.FileIcons.length > 0) {
+            this.settings.FileIcons.forEach(icon => {
+                if (typeof icon.path === 'string') {
+                    icon.path = [icon.path]; 
+                }
+            });
+            this.saveSettings();
+        }
     }
 
     async genSnippetCSS(plugin: CustomIconPlugin) {
@@ -130,24 +141,26 @@ export default class CustomIconPlugin extends Plugin {
         ];
         return body.join('\n');
     }
-    genFileIconsEntryCSS(settings: FolderIcons): string {
-        const selector = `data-path$="${settings.path}"`;
+    genFileIconsEntryCSS(settings: FileIcons): string {
         const iconUrl = this.getResourcePathwithType(settings.image, settings.type);
-        let body: string[] = [
-            `.nav-file-title[${selector}] .nav-file-title-content::before {`,
-            `content: '';`,
-            `display: inline-block;`,
-            `width: 16px;`,
-            `height: 16px;`,
-            `margin: 0px 2px -4px 0px;`,
-            `background-color: transparent;`,
-            `background-blend-mode: normal;`,
-            `background-image: url("${iconUrl}");`,
-            `background-size: contain;`,
-            `background-repeat: no-repeat;`,
-            `}`,
-        ];
-        return body.join('\n');
+        let body: string[] = settings.path.map((path) => {
+            const selector = `data-path$="${path}"`;
+            return [
+                `.nav-file-title[${selector}] .nav-file-title-content::before {`,
+                `content: '';`,
+                `display: inline-block;`,
+                `width: 16px;`,
+                `height: 16px;`,
+                `margin: 0px 2px -4px 0px;`,
+                `background-color: transparent;`,
+                `background-blend-mode: normal;`,
+                `background-image: url("${iconUrl}");`,
+                `background-size: contain;`,
+                `background-repeat: no-repeat;`,
+                `}`
+            ].join('\n');
+        });
+        return body.join('\n\n');
     }
 
     svgToDataURI(svgContent: string): string {

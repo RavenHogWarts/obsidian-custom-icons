@@ -18,7 +18,7 @@ export const ZH: LocalProperty = {
   Type_Lucide: "Lucide",
   About: 
   `
-  <h5>简要说明</h5>
+  <h3>简要说明</h3>
   <ul>
     <li>插件会自动在snippets文件夹中生成CustomIcon-AutoGen.css文件。请勿对此文件进行修改，因为修改了也没用（doge）</li>
   </ul>
@@ -26,5 +26,23 @@ export const ZH: LocalProperty = {
     <li>自定义图标支持: 在线URL 或 本地相对(绝对)文件路径 或 base64编码 或 svg标签。 详情查看<a href="https://github.com/RavenHogWarts/obsidian-custom-sidebar-icons/blob/master/README_ZH.md" target="_blank">README</a>。</li>
     <li>lucide源图标支持直接使用lucide图标名称。 详情查看<a href="https://lucide.dev/icons/" target="_blank">lucide</a>。</li>
   </ul>
+  <h3>Tips</h3>
+  <h4>侧边工作区</h4>
+  <h5>文件图标</h5>
+  <h4>文件夹区</h4>
+  <h5>文件图标</h5>
+  <ul>
+    <li>多个后缀名使用英文逗号隔开，可以为多个后缀名文件设置相同图标</li>
+  </ul>
+  <h5>文件夹图标</h5>
+  <h3>支持</h3>
+  <p>
+  如果您觉得这个插件有用，并希望支持其开发，您可以通过以下方式赞助我：</br>
+  微信，支付宝，
+  <a href="https://afdian.net/a/ravenhogwarts">爱发电</a>，
+  <a href="https://www.paypal.com/paypalme/RavenHogwarts">Paypal</a>。</br>
+  感谢您的任何支持！
+  </p>
+  <p align="center"><img src="https://s2.loli.net/2024/05/06/lWBj3ObszUXSV2f.png" width="500px"></p>
   `
 };

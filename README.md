@@ -75,8 +75,8 @@ Currently, there are two ways to set the icons:
 
 ## Support
 
-If you find this plugin useful and wish to support its development, you can do so through the following methods: [Buy Me a Coffee](https://buymeacoffee.com/ravenhogwart), WeChat, Alipay, or [Love Power Donation](https://afdian.net/a/ravenhogwarts). Any amount of support is appreciated. Thank you!
+If you find this plugin useful and wish to support its development, you can do so through the following methods: WeChat, Alipay, [Love Power Donation](https://afdian.net/a/ravenhogwarts) or [Paypal](https://www.paypal.com/paypalme/RavenHogwarts). Any amount of support is appreciated. Thank you!
 
 <p align="center">
-<img src="https://s2.loli.net/2024/05/06/eoYO8vg9Ktbw21J.png" width="500px">
+<img src="https://s2.loli.net/2024/05/06/lWBj3ObszUXSV2f.png" width="500px">
 </p>

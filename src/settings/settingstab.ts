@@ -272,7 +272,7 @@ export class CustomIconSettingTab extends PluginSettingTab {
               .setName(t.IconID.replace('{num}', `${icon.id}`))
           
           iconSetting.addSearch(search => {
-              new FolderSuggest(search.inputEl);
+              new FolderSuggest(this.app, search.inputEl);
               search
                   .setPlaceholder(t.FolderIcons_FileName)
                   .setValue(icon.path)

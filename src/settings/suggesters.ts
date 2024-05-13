@@ -1,4 +1,4 @@
-import { ISuggestOwner, Scope } from "obsidian";
+import { ISuggestOwner, Scope, App } from "obsidian";
 import { createPopper, Instance as PopperInstance } from "@popperjs/core";
 
 const wrapAround = (value: number, size: number): number => {
@@ -11,14 +11,17 @@ class Suggest<T> {
   private suggestions: HTMLDivElement[];
   private selectedItem: number;
   private containerEl: HTMLElement;
+  private app: App;
 
   constructor(
     owner: ISuggestOwner<T>,
     containerEl: HTMLElement,
-    scope: Scope
+    scope: Scope,
+    app: App
   ){
     this.owner = owner;
     this.containerEl = containerEl;
+    this.app = app;
 
     containerEl.on(
       "click",
@@ -109,19 +112,21 @@ class Suggest<T> {
 
 export abstract class TextInputSuggest<T> implements ISuggestOwner<T> {
   protected inputEl: HTMLInputElement | HTMLTextAreaElement;
+  protected app: App;
 
   private popper: PopperInstance;
   private scope: Scope;
   private suggestEl: HTMLElement;
   private suggest: Suggest<T>;
 
-  constructor(inputEl: HTMLInputElement | HTMLTextAreaElement) {
+  constructor(app: App, inputEl: HTMLInputElement | HTMLTextAreaElement) {
+    this.app = app;
     this.inputEl = inputEl;
     this.scope = new Scope();
 
     this.suggestEl = createDiv("suggestion-container");
     const suggestion = this.suggestEl.createDiv("suggestion");
-    this.suggest = new Suggest(this, suggestion, this.scope);
+    this.suggest = new Suggest(this, suggestion, this.scope, app);
 
     this.scope.register([], "Escape", this.close.bind(this));
 
@@ -149,14 +154,14 @@ export abstract class TextInputSuggest<T> implements ISuggestOwner<T> {
     if (suggestions.length > 0) {
       this.suggest.setSuggestions(suggestions);
       // @ts-ignore
-      this.open(app.dom.appContainerEl, this.inputEl);
+      this.open(this.app.dom.appContainerEl, this.inputEl);
     } else {
       this.close();
     }
   }
 
   open(container: HTMLElement, inputEl: HTMLElement): void {
-    app.keymap.pushScope(this.scope);
+    this.app.keymap.pushScope(this.scope);
 
     container.appendChild(this.suggestEl);
     this.popper = createPopper(inputEl, this.suggestEl, {
@@ -181,7 +186,7 @@ export abstract class TextInputSuggest<T> implements ISuggestOwner<T> {
   }
 
   close(): void {
-      app.keymap.popScope(this.scope);
+      this.app.keymap.popScope(this.scope);
 
       this.suggest.setSuggestions([]);
       if (this.popper) this.popper.destroy();

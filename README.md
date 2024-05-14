@@ -3,6 +3,7 @@
 Enhance your workspace with customizable icons for documents and folders.
 
 Tips: 插件安装后需要重新启动当前Obsidian库才能加载到设置数据。
+
 Tips: After installing the plugin, you need to restart the current Obsidian vault to load the setting data.
 
 <div align="center">

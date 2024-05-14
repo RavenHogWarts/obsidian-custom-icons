@@ -1,5 +1,5 @@
-import { Plugin } from 'obsidian';
-import { CustomIconSettings, SidebarIcons, FolderIcons, FileIcons, DEFAULT_SETTINGS} from './types';
+import { App, Plugin } from 'obsidian';
+import { CustomIconSettings, SidebarIcons, FolderIcons, FileIcons, InternalLinkIcons, DEFAULT_SETTINGS} from './types';
 import { EMPTY_PNG_DATA_URL } from './types';
 import { generateUniqueId, updatePreview, convertToCamelCase } from './utils/utils';
 import * as lucideIcons from 'lucide-static';
@@ -87,6 +87,9 @@ export default class CustomIconPlugin extends Plugin {
         plugin.settings.FileIcons.forEach(iconSetting => {
             content.push(this.genFileIconsEntryCSS(iconSetting));
         });
+        plugin.settings.InternalLinkIcons.forEach(iconSetting => {
+            content.push(this.genInternalLinkIconsEntryCSS(iconSetting));
+        });
 
         const vault = plugin.app.vault;
 		const ob_config_path = vault.configDir;
@@ -162,6 +165,27 @@ export default class CustomIconPlugin extends Plugin {
         });
         return body.join('\n\n');
     }
+    genInternalLinkIconsEntryCSS(settings: InternalLinkIcons): string {
+        const iconUrl = this.getResourcePathwithType(settings.image, settings.type);
+        let body: string[] = settings.path.map((path) => {
+            const selector = `data-href$="${path}"`;
+            return [
+                `.custom-icon .internal-link[${selector}]::before {`,
+                `content: '';`,
+                `display: inline-block;`,
+                `width: 16px;`,
+                `height: 16px;`,
+                `margin: 0px 2px -2px 0px;`,
+                `background-color: transparent;`,
+                `background-blend-mode: normal;`,
+                `background-image: url("${iconUrl}");`,
+                `background-size: contain;`,
+                `background-repeat: no-repeat;`,
+                `}`
+            ].join('\n');
+        });
+        return body.join('\n\n');
+    }
 
     svgToDataURI(svgContent: string): string {
         const encodedSVG = encodeURIComponent(svgContent);
@@ -195,6 +219,7 @@ export default class CustomIconPlugin extends Plugin {
     getLucidePath(iconName: string): string {
         const camelCaseIconName = convertToCamelCase(iconName);
         const iconSvg = lucideIcons[camelCaseIconName as keyof typeof lucideIcons];
+        // TODO: custom color support
         return this.svgToDataURI(iconSvg);
     }
 

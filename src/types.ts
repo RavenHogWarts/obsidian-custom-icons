@@ -7,6 +7,7 @@ export interface CustomIconSettings {
     SidebarIcons: Array<SidebarIcons>;
     FolderIcons: Array<FolderIcons>;
     FileIcons: Array<FileIcons>;
+    InternalLinkIcons: Array<InternalLinkIcons>;
     DefaultFolderIcon: Array<DefaultIcon>;
     DefaultFileIcon: Array<DefaultIcon>;
 }
@@ -36,6 +37,13 @@ export interface FileIcons {
     image: string;
     type: string;
 }
+
+export interface InternalLinkIcons {
+    id: string;
+    path: string[];
+    image: string;
+    type: string;
+}
   
 export const DEFAULT_SETTINGS: CustomIconSettings = {
     DefaultFolderIcon: [{ image: "crown", type: "lucide" }],
@@ -43,5 +51,6 @@ export const DEFAULT_SETTINGS: CustomIconSettings = {
     SidebarIcons: [],
     FolderIcons: [],
     FileIcons: [],
+    InternalLinkIcons: [{id: "internalLink-icon-123456789", path: ["md"], image: "file-text", type: "lucide"}],
     customIcons: []
 }

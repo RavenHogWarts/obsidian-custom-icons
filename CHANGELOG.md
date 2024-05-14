@@ -1,5 +1,10 @@
 # Changelog
 
+## Version 0.6.2 (2024-05-14)
+- [feature] 支持显示内部链接的文件图标 [#12](https://github.com/RavenHogWarts/obsidian-custom-icons/issues/12)
+- [changed] 插件设置界面UI修改
+- [updated] pin在侧边的文件如果锁定,锁定的图标会被隐藏
+
 ## Version 0.6.1 (2024-05-06)
 - [updated] 文件图标修改功能可同时为多个后缀设置相同图标 [#9](https://github.com/RavenHogWarts/obsidian-custom-icons/issues/9)
 - [changed] 修改插件设置about页面

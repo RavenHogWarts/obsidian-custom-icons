@@ -8,7 +8,7 @@ export interface LocalProperty {
     FolderIcons_Title: string;
     FolderIcons_Default: string;
     FolderIcons_FileName: string
-    Tab_FileIcons: string;;
+    Tab_FileIcons: string;
     FileIcons_Title: string;
     FileIcons_Default: string;
     FileIcons_FileExt: string;

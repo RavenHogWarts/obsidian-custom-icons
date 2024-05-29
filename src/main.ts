@@ -126,9 +126,11 @@ export default class CustomIconPlugin extends Plugin {
 		if (await vault.adapter.exists(path)) { await vault.adapter.remove(path) }
 		await plugin.app.vault.create(path, content.join('\n'));
 		// @ts-ignore
-		const customCss = this.app.customCss;
-		customCss.enabledSnippets.add(css_filename);
-		customCss.requestLoadSnippets();
+		const customCss = plugin.app.customCss;
+		if (customCss.enabledSnippets instanceof Set) {
+            customCss.enabledSnippets.add(css_filename);
+        }
+        customCss.requestLoadSnippets();
     }
 
     genSidebarIconsEntryCSS(settings: SidebarIcons): string {

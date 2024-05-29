@@ -1,6 +1,6 @@
 # Changelog
 ## Version 0.6.3 (2024-05-29)
-- [feature] 设置的lucide图标可以自适应当前基础颜色 [#5](https://github.com/RavenHogWarts/obsidian-custom-icons/issues/5)[#13](https://github.com/RavenHogWarts/obsidian-custom-icons/issues/13)
+- [feature] 设置的lucide图标可以自适应当前基础颜色 [#5](https://github.com/RavenHogWarts/obsidian-custom-icons/issues/5) [#13](https://github.com/RavenHogWarts/obsidian-custom-icons/issues/13)
 - [fix] bug: "Faild to unload plugin custom-sidebar-icons"
 
 ## Version 0.6.2 (2024-05-14)

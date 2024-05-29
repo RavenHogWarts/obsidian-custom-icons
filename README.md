@@ -2,10 +2,6 @@
 
 Enhance your workspace with customizable icons for documents and folders.
 
-Tips: 插件安装后需要重新启动当前Obsidian库才能加载到设置数据。
-
-Tips: After installing the plugin, you need to restart the current Obsidian vault to load the setting data.
-
 <div align="center">
 
 ![Obsidian Downloads](https://img.shields.io/badge/dynamic/json?logo=obsidian&color=%23483699&label=downloads&query=%24%5B%22custom-sidebar-icons%22%5D.downloads&url=https%3A%2F%2Fraw.githubusercontent.com%2Fobsidianmd%2Fobsidian-releases%2Fmaster%2Fcommunity-plugin-stats.json)

@@ -130,7 +130,9 @@ export default class CustomIconPlugin extends Plugin {
 		if (customCss.enabledSnippets instanceof Set) {
             customCss.enabledSnippets.add(css_filename);
         }
-        customCss.requestLoadSnippets();
+        if (customCss && typeof customCss.requestLoadSnippets === 'function') {
+            customCss.requestLoadSnippets();
+        }
     }
 
     genSidebarIconsEntryCSS(settings: SidebarIcons): string {

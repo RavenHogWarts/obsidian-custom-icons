@@ -32,6 +32,9 @@ export const ZHtw: LocalProperty = {
     <li>自定義圖標支持：在線URL 或 本地相對(絕對)文件路徑 或 base64編碼 或 svg標籤。 詳情查看<a href="https://github.com/RavenHogWarts/obsidian-custom-sidebar-icons/blob/master/README_ZH.md" target="_blank">README</a>。</li>
     <li>lucide源圖標支持直接使用lucide圖標名稱。 詳情查看<a href="https://lucide.dev/icons/" target="_blank">lucide</a>。</li>
   </ul>
+  <ul>
+    <li>關於圖標顏色，目前lucide圖標能夠自適應obsidian的基礎顏色</li>
+  </ul>
   <h3>Tips</h3>
   <h4>側邊工作區</h4>
   <h5>Pin文件圖標</h5>

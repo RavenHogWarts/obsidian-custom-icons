@@ -11,6 +11,7 @@ const css_filename = "CustomIcon-AutoGen";
 export default class CustomIconPlugin extends Plugin {
     settings: CustomIconSettings;
     resourceBase: string;
+    themeObserver: MutationObserver | null = null;
     
     async onload() {
         await this.loadSettings();
@@ -31,6 +32,10 @@ export default class CustomIconPlugin extends Plugin {
             customCss.enabledSnippets.delete(css_filename);
         }
         customCss.requestLoadSnippets();
+        if (this.themeObserver) {
+            this.themeObserver.disconnect();
+            this.themeObserver = null;
+        }
     }
 
     async loadSettings() {
@@ -43,7 +48,7 @@ export default class CustomIconPlugin extends Plugin {
     }
 
     observeThemeChange() {
-        const observer = new MutationObserver(mutations => {
+        this.themeObserver = new MutationObserver(mutations => {
             mutations.forEach(mutation => {
                 if (mutation.attributeName === 'class') {
                     const body = document.body;
@@ -54,7 +59,7 @@ export default class CustomIconPlugin extends Plugin {
             });
         });
 
-        observer.observe(document.body, {
+        this.themeObserver.observe(document.body, {
             attributes: true,
             attributeFilter: ['class']
         });

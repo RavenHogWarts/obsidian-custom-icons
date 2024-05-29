@@ -32,6 +32,9 @@ export const EN: LocalProperty = {
     <li>Custom icon support: Online URL, local relative (absolute) file path, base64 encoding, or SVG tags. For details, see the <a href="https://github.com/RavenHogWarts/obsidian-custom-sidebar-icons/blob/master/README_ZH.md" target="_blank">README</a>.</li>
     <li>Lucide source icons support using lucide icon names directly. For details, see <a href="https://lucide.dev/icons/" target="_blank">lucide</a>.</li>
   </ul>
+  <ul>
+    <li>Regarding icon colors, Lucide icons can currently adapt to the base colors of Obsidian</li>
+  </ul>
   <h3>Tips</h3>
   <h4>Sidebar Workspace</h4>
   <h5>Pin File Icons</h5>

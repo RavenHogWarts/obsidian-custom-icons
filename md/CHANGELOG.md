@@ -1,4 +1,7 @@
 # Changelog
+## Version 0.6.3 (2024-05-29)
+- [feature] 设置的lucide图标可以自适应当前基础颜色
+- [fix] bug: "Faild to unload plugin custom-sidebar-icons"
 
 ## Version 0.6.2 (2024-05-14)
 - [feature] 支持显示内部链接的文件图标 [#12](https://github.com/RavenHogWarts/obsidian-custom-icons/issues/12)

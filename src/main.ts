@@ -21,13 +21,16 @@ export default class CustomIconPlugin extends Plugin {
         );
         this.addSettingTab(new CustomIconSettingTab(this.app, this));
         await this.genSnippetCSS(this);
+        this.observeThemeChange();
     }
 
     onunload() {
         // @ts-ignore
-        const customCss = plugin.app.customCss;
-		customCss.enabledSnippets.remove(css_filename);
-        customCss
+        const customCss = this.app.customCss;
+        if (customCss.enabledSnippets instanceof Set) {
+            customCss.enabledSnippets.delete(css_filename);
+        }
+        customCss.requestLoadSnippets();
     }
 
     async loadSettings() {
@@ -37,6 +40,24 @@ export default class CustomIconPlugin extends Plugin {
 
     async saveSettings() {
         await this.saveData(this.settings);
+    }
+
+    observeThemeChange() {
+        const observer = new MutationObserver(mutations => {
+            mutations.forEach(mutation => {
+                if (mutation.attributeName === 'class') {
+                    const body = document.body;
+                    if (body.classList.contains('theme-light') || body.classList.contains('theme-dark')) {
+                        this.genSnippetCSS(this);
+                    }
+                }
+            });
+        });
+
+        observer.observe(document.body, {
+            attributes: true,
+            attributeFilter: ['class']
+        });
     }
 
     migrateData() {
@@ -99,9 +120,8 @@ export default class CustomIconPlugin extends Plugin {
 		if (!(await vault.adapter.exists(snippets_path))) { await vault.adapter.mkdir(snippets_path); }
 		if (await vault.adapter.exists(path)) { await vault.adapter.remove(path) }
 		await plugin.app.vault.create(path, content.join('\n'));
-		// Activate snippet
 		// @ts-ignore
-		const customCss = plugin.app.customCss;
+		const customCss = this.app.customCss;
 		customCss.enabledSnippets.add(css_filename);
 		customCss.requestLoadSnippets();
     }
@@ -216,11 +236,21 @@ export default class CustomIconPlugin extends Plugin {
         }
     }
 
+    getThemeColorVariable(variableName: string): string {
+        const style = getComputedStyle(document.body);
+        return style.getPropertyValue(variableName).trim();
+    }
+
     getLucidePath(iconName: string): string {
         const camelCaseIconName = convertToCamelCase(iconName);
-        const iconSvg = lucideIcons[camelCaseIconName as keyof typeof lucideIcons];
-        // TODO: custom color support
-        return this.svgToDataURI(iconSvg);
+        let iconSvg = lucideIcons[camelCaseIconName as keyof typeof lucideIcons];
+        const iconColor = this.getThemeColorVariable('--tab-text-color-focused-active');
+        if (iconSvg && iconColor) {
+            iconSvg = iconSvg.replace(/stroke=".*?"/g, `stroke="${iconColor}"`);
+            return this.svgToDataURI(iconSvg);
+        } else {
+            return this.svgToDataURI('<svg></svg>');
+        }
     }
 
     getResourcePathwithType(path: string, type: string): string {

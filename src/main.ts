@@ -27,7 +27,7 @@ export default class CustomIconPlugin extends Plugin {
 
     onunload() {
         // @ts-ignore
-        const customCss = this.app.customCss;
+        const customCss = plugin.app.customCss;
         if (customCss.enabledSnippets instanceof Set) {
             customCss.enabledSnippets.delete(css_filename);
         }

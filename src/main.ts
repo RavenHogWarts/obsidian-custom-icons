@@ -25,12 +25,6 @@ export default class CustomIconPlugin extends Plugin {
     }
 
     onunload() {
-        // @ts-ignore
-        // const customCss = this.app.customCss;
-        // if (customCss.enabledSnippets instanceof Set) {
-        //     customCss.enabledSnippets.delete(css_filename);
-        // }
-        customCss.requestLoadSnippets();
         if (this.themeObserver) {
             this.themeObserver.disconnect();
             this.themeObserver = null;

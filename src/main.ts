@@ -20,9 +20,6 @@ export default class CustomIconPlugin extends Plugin {
                 this.refreshSidebarIcons();
             })
         );
-        this.registerEvent(
-            this.addCommand()
-        )
         this.addSettingTab(new CustomIconSettingTab(this.app, this));
         this.observeThemeChange();
     }

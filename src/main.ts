@@ -20,17 +20,19 @@ export default class CustomIconPlugin extends Plugin {
                 this.refreshSidebarIcons();
             })
         );
+        this.registerEvent(
+            this.addCommand()
+        )
         this.addSettingTab(new CustomIconSettingTab(this.app, this));
-        await this.genSnippetCSS(this);
         this.observeThemeChange();
     }
 
     onunload() {
         // @ts-ignore
-        const customCss = this.app.customCss;
-        if (customCss.enabledSnippets instanceof Set) {
-            customCss.enabledSnippets.delete(css_filename);
-        }
+        // const customCss = this.app.customCss;
+        // if (customCss.enabledSnippets instanceof Set) {
+        //     customCss.enabledSnippets.delete(css_filename);
+        // }
         customCss.requestLoadSnippets();
         if (this.themeObserver) {
             this.themeObserver.disconnect();
@@ -282,10 +284,22 @@ export default class CustomIconPlugin extends Plugin {
         this.settings.SidebarIcons.forEach(icon => {
             document.querySelectorAll(`.workspace-tab-header[aria-label="${icon.label}"]`)
                 .forEach(tabHeader => {
-                    tabHeader.classList.add('custom-icon');
+                    tabHeader.classList.add('custom-icons');
                     tabHeader.setAttribute('data-icon-id', icon.id);
+                    
+                    const existingIcon = tabHeader.querySelector('.workspace-tab-header-inner-icon');
+                    // 检查是否已存在custom-icon div
+                    let iconDiv = existingIcon?.querySelector('.custom-icon');
+                    if (!iconDiv) {
+                        // 仅当不存在时才创建新的div
+                        iconDiv = existingIcon?.createEl('div', { cls: 'custom-icon' });
+                    }
+                    const iconUrl = this.getResourcePathwithType(icon.image, icon.type);
+                    // 设置div内部为img标签，展示图标
+                    if (iconDiv){
+                        iconDiv.innerHTML = `<img src="${iconUrl}" alt="icon"/>`;
+                    }
                 });
         });
-        
     }
 }

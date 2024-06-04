@@ -27,10 +27,8 @@ export default class CustomIconPlugin extends Plugin {
 
     onunload() {
         // @ts-ignore
-        const customCss = plugin.app.customCss;
-        if (customCss.enabledSnippets instanceof Set) {
-            customCss.enabledSnippets.delete(css_filename);
-        }
+        const customCss = this.app.customCss;
+        customCss.enabledSnippets.delete(css_filename);
         customCss.requestLoadSnippets();
         if (this.themeObserver) {
             this.themeObserver.disconnect();
@@ -127,12 +125,8 @@ export default class CustomIconPlugin extends Plugin {
 		await plugin.app.vault.create(path, content.join('\n'));
 		// @ts-ignore
 		const customCss = plugin.app.customCss;
-		if (customCss.enabledSnippets instanceof Set) {
-            customCss.enabledSnippets.add(css_filename);
-        }
-        if (customCss && typeof customCss.requestLoadSnippets === 'function') {
-            customCss.requestLoadSnippets();
-        }
+        customCss.enabledSnippets.add(css_filename);
+        customCss.requestLoadSnippets();
     }
 
     genSidebarIconsEntryCSS(settings: SidebarIcons): string {

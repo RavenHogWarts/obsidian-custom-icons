@@ -1,20 +1,17 @@
-import { EN } from "./en";
-import { LocalProperty } from "./types";
-import { ZH } from "./zh";
-import { ZHtw } from "./zh-tw";
+import ZH from "@/src/i18n/zh";
+import EN from "@/src/i18n/en";
 
-export class Locals {
+export interface Messages {
 
-	static get(): LocalProperty {
-		const lang = window.localStorage.getItem("language");
-		// console.log(lang);
-		switch (lang) {
-			case "zh":
-				return ZH;
-			case "zh-TW":
-				return ZHtw;
-			default:
-				return EN;
-		}
-	}
+}
+
+export function getLocal(): Messages {
+  const lang = window.localStorage.getItem("language");
+  switch (lang) {
+    case "zh":
+    case "zh-TW":
+      return new ZH();
+    default:
+      return new EN();
+  }
 }

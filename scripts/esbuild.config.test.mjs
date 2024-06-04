@@ -23,12 +23,29 @@ if(process.env.OUT === "1"){
 
 console.info(`\nSaving plugin to ${outdir}\n`);
 
+const renamePlugin = () => ({
+	name: "rename-plugin",
+	setup(build) {
+		build.onEnd(async (result) => {
+			const parent = build.initialOptions.outdir;;
+			const cssFileName = parent + "/main.css";
+			const newCssFileName = parent + "/styles.css";
+			try {
+				fs.renameSync(cssFileName, newCssFileName);
+			} catch (e) {
+				console.error("Failed to rename file:", e);
+			}
+		});
+	},
+});
+
 esbuild.build({
 	banner: {
 		js: banner,
 	},
-	entryPoints: ["src/main.ts", "src/styles.css"],
+	entryPoints: ["src/main.ts"],
 	bundle: true,
+	plugins: [renamePlugin()],
 	external: [
 		"obsidian",
 		"electron",

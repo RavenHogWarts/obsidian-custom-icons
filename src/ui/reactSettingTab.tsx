@@ -8,7 +8,7 @@ import SettingsContent from "./settings/SettingsContent";
 
 export default class CustomIconsSettingTab extends PluginSettingTab {
   plugin: CustomIconsPlugin;
-  root: Root;
+  root: Root | null = null;
   state: { activeTab: string, activeSubTab: string};
 
   constructor(app: App, plugin: CustomIconsPlugin) {
@@ -24,40 +24,44 @@ export default class CustomIconsSettingTab extends PluginSettingTab {
     Object.assign(this.state, newState);
     this.display();
   }
+  
 
   display() {
     const { containerEl } = this;
-    if (!this.root) {
-      this.root = createRoot(containerEl);
+    if(!this.root) this.root = createRoot(containerEl);
+    
+    if (this.root) {
+      this.root.render(
+        <StrictMode>
+          <SettingsTitle
+            title="Custom Icons"
+            tips="Configure your custom icons here."
+          />
+          <TabGroup 
+            tabs={['SidebarTab', 'FolderTab', 'EditorTab', 'AboutTab']}
+            activeTab={this.state.activeTab}
+            setActiveTab={(tab: string) => {
+              this.updateState({ activeTab: tab });
+            }}
+            activeSubTab={this.state.activeSubTab}
+            setActiveSubTab={(subTab: string) => {
+              this.updateState({ activeSubTab: subTab });
+            }}
+          />
+          <SettingsContent
+            activeTab={this.state.activeTab}
+            activeSubTab={this.state.activeSubTab}
+          />
+        </StrictMode>
+      );
     }
-  
-    this.root.render(
-      <StrictMode>
-        <SettingsTitle
-          title="Custom Icons"
-          tips="Configure your custom icons here."
-        />
-        <TabGroup 
-          tabs={['SidebarTab', 'FolderTab', 'EditorTab', 'AboutTab']}
-          activeTab={this.state.activeTab}
-          setActiveTab={(tab: string) => {
-            this.updateState({ activeTab: tab });
-          }}
-          activeSubTab={this.state.activeSubTab}
-          setActiveSubTab={(subTab: string) => {
-            this.updateState({ activeSubTab: subTab });
-          }}
-        />
-        <SettingsContent
-          activeTab={this.state.activeTab}
-          activeSubTab={this.state.activeSubTab}
-        />
-      </StrictMode>
-    );
   }
 
   hide() {
-    this.root.unmount();
+    if (this.root) {
+      this.root.unmount();
+      this.root = null;
+    }
     this.containerEl.empty();
   }
 }

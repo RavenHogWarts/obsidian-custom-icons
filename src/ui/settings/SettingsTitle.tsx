@@ -1,6 +1,11 @@
 import React from 'react';
 
-const SettingsTitle: React.FC<{ title: string, tip: string }> = ({ title, tip }) => {
+interface SettingsTitleProps {
+  title: string;
+  tips: string;
+}
+
+const SettingsTitle: React.FC<SettingsTitleProps> = ({ title, tips }) => {
   return (
     <div
       className='csbi-setting-title'
@@ -9,7 +14,7 @@ const SettingsTitle: React.FC<{ title: string, tip: string }> = ({ title, tip })
       <div
         className='csbi-setting-tip'
       >
-        <h6>{tip}</h6>
+        <h6>{tips}</h6>
       </div>
     </div>
   );

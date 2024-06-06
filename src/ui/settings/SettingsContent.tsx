@@ -1,48 +1,49 @@
 import React from 'react';
-import SubTabGroup from "@/src/ui/settings/SubTabGroup";
+import SidebarTab from "./contents/SidebarTab";
+import SidebarSubTab1 from "./contents/SidebarSubTab1";
+import FolderTab from "./contents/FolderTab";
+import FolderSubTab1 from "./contents/FolderSubTab1";
+import FolderSubTab2 from "./contents/FolderSubTab2";
+import EditorTab from "./contents/EditorTab";
+import EditorSubTab1 from "./contents/EditorSubTab1";
+import AboutTab from "./contents/AboutTab";
 
 interface SettingsContentProps {
   activeTab: string;
   activeSubTab: string;
-  setActiveSubTab: (subTab: string) => void;
 }
 
-const SettingsContent: React.FC<SettingsContentProps> = ({ activeTab, activeSubTab, setActiveSubTab }) => {
-  let subTabs: string[] = [];
-  let ContentComponent: React.FC | null = null;
+const componentsMap: {[key: string]: React.ComponentType<any>} = {
+  SidebarTab: SidebarTab,
+  SidebarSubTab1: SidebarSubTab1,
+  FolderTab: FolderTab,
+  FolderSubTab1: FolderSubTab1,
+  FolderSubTab2: FolderSubTab2,
+  EditorTab: EditorTab,
+  EditorSubTab1: EditorSubTab1,
+  AboutTab: AboutTab,
+};
 
-  switch(activeTab){
-    case 'SidebarTab':
-      subTabs = ['SidebarSubTab1', 'SidebarSubTab2'];
-      // ContentComponent = activeSubTab === 'SidebarSubTab1' ? YourSubTabContent1 : YourSubTabContent2;
-      break;
-      case 'FolderTab':
-        subTabs = ['FolderSubTab1', 'FolderSubTab2'];
-        break;
-      case 'EditorTab':
-        subTabs = ['EditorSubTab1', 'EditorSubTab2'];
-        break;
-      case 'AboutTab':
-        // subTabs = [''];
-        break;
-      default:
-        ContentComponent = null;
+const SettingsContent: React.FC<SettingsContentProps> = ({ activeTab, activeSubTab }) => {
+  const TabComponent  = componentsMap[activeTab];
+  const SubTabComponent = componentsMap[activeSubTab];
+
+  if (!activeSubTab) {
+    return (
+      <div className="csbi-setting-content">
+        <div className="csbi-setting-tab-content">
+          {TabComponent  ? <TabComponent  /> : null}
+        </div>
+      </div>
+    );
   }
-
-  return(
-    <div
-      className='csbi-setting-content'
-    >
-      {subTabs.length > 0 && 
-        <SubTabGroup 
-          activeSubTab={activeSubTab} 
-          setActiveSubTab={setActiveSubTab} 
-          subTabs={subTabs}
-        />
-      }
-      {ContentComponent}
+  return (
+    <div className="csbi-setting-content">
+      <div className="csbi-setting-subTab-content">
+        {SubTabComponent ? <SubTabComponent /> : null}
+      </div>
     </div>
   );
-}
+};
 
 export default SettingsContent;

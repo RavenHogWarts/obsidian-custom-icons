@@ -2,9 +2,9 @@ import { StrictMode } from "react";
 import { Root, createRoot } from "react-dom/client";
 import { PluginSettingTab, App } from "obsidian";
 import CustomIconsPlugin from "@/src/main";
-import SettingsTitle from "@/src/ui/settings/SettingsTitle";
-import TabGroup from "@/src/ui/settings/TabGroup";
-import SettingsContent from "@/src/ui/settings/SettingsContent";
+import SettingsTitle from "./settings/SettingsTitle";
+import TabGroup from "./settings/TabGroup";
+import SettingsContent from "./settings/SettingsContent";
 
 export default class CustomIconsSettingTab extends PluginSettingTab {
   plugin: CustomIconsPlugin;
@@ -16,7 +16,7 @@ export default class CustomIconsSettingTab extends PluginSettingTab {
     this.plugin = plugin;
     this.state = { 
       activeTab: 'SidebarTab',
-      activeSubTab: 'SidebarSubTab1'
+      activeSubTab: ''
     };
   }
 
@@ -27,27 +27,30 @@ export default class CustomIconsSettingTab extends PluginSettingTab {
 
   display() {
     const { containerEl } = this;
-    containerEl.empty();
-    this.root = createRoot(containerEl);
+    if (!this.root) {
+      this.root = createRoot(containerEl);
+    }
+  
     this.root.render(
       <StrictMode>
         <SettingsTitle
           title="Custom Icons"
-          tip="Configure your custom icons here."
+          tips="Configure your custom icons here."
         />
-        <TabGroup
+        <TabGroup 
+          tabs={['SidebarTab', 'FolderTab', 'EditorTab', 'AboutTab']}
           activeTab={this.state.activeTab}
           setActiveTab={(tab: string) => {
             this.updateState({ activeTab: tab });
           }}
-          tabs={['SidebarTab', 'FolderTab', 'EditorTab', 'AboutTab']}
-        />
-         <SettingsContent
-          activeTab={this.state.activeTab}
           activeSubTab={this.state.activeSubTab}
           setActiveSubTab={(subTab: string) => {
             this.updateState({ activeSubTab: subTab });
           }}
+        />
+        <SettingsContent
+          activeTab={this.state.activeTab}
+          activeSubTab={this.state.activeSubTab}
         />
       </StrictMode>
     );

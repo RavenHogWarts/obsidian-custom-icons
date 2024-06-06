@@ -2,7 +2,15 @@ import ZH from "@/src/i18n/zh";
 import EN from "@/src/i18n/en";
 
 export interface Messages {
-
+  [key: string]: string; // 添加索引签名
+  SidebarTab: string;
+  SidebarSubTab1: string;
+  FolderTab: string;
+  FolderSubTab1: string;
+  FolderSubTab2: string;
+  EditorTab: string;
+  EditorSubTab1: string;
+  AboutTab: string;
 }
 
 export function getLocal(): Messages {

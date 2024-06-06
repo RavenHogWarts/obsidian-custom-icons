@@ -1,7 +1,7 @@
 import { Notice, Plugin } from "obsidian";
-import CustomIconsSettingTab from "@/src/ui/reactSettingTab";
-import { CustomIconsConfig } from "@/src/manager/types";
-import { DEFAULT_SETTINGS } from "@/src/setting/defaultSetting";
+import CustomIconsSettingTab from "./ui/reactSettingTab";
+import { CustomIconsConfig } from "./manager/types";
+import { DEFAULT_SETTINGS } from "./setting/defaultSetting";
 import "@/style/styles.css"
 
 export default class CustomIconsPlugin extends Plugin {

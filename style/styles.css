@@ -21,14 +21,14 @@
   overflow-x: auto;
 }
 .csbi-setting-tab-group,
-.csbi-setting-sub-tab-group {
+.csbi-setting-subTab-group {
   display: flex;
   align-items: flex-end;
   border-bottom: 2px solid var(--background-modifier-border);
   margin-bottom: 4px;
 }
 .csbi-tab, 
-.csbi-sub-tab {
+.csbi-subTab {
   padding: 6px 12px;
   font-weight: 600;
   cursor: pointer;
@@ -39,27 +39,27 @@
 .csbi-tab {
   font-size: var(--tab-font-size);
 }
-.csbi-sub-tab {
+.csbi-subTab {
   font-size: var(--sub-tab-font-size);
 }
 .csbi-tab:hover, 
-.csbi-sub-tab:hover {
+.csbi-subTab:hover {
   background-color: var(--background-modifier-hover);
   color: var(--text-normal);
   border-radius: 3px;
 }
-.csbi-tab.csbi-tab-active,
-.csbi-sub-tab.csbi-sub-tab-active {
+.csbi-tab.active,
+.csbi-subTab.active {
   transform: translateY(2px);
   border: 2px solid var(--interactive-accent);
   background-color: var(--background-primary);
   color: var(--text-accent);
 }
-.csbi-tab.csbi-tab-active {
+.csbi-tab.active {
   border-radius: 3px;
   border-bottom-color: transparent;
 }
-.csbi-sub-tab.csbi-sub-tab-active {
+.csbi-subTab.active {
   border-radius: 100px;
 }
 .csbi-setting-content,

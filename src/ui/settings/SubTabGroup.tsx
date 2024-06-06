@@ -1,30 +1,28 @@
-import React from 'react';
+import { getLocal } from '@/src/i18n/i18n';
 
 interface SubTabGroupProps {
+  subTabs: string[];
   activeSubTab: string;
   setActiveSubTab: (subTab: string) => void;
-  subTabs: string[];
 }
 
 const SubTabGroup: React.FC<SubTabGroupProps> = ({ activeSubTab, setActiveSubTab, subTabs }) => {
+  if (subTabs.length === 0) {
+    return null;
+  }
+
   return (
-    <nav
-      className='csbi-setting-header'
-    >
-      <div
-        className='csbi-setting-sub-tab-group'
-      >
-        {subTabs.map(subTab => (
-          <div 
-            key={subTab} 
-            className={`csbi-sub-tab ${activeSubTab === subTab ? 'csbi-sub-tab-active' : ''}`} 
-            onClick={() => setActiveSubTab(subTab)}
-          >
-            {subTab}
-          </div>
-        ))}
-      </div>
-    </nav>
+    <div className="csbi-setting-subTab-group">
+      {subTabs.map(subTab => (
+        <div 
+          key={subTab} 
+          className={`csbi-subTab ${activeSubTab === subTab ? 'active' : ''}`}
+          onClick={() => setActiveSubTab(subTab)}
+        >
+          {getLocal()[subTab]}
+        </div>
+      ))}
+    </div>
   );
 };
 

@@ -1,33 +1,45 @@
-import React from 'react';
+import SubTabGroup from "./SubTabGroup";
+import { getLocal } from '@/src/i18n/i18n';
 
 interface TabGroupProps {
-  activeTab: string;
-  setActiveTab: (tab: string) => void;
-  tabs: string[];
+  tabs: string[],
+  activeTab: string,
+  setActiveTab: (tab: string) => void,
+  activeSubTab: string,
+  setActiveSubTab: (subTab: string) => void
 }
 
-const TabGroup: React.FC<TabGroupProps> = ({ activeTab, setActiveTab, tabs }) => {
+const tabToSubTabsMapping: {[key: string]: string[]} = {
+  SidebarTab: ["SidebarSubTab1"],
+  FolderTab: ["FolderSubTab1", "FolderSubTab2"],
+  EditorTab: ["EditorSubTab1"],
+  AboutTab: []
+};
+
+const TabGroup: React.FC<TabGroupProps> = ({ tabs, activeTab, setActiveTab, activeSubTab, setActiveSubTab }) => {
+  const currentSubTabs = tabToSubTabsMapping[activeTab] || [];
   return (
-    <nav
-      className='csbi-setting-header'
-    >
-      <div
-        className='csbi-setting-tab-group'
-      >
-        {tabs.map(tab => (
-          <div 
-            key={tab} 
-            className={`csbi-tab ${activeTab === tab ? 'csbi-tab-active' : ''}`} 
-            onClick={() => setActiveTab(tab)}
+    <nav className="csbi-setting-header">
+      <div className="csbi-setting-tab-group">
+        {tabs.map((tab) => (
+          <div
+            key={tab}
+            className={`csbi-tab ${activeTab === tab ? 'active' : ''}`}
+            onClick={() => {
+              setActiveTab(tab);
+              setActiveSubTab("");
+            }}
           >
-            {tab}
+            {getLocal()[tab]}
           </div>
         ))}
       </div>
-      <div
-        className='csbi-fill'
-      >
-      </div>
+      <div className="csbi-fill"></div>
+      <SubTabGroup
+          subTabs={currentSubTabs}
+          activeSubTab={activeSubTab}
+          setActiveSubTab={setActiveSubTab}
+      />
     </nav>
   );
 };

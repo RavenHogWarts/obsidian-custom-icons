@@ -1,58 +1,70 @@
-export interface CustomIconsConfig {
-  sidebarWorkspaceIcons: sidebarWorkspaceIconsConfig[];
-  navFolderIcons: navFolderIconsConfig[];
-  navFileIcons: navFileIconsConfig[];
-}
+import { DEFAULT_SETTINGS } from "@/src/setting/defaultSetting";
+import { generateUniqueId } from "@/src/util/uuid";
 
-export interface sidebarWorkspaceIconsConfig {
-  defaultIcon?: defaultIconDetail;
-  icons: sidebarWorkspaceIconsDetail[];
-}
-export interface sidebarWorkspaceIconsDetail {
-  id: string;
-  image: imageDetail;
-  type: iconType;
-  label: string;
-  sort: number;
-}
+export type IconType = "local" | "url" | "svg" | "base64" | "lucide";
 
-export interface navFolderIconsConfig {
-  defaultIcon?: defaultIconDetail;
-  icons: navFolderIconsDetail[];
-}
-export interface navFolderIconsDetail {
-  id: string;
-  image: imageDetail;
-  type: iconType;
-  path: string;
-  sort: number;
-}
-
-export interface navFileIconsConfig {
-  defaultIcon?: defaultIconDetail;
-  icons: navFileIconsDetail[];
-}
-export interface navFileIconsDetail {
-  id: string;
-  image: imageDetail;
-  type: iconType;
-  extension: string[];
-  sort: number;
-}
-
-export interface defaultIconDetail {
-  image: imageDetail;
-  type: iconType;
-}
-
-export interface imageDetail {
+export interface ImageDetail {
   src: string;
   color?: string;
 }
 
-export type iconType = 
-| "local"
-| "url"
-| "svg"
-| "base64"
-| "lucide";
+export interface IconDetail {
+  id: string;
+  image: ImageDetail;
+  type: IconType;
+  sort?: number;
+  label?: string;
+  path?: string;
+  extension?: string[];
+}
+
+export interface IconsConfig {
+  defaultIcon: IconDetail;
+  icons: IconDetail[];
+}
+
+export interface CustomIconsConfig {
+  sidebarWorkspaceIcons: IconsConfig;
+  navFolderIcons: IconsConfig;
+  navFileIcons: IconsConfig;
+}
+
+export class DefaultIconConfig implements IconDetail {
+  id: string;
+  image: ImageDetail;
+  type: IconType;
+  sort: number;
+  label?: string;
+  path?: string;
+  extension?: string[];
+
+  constructor(configKey: keyof CustomIconsConfig, extraProps?: Partial<IconDetail>) {
+    const defaultIcon = DEFAULT_SETTINGS[configKey].defaultIcon;
+    this.id = generateUniqueId(configKey);
+    this.image = {
+      src: defaultIcon?.image.src ?? '',
+      color: defaultIcon?.image.color,
+    };
+    this.type = defaultIcon?.type ?? 'lucide';
+    this.sort = 0;
+    Object.assign(this, extraProps);
+  }
+}
+
+export class DefaultSidebarWorkspaceIconsConfig extends DefaultIconConfig {
+  constructor() {
+    super('sidebarWorkspaceIcons', { label: ''});
+  }
+}
+
+export class DefaultNavFolderIconsConfig extends DefaultIconConfig {
+  constructor() {
+    super('navFolderIcons', { path: '' });
+  }
+}
+
+export class DefaultNavFileIconsConfig extends DefaultIconConfig {
+  constructor() {
+    super('navFileIcons', { extension: [] });
+  }
+}

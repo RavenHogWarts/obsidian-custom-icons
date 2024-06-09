@@ -1,31 +1,37 @@
 import { CustomIconsConfig } from "@/src/manager/types";
 
 export const DEFAULT_SETTINGS: CustomIconsConfig = {
-  sidebarWorkspaceIcons: [{
+  sidebarWorkspaceIcons: {
     defaultIcon: {
+      id: "custom-icon-11001100",
       image: {
         src: "file",
+        color: "",
       },
-      type: "lucide"
+      type: "lucide",
     },
-    icons: []
-  }],
-  navFolderIcons: [{
+    icons: [],
+  },
+  navFolderIcons: {
     defaultIcon: {
+      id: "custom-icon-11001101",
       image: {
         src: "crown",
+        color: "",
       },
-      type: "lucide"
+      type: "lucide",
     },
-    icons: []
-  }],
-  navFileIcons: [{
+    icons: [],
+  },
+  navFileIcons: {
     defaultIcon: {
+      id: "custom-icon-11001110",
       image: {
         src: "file-text",
+        color: "",
       },
-      type: "lucide"
+      type: "lucide",
     },
-    icons: []
-  }],
-}
+    icons: [],
+  },
+};

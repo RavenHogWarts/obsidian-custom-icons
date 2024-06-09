@@ -13,6 +13,7 @@ export interface sidebarWorkspaceIconsDetail {
   image: imageDetail;
   type: iconType;
   label: string;
+  sort: number;
 }
 
 export interface navFolderIconsConfig {
@@ -24,6 +25,7 @@ export interface navFolderIconsDetail {
   image: imageDetail;
   type: iconType;
   path: string;
+  sort: number;
 }
 
 export interface navFileIconsConfig {
@@ -35,6 +37,7 @@ export interface navFileIconsDetail {
   image: imageDetail;
   type: iconType;
   extension: string[];
+  sort: number;
 }
 
 export interface defaultIconDetail {

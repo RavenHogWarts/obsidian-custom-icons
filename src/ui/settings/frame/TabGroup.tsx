@@ -19,12 +19,12 @@ const tabToSubTabsMapping: {[key: string]: string[]} = {
 const TabGroup: React.FC<TabGroupProps> = ({ tabs, activeTab, setActiveTab, activeSubTab, setActiveSubTab }) => {
   const currentSubTabs = tabToSubTabsMapping[activeTab] || [];
   return (
-    <nav className="csbi-setting-header">
-      <div className="csbi-setting-tab-group">
+    <nav className="ci-setting-header">
+      <div className="ci-setting-tab-group">
         {tabs.map((tab) => (
           <div
             key={tab}
-            className={`csbi-tab ${activeTab === tab ? 'active' : ''}`}
+            className={`ci-tab ${activeTab === tab ? 'active' : ''}`}
             onClick={() => {
               setActiveTab(tab);
               setActiveSubTab("");
@@ -34,7 +34,7 @@ const TabGroup: React.FC<TabGroupProps> = ({ tabs, activeTab, setActiveTab, acti
           </div>
         ))}
       </div>
-      <div className="csbi-fill"></div>
+      <div className="ci-fill"></div>
       <SubTabGroup
           subTabs={currentSubTabs}
           activeSubTab={activeSubTab}

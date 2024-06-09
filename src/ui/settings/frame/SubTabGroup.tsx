@@ -12,11 +12,11 @@ const SubTabGroup: React.FC<SubTabGroupProps> = ({ activeSubTab, setActiveSubTab
   }
 
   return (
-    <div className="csbi-setting-subTab-group">
+    <div className="ci-setting-subTab-group">
       {subTabs.map(subTab => (
         <div 
           key={subTab} 
-          className={`csbi-subTab ${activeSubTab === subTab ? 'active' : ''}`}
+          className={`ci-subTab ${activeSubTab === subTab ? 'active' : ''}`}
           onClick={() => setActiveSubTab(subTab)}
         >
           {getLocal()[subTab]}

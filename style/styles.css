@@ -1,75 +1,81 @@
 :root {
   --tab-font-size: 14px;
-  --sub-tab-font-size: 12px;
+  --subTab-font-size: 12px;
 }
 
-.csbi-setting-title {
+.ci-setting-title {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
 }
-.csbi-setting-tip {
+.ci-setting-title .ci-setting-tip {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
   font-size: 12px;
   color: var(--text-muted);
 }
-.csbi-setting-header {
-  margin-bottom: 4px;
+.ci-setting-header {
   overflow-y: hidden;
   overflow-x: auto;
+  margin-bottom: 3px;
 }
-.csbi-setting-tab-group,
-.csbi-setting-subTab-group {
+.ci-setting-header .ci-setting-tab-group {
   display: flex;
   align-items: flex-end;
-  border-bottom: 2px solid var(--background-modifier-border);
-  margin-bottom: 4px;
+  border-bottom: 1px solid var(--background-modifier-border);
+  margin-bottom: 3px;
 }
-.csbi-tab, 
-.csbi-subTab {
+.ci-setting-header .ci-setting-subTab-group {
+  display: flex;
+  align-items: flex-end;
+  border-bottom: 1px solid var(--background-modifier-border);
+  margin-bottom: 3px;
+}
+
+.ci-setting-header .ci-tab {
   padding: 6px 12px;
   font-weight: 600;
   cursor: pointer;
   white-space: nowrap;
   color: var(--text-muted);
   transition: color 0.2s ease-in-out, background-color 0.2s ease-in-out;
-}
-.csbi-tab {
   font-size: var(--tab-font-size);
 }
-.csbi-subTab {
-  font-size: var(--sub-tab-font-size);
+.ci-setting-header .ci-subTab {
+  padding: 6px 12px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  color: var(--text-muted);
+  transition: color 0.2s ease-in-out, background-color 0.2s ease-in-out;
+  font-size: var(--subTab-font-size);
 }
-.csbi-tab:hover, 
-.csbi-subTab:hover {
+.ci-setting-header .ci-tab:hover {
   background-color: var(--background-modifier-hover);
   color: var(--text-normal);
   border-radius: 3px;
 }
-.csbi-tab.active,
-.csbi-subTab.active {
+.ci-setting-header .ci-subTab:hover {
+  background-color: var(--background-modifier-hover);
+  color: var(--text-normal);
+  border-radius: 3px;
+}
+.ci-setting-header .ci-tab.active {
   transform: translateY(2px);
-  border: 2px solid var(--interactive-accent);
+  border: 1px solid var(--interactive-accent);
   background-color: var(--background-primary);
   color: var(--text-accent);
-}
-.csbi-tab.active {
   border-radius: 3px;
   border-bottom-color: transparent;
 }
-.csbi-subTab.active {
+.ci-setting-header .ci-subTab.active {
+  border: 1px solid var(--interactive-accent);
+  background-color: var(--background-primary);
+  color: var(--text-accent);
   border-radius: 100px;
 }
-.csbi-setting-content,
-.csbi-setting-sub-content {
-  height: calc(100% - 10rem);
-}
-.csbi-fill {
-  border: 2px solid #0000;
+.ci-setting-header .ci-fill {
+  border: 1px solid transparent transparent;
   width: 100%;
-}
-.csbi-setting-about {
-  font-size: 12px;
 }

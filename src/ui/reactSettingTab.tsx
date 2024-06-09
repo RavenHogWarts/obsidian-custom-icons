@@ -2,9 +2,10 @@ import { StrictMode } from "react";
 import { Root, createRoot } from "react-dom/client";
 import { PluginSettingTab, App } from "obsidian";
 import CustomIconsPlugin from "@/src/main";
-import SettingsTitle from "./settings/SettingsTitle";
-import TabGroup from "./settings/TabGroup";
-import SettingsContent from "./settings/SettingsContent";
+import SettingsTitle from "./settings/frame/SettingsTitle";
+import TabGroup from "./settings/frame/TabGroup";
+import SettingsContent from "./settings/frame/SettingsContent";
+import { ObsidianAppContext } from "./context/obsidianAppContext";
 
 export default class CustomIconsSettingTab extends PluginSettingTab {
   plugin: CustomIconsPlugin;
@@ -48,10 +49,16 @@ export default class CustomIconsSettingTab extends PluginSettingTab {
               this.updateState({ activeSubTab: subTab });
             }}
           />
-          <SettingsContent
-            activeTab={this.state.activeTab}
-            activeSubTab={this.state.activeSubTab}
-          />
+          <ObsidianAppContext.Provider value={this.app}>
+            <SettingsContent
+              activeTab={this.state.activeTab}
+              activeSubTab={this.state.activeSubTab}
+              config={this.plugin.settings}
+              onChange={(config) => {
+                this.plugin.replaceSettings(config);
+              }}
+            />
+          </ObsidianAppContext.Provider>
         </StrictMode>
       );
     }

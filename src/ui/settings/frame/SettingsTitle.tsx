@@ -8,11 +8,11 @@ interface SettingsTitleProps {
 const SettingsTitle: React.FC<SettingsTitleProps> = ({ title, tips }) => {
   return (
     <div
-      className='csbi-setting-title'
+      className='ci-setting-title'
     >
       <h1>{title}</h1>
       <div
-        className='csbi-setting-tip'
+        className='ci-setting-tip'
       >
         <h6>{tips}</h6>
       </div>

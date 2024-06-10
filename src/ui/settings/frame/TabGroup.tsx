@@ -10,8 +10,8 @@ interface TabGroupProps {
 }
 
 const tabToSubTabsMapping: {[key: string]: string[]} = {
-  SidebarTab: ["SidebarSubTab1"],
-  FolderTab: ["FolderSubTab1", "FolderSubTab2"],
+  SidebarTab: ["sidePinFileTab"],
+  FolderTab: ["navFileTab", "navFolderTab"],
   EditorTab: ["EditorSubTab1"],
   AboutTab: []
 };

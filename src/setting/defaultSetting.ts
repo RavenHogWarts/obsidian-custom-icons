@@ -1,7 +1,7 @@
 import { CustomIconsConfig } from "@/src/manager/types";
 
 export const DEFAULT_SETTINGS: CustomIconsConfig = {
-  sidebarWorkspaceIcons: {
+  sidePinFileIcons: {
     defaultIcon: {
       id: "custom-icon-11001100",
       image: {

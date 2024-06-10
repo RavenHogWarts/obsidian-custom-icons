@@ -24,7 +24,7 @@ export interface IconsConfig {
 }
 
 export interface CustomIconsConfig {
-  sidebarWorkspaceIcons: IconsConfig;
+  sidePinFileIcons: IconsConfig;
   navFolderIcons: IconsConfig;
   navFileIcons: IconsConfig;
 }
@@ -48,23 +48,5 @@ export class DefaultIconConfig implements IconDetail {
     this.type = defaultIcon?.type ?? 'lucide';
     this.sort = 0;
     Object.assign(this, extraProps);
-  }
-}
-
-export class DefaultSidebarWorkspaceIconsConfig extends DefaultIconConfig {
-  constructor() {
-    super('sidebarWorkspaceIcons', { label: ''});
-  }
-}
-
-export class DefaultNavFolderIconsConfig extends DefaultIconConfig {
-  constructor() {
-    super('navFolderIcons', { path: '' });
-  }
-}
-
-export class DefaultNavFileIconsConfig extends DefaultIconConfig {
-  constructor() {
-    super('navFileIcons', { extension: [] });
   }
 }

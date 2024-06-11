@@ -20,7 +20,7 @@ export interface IconDetail {
   id: string;
   image: ImageDetail;
   type: IconType;
-  sort?: number;
+  sort: number;
   label?: string;
   path?: string;
   extension?: string[];

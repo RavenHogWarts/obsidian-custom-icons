@@ -1,5 +1,4 @@
 import { CustomIconsConfig, DefaultIconConfig, ExtraProps, IconDetail, IconType } from "@/src/manager/types";
-import { getResourcePathWithType } from '@/src/util/path';
 import DynamicIcon from '@/src/ui/componets/DynamicIcon';
 import IconsDispaly from "../../componets/IconsDispaly";
 
@@ -17,15 +16,30 @@ function IconsDetailForm(props:{
     onChange(newIconConfig);
   }
   const handleAdd = () => {
+    const newIndex = iconConfig.length > 0 ? iconConfig[iconConfig.length - 1].sort + 1 : 0;
     const { image, type } = currentDefaultIconConfig;
     const newIcon = {
       ...new DefaultIconConfig(configKey),
       image,
       type,
+      sort: newIndex,
       [extraProps]: '',
     };
     const newIconConfig = [...iconConfig, newIcon];
     onChange(newIconConfig);
+  };
+  const handleMove = (index: number, direction: 'up' | 'down') => {
+    let newIconConfig = [...iconConfig];
+    if ((direction === 'up' && index > 0) || (direction === 'down' && index < newIconConfig.length - 1)) {
+      if (direction === 'up') {
+        [newIconConfig[index - 1], newIconConfig[index]] = [newIconConfig[index], newIconConfig[index - 1]];
+      } else {
+        [newIconConfig[index], newIconConfig[index + 1]] = [newIconConfig[index + 1], newIconConfig[index]];
+      }
+      newIconConfig.forEach((item, idx) => item.sort = idx);
+      newIconConfig.sort((a, b) => a.sort - b.sort);
+      onChange(newIconConfig);
+    }
   };
   const handleSrcChange = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
     const newIconConfig = [...iconConfig];
@@ -64,10 +78,10 @@ function IconsDetailForm(props:{
             <div className='form-toolbar'>
               <div className='form-label'>{rule.id}</div>
               <div className='form-tools'>
-                <div className='menu-item ci-up'>
+                <div className='menu-item ci-up' onClick={() => handleMove(index, 'up')}>
                   <DynamicIcon name='chevron-up'/>
                 </div>
-                <div className='menu-item ci-down'>
+                <div className='menu-item ci-down' onClick={() => handleMove(index, 'down')}>
                   <DynamicIcon name='chevron-down'/>
                 </div>
               </div>

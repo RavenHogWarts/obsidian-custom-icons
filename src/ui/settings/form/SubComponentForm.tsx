@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
-import { CustomIconsConfig, IconDetail } from "@/src/manager/types";
+import { CustomIconsConfig, ExtraProps, IconDetail } from "@/src/manager/types";
 import DefaultIconDetailForm from "./DefaultIconDetailForm";
 import IconsDetailForm from "./IconsDetailForm";
 
 
 function SubComponentForm(props: {
   configKey: keyof CustomIconsConfig;
-  extraProps: 'label' | 'path' | 'extension';
+  extraProps: ExtraProps;
   iconConfig: CustomIconsConfig;
   onChange: (newIcon: CustomIconsConfig) => void;
 }) {

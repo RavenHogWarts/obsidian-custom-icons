@@ -1,7 +1,6 @@
-import { CustomIconsConfig } from '@/src/manager/types';
+import { CustomIconsConfig, ExtraProps } from '@/src/manager/types';
 import SubComponentForm from '../form/SubComponentForm';
 import TabComponentForm from '../form/TabComponentForm';
-
 
 interface SettingsContentProps {
   activeTab: string;
@@ -10,43 +9,33 @@ interface SettingsContentProps {
   onChange: (config: CustomIconsConfig) => void;
 }
 
-const SettingsContent: React.FC<SettingsContentProps> = ({ activeTab, activeSubTab, config, onChange }) => {
-  if (!activeSubTab) {
-    return (
-      <div className="ci-setting-content">
-        <div className="ci-setting-tab-content">
-          <TabComponentForm />
-        </div>
-      </div>
-    );
+const subTabConfigMap: {
+  [key: string]: { 
+    configKey: keyof CustomIconsConfig; 
+    extraProps: ExtraProps; 
   }
+} = {
+  sidePinFileTab: { configKey: 'sidePinFileIcons', extraProps: 'label' },
+  navFolderTab: { configKey: 'navFolderIcons', extraProps: 'path' },
+  navFileTab: { configKey: 'navFileIcons', extraProps: 'extension' },
+};
+
+const SettingsContent: React.FC<SettingsContentProps> = ({ activeTab, activeSubTab, config, onChange }) => {
+  const subTabConfig = subTabConfigMap[activeSubTab];
+
   return (
     <div className="ci-setting-content">
-      <div className="ci-setting-subTab-content">
-        {activeSubTab === "sidePinFileTab" && (
-          <SubComponentForm 
-            configKey='sidePinFileIcons'
-            extraProps='label'
+      <div className="ci-setting-tab-content">
+        {!activeSubTab ? (
+          <TabComponentForm />
+        ) : subTabConfig ? (
+          <SubComponentForm
+            configKey={subTabConfig.configKey}
+            extraProps={subTabConfig.extraProps}
             iconConfig={config}
             onChange={onChange}
           />
-        )}
-        {activeSubTab === 'navFolderTab' && (
-          <SubComponentForm 
-           configKey='navFolderIcons'
-           extraProps='path'
-           iconConfig={config}
-           onChange={onChange}
-          />
-        )}
-        {activeSubTab === 'navFileTab' && (
-          <SubComponentForm 
-           configKey='navFileIcons'
-           extraProps='extension'
-           iconConfig={config}
-           onChange={onChange}
-          />
-        )}
+        ) : null}
       </div>
     </div>
   );

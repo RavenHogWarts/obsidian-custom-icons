@@ -1,5 +1,5 @@
-import * as lucideIcons from 'lucide-static';
-import { convertToCamelCase } from './case';
+import { IconType } from '../manager/types';
+import dynamicIconImports from 'lucide-react/dynamicIconImports';
 
 export function svgToDataURI(svgContent: string): string {
   const encodedSVG = encodeURIComponent(svgContent);
@@ -33,34 +33,32 @@ export function getResourcePathOfSvg(svgContent: string): string {
   return "";
 }
 
-export function getResourcePathOfLucide(iconName: string): string {
-  const camelCaseIconName = convertToCamelCase(iconName);
-  let iconSvg = lucideIcons[camelCaseIconName as keyof typeof lucideIcons];
-  const iconColor = getThemeColorVariable('--tab-text-color-focused-active');
-  if (iconSvg && iconColor) {
-    iconSvg = iconSvg.replace(/stroke=".*?"/g, `stroke="${iconColor}"`);
-    return svgToDataURI(iconSvg);
-  } else {
-    return svgToDataURI('<svg></svg>');
-  }
-}
-
 export function getThemeColorVariable(variableName: string): string {
   const style = getComputedStyle(document.body);
   return style.getPropertyValue(variableName).trim();
 }
 
-export function getResourcePathWithPath(path: string, type: string): string {
+export function getResourcePathOfLucide(iconName: string): string {
+  const IconName = iconName.toLowerCase();
+  if(IconName in dynamicIconImports){
+    return IconName;
+  }
+  else{
+    return "file";
+  }
+}
+
+export function getResourcePathWithType(src: string, type: IconType): string {
   switch (type) {
     case "local":
-      return getResourcePathOfLocal(path);
+      return getResourcePathOfLocal(src);
     case "url":
     case "base64":
-      return getResourcePathOfUrlAndBase64(path);
+      return getResourcePathOfUrlAndBase64(src);
     case "svg":
-      return getResourcePathOfSvg(path);
+      return getResourcePathOfSvg(src);
     case "lucide":
-      return getResourcePathOfLucide(path);
+      return getResourcePathOfLucide(src);
     default:
       return "";
   }

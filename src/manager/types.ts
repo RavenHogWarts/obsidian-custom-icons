@@ -1,7 +1,15 @@
 import { DEFAULT_SETTINGS } from "@/src/setting/defaultSetting";
 import { generateUniqueId } from "@/src/util/uuid";
+import { LucideProps } from 'lucide-react';
+import dynamicIconImports from 'lucide-react/dynamicIconImports';
 
 export type IconType = "local" | "url" | "svg" | "base64" | "lucide";
+export type ExtraProps = 'label' | 'path' | 'extension';
+export type LucideIconName = keyof typeof dynamicIconImports;
+
+export interface LucideIconProps extends Omit<LucideProps, 'ref'> {
+  name: LucideIconName;
+}
 
 export interface ImageDetail {
   src: string;

@@ -1,10 +1,11 @@
-import { CustomIconsConfig, DefaultIconConfig, IconDetail, IconType } from "@/src/manager/types";
-import { getResourcePathWithPath } from '@/src/util/path';
+import { CustomIconsConfig, DefaultIconConfig, ExtraProps, IconDetail, IconType } from "@/src/manager/types";
+import { getResourcePathWithType } from '@/src/util/path';
 import DynamicIcon from '@/src/ui/componets/DynamicIcon';
+import IconsDispaly from "../../componets/IconsDispaly";
 
 function IconsDetailForm(props:{
   configKey: keyof CustomIconsConfig;
-  extraProps: 'label' | 'path' | 'extension';
+  extraProps: ExtraProps;
   iconConfig: IconDetail[];
   currentDefaultIconConfig: IconDetail;
   onChange: (newIcon: IconDetail[]) => void;
@@ -63,10 +64,10 @@ function IconsDetailForm(props:{
             <div className='form-toolbar'>
               <div className='form-label'>{rule.id}</div>
               <div className='form-tools'>
-                <div className='menu-item'>
+                <div className='menu-item ci-up'>
                   <DynamicIcon name='chevron-up'/>
                 </div>
-                <div className='menu-item'>
+                <div className='menu-item ci-down'>
                   <DynamicIcon name='chevron-down'/>
                 </div>
               </div>
@@ -74,10 +75,7 @@ function IconsDetailForm(props:{
             <div className='form-content'>
               <div className='form-iconSetting'>
                 <div className='image-preview'>
-                  <img
-                    src={getResourcePathWithPath(rule.image.src, rule.type)}
-                    alt={rule.type}
-                  />
+                  <IconsDispaly src={rule.image.src} type={rule.type} />
                 </div>
                 <input 
                   type='text'
@@ -104,7 +102,7 @@ function IconsDetailForm(props:{
                   value={extraPropsValue}
                   onChange={(e) => handleExtraPropsChange(e, index)}
                 />
-                <div className='menu-item' onClick={() => handleRemove(rule)}>
+                <div className='menu-item ci-remove' onClick={() => handleRemove(rule)}>
                   <DynamicIcon name='trash-2'/>
                 </div>
               </div>
@@ -112,7 +110,7 @@ function IconsDetailForm(props:{
           </div>
         );
       })}
-      <div>
+      <div className='menu-item ci-add'>
         <button onClick={handleAdd}>
           <DynamicIcon name='plus'/>
         </button>

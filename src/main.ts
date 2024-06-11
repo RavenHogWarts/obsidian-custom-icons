@@ -4,8 +4,6 @@ import { CustomIconsConfig } from "./manager/types";
 import { DEFAULT_SETTINGS } from "./setting/defaultSetting";
 import "@/style/styles.css"
 import "@/style/settingContent.css"
-import * as Icons from 'lucide-react';
-
 
 const css_filename = "custom-icon-auto-gen";
 
@@ -49,7 +47,7 @@ export default class CustomIconsPlugin extends Plugin {
 		this.settings = Object.assign({}, this.settings, value);
 		console.log("[Config] replace setting from", value, "to", this.settings);
 		await this.saveSettings();
-		// debounce(this.genSnippetCSS, 1000, true);
+		debounce(this.genSnippetCSS, 1000, true);
 	}
 
 	async genSnippetCSS(plugin: CustomIconsPlugin) {

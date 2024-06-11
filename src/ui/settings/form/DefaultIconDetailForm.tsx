@@ -1,7 +1,8 @@
 import { CustomIconsConfig, IconDetail, IconsConfig, IconType } from "@/src/manager/types";
 import { DEFAULT_SETTINGS } from '@/src/setting/defaultSetting';
-import { getResourcePathWithPath } from '@/src/util/path';
+import { getResourcePathWithType } from '@/src/util/path';
 import DynamicIcon from '@/src/ui/componets/DynamicIcon';
+import IconsDispaly from "../../componets/IconsDispaly";
 
 function DefaultIconDetailForm(porps:{
   configKey: keyof CustomIconsConfig;
@@ -44,10 +45,7 @@ function DefaultIconDetailForm(porps:{
       <div className='form-content'>
         <div className='form-iconSetting'>
           <div className='image-preview'>
-            <img
-              src={getResourcePathWithPath(defaultIconConfig.image.src, defaultIconConfig.type)}
-              alt={defaultIconConfig.type}
-            />
+            <IconsDispaly src={defaultIconConfig.image.src} type={defaultIconConfig.type}/>
           </div>
           <input
             type="text"

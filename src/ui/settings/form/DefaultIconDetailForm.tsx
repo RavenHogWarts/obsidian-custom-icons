@@ -1,8 +1,10 @@
+import { useState } from "react";
 import { CustomIconsConfig, IconDetail, IconsConfig, IconType } from "@/src/manager/types";
 import { DEFAULT_SETTINGS } from '@/src/setting/defaultSetting';
-import { getResourcePathWithType } from '@/src/util/path';
+import { convertCamelCaseToKebabCase } from "@/src/util/case";
 import DynamicIcon from '@/src/ui/componets/DynamicIcon';
 import IconsDispaly from "../../componets/IconsDispaly";
+import IconSelector from "../../componets/IconSelector";
 
 function DefaultIconDetailForm(porps:{
   configKey: keyof CustomIconsConfig;
@@ -10,9 +12,12 @@ function DefaultIconDetailForm(porps:{
   onChange: (newIcon: IconDetail) => void;
 }):JSX.Element {
   const { configKey, defaultIconConfig, onChange } = porps;
+  const [iconName, setIconName] = useState(defaultIconConfig.image.src);
+
   const handleReset = () => {
     const newIconConfig = DEFAULT_SETTINGS[configKey].defaultIcon;
     onChange(newIconConfig);
+    setIconName(newIconConfig.image.src);
   }
   const handleSrcChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newIconConfig = {
@@ -23,7 +28,19 @@ function DefaultIconDetailForm(porps:{
       }
     }
     onChange(newIconConfig);
+    setIconName(e.target.value);
   }
+  const handleIconSelect = (selectedIconName: string) => {
+    const newIconConfig = {
+      ...defaultIconConfig,
+      image: {
+        ...defaultIconConfig.image,
+        src: convertCamelCaseToKebabCase(selectedIconName)
+      }
+    };
+    onChange(newIconConfig);
+    setIconName(convertCamelCaseToKebabCase(selectedIconName));
+  };
   const handleTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newIconConfig = {
      ...defaultIconConfig,
@@ -38,19 +55,19 @@ function DefaultIconDetailForm(porps:{
         <div className='form-label'>DefaultIcon Setting</div>
         <div className='form-tools'>
           <div className='menu-item' onClick={() => handleReset()}>
-            <DynamicIcon name="rotate-cw"/>
+            <DynamicIcon name="RotateCw"/>
           </div>
         </div>
       </div>
       <div className='form-content'>
         <div className='form-iconSetting'>
-          <div className='image-preview'>
+          <>
             <IconsDispaly src={defaultIconConfig.image.src} type={defaultIconConfig.type}/>
-          </div>
+          </>
           <input
             type="text"
             placeholder="Image Source"
-            value={defaultIconConfig.image.src}
+            value={iconName}
             onChange={handleSrcChange}
           />
           <select 
@@ -64,6 +81,9 @@ function DefaultIconDetailForm(porps:{
             <option value="svg">SVG</option>
             <option value="base64">Base64</option>
           </select>
+          {defaultIconConfig.type === 'lucide' && 
+            <IconSelector onSelect={handleIconSelect} />
+          }
         </div>
       </div>
     </div>

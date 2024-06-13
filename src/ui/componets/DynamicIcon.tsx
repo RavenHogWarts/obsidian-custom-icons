@@ -1,17 +1,14 @@
-import React, { lazy, Suspense } from 'react';
-import { LucideIconProps } from '@/src/manager/types';
-import dynamicIconImports from 'lucide-react/dynamicIconImports';
+import { icons } from 'lucide-react';
 
-const fallback = <div style={{ background: '#ddd', width: 24, height: 24 }}/>
-
-const DynamicIcon = React.memo(({ name, ...props }: LucideIconProps) => {
-  const LucideIcon = lazy(dynamicIconImports[name]);
-
-  return (
-    <Suspense fallback={fallback}>
-      <LucideIcon {...props} />
-    </Suspense>
-  );
-});
+function DynamicIcon(props: { 
+  name: string; 
+  color?: string; 
+  size?: number;
+}) {
+  const { name, color, size }=props;
+  // @ts-ignore
+  const LucideIcon = icons[name];
+  return <LucideIcon color={color} size={size} />;
+}
 
 export default DynamicIcon;

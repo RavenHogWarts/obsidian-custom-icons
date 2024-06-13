@@ -1,10 +1,18 @@
 import { IconType } from '../manager/types';
 import dynamicIconImports from 'lucide-react/dynamicIconImports';
+import { convertKebabCaseToCamelCase } from './case';
 
-export function svgToDataURI(svgContent: string): string {
+function svgToDataURI(svgContent: string): string {
   const encodedSVG = encodeURIComponent(svgContent);
   const dataURI = `data:image/svg+xml;charset=utf-8,${encodedSVG}`;
   return dataURI;
+}
+function cleanSvg(svgContent: string): string {
+  if (svgContent.startsWith("<svg")) {
+    const updatedSvg = svgContent.replace(/\s+(width|height)="[^"]*"/g, ' $1="24"');
+    return updatedSvg;
+  }
+  return svgContent;
 }
 
 export function getResourcePathOfLocal(path: string): string {
@@ -28,7 +36,7 @@ export function getResourcePathOfUrlAndBase64(path: string): string {
 
 export function getResourcePathOfSvg(svgContent: string): string {
   if (svgContent.startsWith("<svg")) {
-    return svgToDataURI(svgContent);
+    return cleanSvg(svgContent);
   }
   return "";
 }
@@ -39,13 +47,7 @@ export function getThemeColorVariable(variableName: string): string {
 }
 
 export function getResourcePathOfLucide(iconName: string): string {
-  const IconName = iconName.toLowerCase();
-  if(IconName in dynamicIconImports){
-    return IconName;
-  }
-  else{
-    return "file";
-  }
+  return convertKebabCaseToCamelCase(iconName);
 }
 
 export function getResourcePathWithType(src: string, type: IconType): string {

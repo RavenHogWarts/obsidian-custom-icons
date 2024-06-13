@@ -1,0 +1,55 @@
+.iconPanel {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 190px;
+  background-color: var(--interactive-normal);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-s);
+  padding: 2px 2px 2px 6px;
+}
+.iconPanel-Header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 6px;
+}
+.iconPanel-Header .iconPanel-Search {
+  padding: 0px 4px 0px 4px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+  flex-grow: 1;
+}
+.iconPanel-Header .iconPanel-Random {
+  display: flex;
+  align-items: center;
+  padding: 4px;
+}
+
+.iconPanel-Body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+  overflow-y: auto;
+  width: 260px;
+}
+.iconPanel-Body-Inner {
+  width: 100%;
+  position: relative;
+}
+.iconPanel-Row {
+  display: flex;
+  gap: 8px;
+}
+.iconPanel-Cell {
+  display: flex;
+  align-items: center;
+  padding: 8px;
+  background-color: var(--background-primary-alt);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-s);
+  color: var(--text-muted);
+}

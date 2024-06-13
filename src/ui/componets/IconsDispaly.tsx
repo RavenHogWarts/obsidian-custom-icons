@@ -1,9 +1,9 @@
-import { IconType, LucideIconName } from "@/src/manager/types";
-import { getResourcePathWithType, getThemeColorVariable } from "@/src/util/path";
+import { IconType } from "@/src/manager/types";
+import { getResourcePathWithType } from "@/src/util/path";
 import DynamicIcon from "./DynamicIcon";
 
 function IconsDispaly(props:{
-  src: string | LucideIconName;
+  src: string;
   type: IconType;
 }):JSX.Element {
   const { src, type } = props;
@@ -11,13 +11,21 @@ function IconsDispaly(props:{
   const iconSrc = getResourcePathWithType(src, type);
 
   switch (type) {
+    case "svg": 
+      return(
+        <div className="image-preview" dangerouslySetInnerHTML={{__html: iconSrc}}/>
+      );
     case "lucide":
       return(
-        <DynamicIcon name={iconSrc as LucideIconName} color={getThemeColorVariable('--tab-text-color-focused-active')}/>
+        <div className="image-preview">
+          <DynamicIcon name={iconSrc} />
+        </div>
       );
     default:
       return(
-        <img src={iconSrc} alt={type} />
+        <div className="image-preview">
+          <img src={iconSrc} alt={type} />
+        </div>
       );
   }
 }

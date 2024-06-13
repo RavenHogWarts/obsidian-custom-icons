@@ -1,6 +1,9 @@
+import { useState } from "react";
 import { CustomIconsConfig, DefaultIconConfig, ExtraProps, IconDetail, IconType } from "@/src/manager/types";
+import { convertCamelCaseToKebabCase } from "@/src/util/case";
 import DynamicIcon from '@/src/ui/componets/DynamicIcon';
 import IconsDispaly from "../../componets/IconsDispaly";
+import IconSelector from "../../componets/IconSelector";
 
 function IconsDetailForm(props:{
   configKey: keyof CustomIconsConfig;
@@ -10,6 +13,7 @@ function IconsDetailForm(props:{
   onChange: (newIcon: IconDetail[]) => void;
 }):JSX.Element {
   const { configKey, extraProps, iconConfig, currentDefaultIconConfig, onChange } = props;
+  const [selectedIcons, setSelectedIcons] = useState({});
 
   const handleRemove = (rule: IconDetail) => {
     const newIconConfig = iconConfig.filter((item) => item.id!== rule.id);
@@ -52,6 +56,21 @@ function IconsDetailForm(props:{
     };
     onChange(newIconConfig);
   }
+  const handleIconSelect = (id: string, iconName: string) => {
+    const newIconConfig = iconConfig.map((item) => {
+      if (item.id === id) {
+        return {
+          ...item,
+          image: {
+            ...item.image,
+            src: convertCamelCaseToKebabCase(iconName)
+          }
+        };
+      }
+      return item;
+    });
+    onChange(newIconConfig);
+  };
   const handleTypeChange = (e: React.ChangeEvent<HTMLSelectElement>, index: number) => {
     const newIconConfig = [...iconConfig];
     newIconConfig[index] = {
@@ -79,18 +98,18 @@ function IconsDetailForm(props:{
               <div className='form-label'>{rule.id}</div>
               <div className='form-tools'>
                 <div className='menu-item ci-up' onClick={() => handleMove(index, 'up')}>
-                  <DynamicIcon name='chevron-up'/>
+                  <DynamicIcon name='ChevronUp'/>
                 </div>
                 <div className='menu-item ci-down' onClick={() => handleMove(index, 'down')}>
-                  <DynamicIcon name='chevron-down'/>
+                  <DynamicIcon name='ChevronDown'/>
                 </div>
               </div>
             </div>
             <div className='form-content'>
               <div className='form-iconSetting'>
-                <div className='image-preview'>
+                <>
                   <IconsDispaly src={rule.image.src} type={rule.type} />
-                </div>
+                </>
                 <input 
                   type='text'
                   placeholder='Image Source'
@@ -108,6 +127,9 @@ function IconsDetailForm(props:{
                   <option value="svg">SVG</option>
                   <option value="base64">Base64</option>
                 </select>
+                {rule.type === 'lucide' && 
+                  <IconSelector onSelect={(iconName) => handleIconSelect(rule.id, iconName)} />
+                }
               </div>
               <div className='form-labelSetting'>
                 <input 
@@ -117,7 +139,7 @@ function IconsDetailForm(props:{
                   onChange={(e) => handleExtraPropsChange(e, index)}
                 />
                 <div className='menu-item ci-remove' onClick={() => handleRemove(rule)}>
-                  <DynamicIcon name='trash-2'/>
+                  <DynamicIcon name='Trash2'/>
                 </div>
               </div>
             </div>
@@ -126,7 +148,7 @@ function IconsDetailForm(props:{
       })}
       <div className='menu-item ci-add'>
         <button onClick={handleAdd}>
-          <DynamicIcon name='plus'/>
+          <DynamicIcon name='Plus'/>
         </button>
       </div>
     </>

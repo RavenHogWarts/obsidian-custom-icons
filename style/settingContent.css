@@ -1,0 +1,109 @@
+.ci-setting-form {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+/* 1.form-item-default */
+.ci-setting-form .form-item {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 12px;
+  padding-top: 2px;
+  padding-bottom: 2px;
+  padding-left: 24px;
+  padding-right: 24px;
+  min-width: 100%;
+}
+/* 1.1 form-toolbar */
+.ci-setting-form .form-item .form-toolbar {
+  display: flex;
+  flex-direction: row;
+  gap: 3px;
+  align-items: baseline;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+.ci-setting-form .form-item .form-toolbar .form-label {
+  color: var(--text-normal);
+  font-size: var(--font-ui-medium);
+}
+.ci-setting-form .form-item .form-toolbar .form-tools {
+  display: flex;
+  flex-direction: row;
+  gap: 3px;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+.ci-setting-form .menu-item {
+  display: flex;
+  color: var(--text-muted);
+}
+.ci-setting-form .menu-item:hover {
+  color: var(--interactive-accent)
+}
+.ci-setting-form .menu-item.ci-add {
+  justify-content: flex-end;
+}
+/* 1.2  form-content*/
+.ci-setting-form .form-item .form-content {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+/* 1.2.1 form-iconSetting*/
+.ci-setting-form .form-item .form-content .form-iconSetting {
+  display: flex;
+  flex-direction: row;
+  gap: 3px;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  padding: 0.5rem 0;
+}
+.ci-setting-form .form-item .form-content .form-iconSetting .image-preview {
+  display: inline-flex;
+  width: 32px;
+  height: 32px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 1px solid var(--background-modifier-border);
+  box-shadow: 1px 1px 1px 0px var(--background-modifier-border);
+}
+.ci-setting-form .form-item .form-content .form-iconSetting .image-preview img {
+  width: 80%;
+  height: 80%;
+  overflow: hidden;
+}
+.ci-setting-form .form-item .form-content input {
+  box-shadow: none;
+  border-radius: 0px;
+  border: none;
+  background-color: transparent;
+  border-bottom: 1px solid var(--background-modifier-border);
+  flex-grow: 1;
+}
+.ci-setting-form .form-item .form-content input:focus {
+  box-shadow: none;
+  border-bottom: 1px solid var(--background-modifier-border-focus);
+}
+.ci-setting-form .form-item .form-content .form-iconSetting select {
+  box-shadow: none;
+  border-radius: 8px;
+  border: 1px solid var(--background-modifier-border);
+  text-align: center;
+  box-shadow: 1px 1px 2px 0px var(--background-modifier-border);
+}
+/* 1.2.2 form-labelSetting*/
+.ci-setting-form .form-item .form-content .form-labelSetting {
+  display: flex;
+  flex-direction: row;
+  gap: 3px;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  padding: 0.5rem 0;
+}

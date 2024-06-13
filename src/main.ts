@@ -4,6 +4,7 @@ import { CustomIconsConfig } from "./manager/types";
 import { DEFAULT_SETTINGS } from "./setting/defaultSetting";
 import "@/style/styles.css"
 import "@/style/settingContent.css"
+import '@/style/floatingContainer.css'
 
 const css_filename = "custom-icon-auto-gen";
 

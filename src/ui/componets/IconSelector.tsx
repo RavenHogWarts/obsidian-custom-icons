@@ -1,11 +1,16 @@
-import { useEffect, useRef, useState } from "react";
-import DynamicIcon from "./DynamicIcon";
-import LucideIconPanel from "../settings/frame/LucideIconPanel";
+import { useRef, useState } from "react";
+import { IconType } from "@/src/manager/types";
+import IconsDispaly from "./IconsDispaly";
+import IconFloatingPanel from "../settings/floating/IconFloatingPanel";
 
 function IconSelector(props:{
-  onSelect: (icon: string) => void;
+  src: string;
+  type: IconType;
+  onSrcSelect: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onTypeSelect: (e: React.ChangeEvent<HTMLSelectElement>) => void;
+  onIconSelect: (icon: string) => void;
 }) {
-  const { onSelect } = props;
+  const { src, type, onSrcSelect, onTypeSelect, onIconSelect } = props;
   const menuRef = useRef<HTMLDivElement>(null);
   const [showIcon, setShowIcon] = useState(false);
 
@@ -15,16 +20,20 @@ function IconSelector(props:{
 
   return(
     <>
-      <div className='menu-item ci-select' ref={menuRef} onClick={handleIconSelect}>
-        <DynamicIcon name='ImagePlus'/>
+      <div className="form-image" ref={menuRef} onClick={handleIconSelect} aria-label="select icon">
+        <IconsDispaly src={src} type={type} />
       </div>
       {menuRef.current && (
-      <LucideIconPanel 
-        showIcon={showIcon}
-        anchorElement={menuRef.current}
-        onOpenChange={handleIconSelect}
-        onSelect={onSelect}
-      />
+        <IconFloatingPanel 
+          showIcon={showIcon}
+          anchorElement={menuRef.current}
+          onOpenChange={handleIconSelect}
+          src={src}
+          type={type}
+          onSrcSelect={onSrcSelect}
+          onTypeSelect={onTypeSelect}
+          onIconSelect={onIconSelect}
+        />
       )}
     </>
   );

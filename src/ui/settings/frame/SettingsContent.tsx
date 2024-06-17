@@ -25,18 +25,16 @@ const SettingsContent: React.FC<SettingsContentProps> = ({ activeTab, activeSubT
 
   return (
     <div className="ci-setting-content">
-      <div className="ci-setting-tab-content">
-        {!activeSubTab ? (
-          <TabComponentForm />
-        ) : subTabConfig ? (
-          <SubComponentForm
-            configKey={subTabConfig.configKey}
-            extraProps={subTabConfig.extraProps}
-            iconConfig={config}
-            onChange={onChange}
-          />
-        ) : null}
-      </div>
+      {!activeSubTab ? (
+        <TabComponentForm />
+      ) : subTabConfig ? (
+        <SubComponentForm
+          configKey={subTabConfig.configKey}
+          extraProps={subTabConfig.extraProps}
+          iconConfig={config}
+          onChange={onChange}
+        />
+      ) : null}
     </div>
   );
 };

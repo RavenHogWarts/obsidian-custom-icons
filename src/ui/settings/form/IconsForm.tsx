@@ -2,10 +2,9 @@ import { useState } from "react";
 import { CustomIconsConfig, DefaultIconConfig, ExtraProps, IconDetail, IconType } from "@/src/manager/types";
 import { convertCamelCaseToKebabCase } from "@/src/util/case";
 import DynamicIcon from '@/src/ui/componets/DynamicIcon';
-import IconsDispaly from "../../componets/IconsDispaly";
 import IconSelector from "../../componets/IconSelector";
 
-function IconsDetailForm(props:{
+function IconsForm(props:{
   configKey: keyof CustomIconsConfig;
   extraProps: ExtraProps;
   iconConfig: IconDetail[];
@@ -89,70 +88,60 @@ function IconsDetailForm(props:{
     onChange(newIconConfig);
   }
   return(
-    <>
+    <div className="icons-form">
+      <div className="form-title">Icons Setting</div>
       {iconConfig.map((rule, index) => {
         const extraPropsValue = extraProps === 'extension' ? (rule[extraProps] || []).join(',') : rule[extraProps] || '';
         return(
           <div className='form-item' key={index}>
-            <div className='form-toolbar'>
-              <div className='form-label'>{rule.id}</div>
-              <div className='form-tools'>
-                <div className='menu-item ci-up' onClick={() => handleMove(index, 'up')}>
-                  <DynamicIcon name='ChevronUp'/>
-                </div>
-                <div className='menu-item ci-down' onClick={() => handleMove(index, 'down')}>
-                  <DynamicIcon name='ChevronDown'/>
-                </div>
-              </div>
-            </div>
             <div className='form-content'>
-              <div className='form-iconSetting'>
-                <>
-                  <IconsDispaly src={rule.image.src} type={rule.type} />
-                </>
-                <input 
-                  type='text'
-                  placeholder='Image Source'
-                  value={rule.image.src}
-                  onChange={(e) => handleSrcChange(e, index)}
-                />
-                <select
-                  className='select'
-                  value={rule.type}
-                  onChange={(e) => {handleTypeChange(e, index)}}
-                >
-                  <option value="lucide">Lucide</option>
-                  <option value="local">Local</option>
-                  <option value="url">URL</option>
-                  <option value="svg">SVG</option>
-                  <option value="base64">Base64</option>
-                </select>
-                {rule.type === 'lucide' && 
-                  <IconSelector onSelect={(iconName) => handleIconSelect(rule.id, iconName)} />
-                }
+              <label className="form-label">{rule.id}</label>
+              <IconSelector 
+                src={rule.image.src}
+                type={rule.type}
+                onSrcSelect={(e) => handleSrcChange(e, index)}
+                onTypeSelect={(e) => {handleTypeChange(e, index)}}
+                onIconSelect={(iconName) => handleIconSelect(rule.id, iconName)}
+              />
+              <input 
+                className="form-input"
+                aria-label="input label name"
+                type='text'
+                placeholder={extraProps}
+                value={extraPropsValue}
+                onChange={(e) => handleExtraPropsChange(e, index)}
+              />
+            </div>
+            <div className='form-tools'>
+              <div className='menu-item ci-remove' 
+                aria-label="remove icon"
+                onClick={() => handleRemove(rule)}
+              >
+                <DynamicIcon name='X'/>
               </div>
-              <div className='form-labelSetting'>
-                <input 
-                  type='text'
-                  placeholder={extraProps}
-                  value={extraPropsValue}
-                  onChange={(e) => handleExtraPropsChange(e, index)}
-                />
-                <div className='menu-item ci-remove' onClick={() => handleRemove(rule)}>
-                  <DynamicIcon name='Trash2'/>
-                </div>
+              <div className='menu-item ci-up' 
+                aria-label="move icon up"
+                onClick={() => handleMove(index, 'up')}
+              >
+                <DynamicIcon name='ArrowUp'/>
+              </div>
+              <div className='menu-item ci-down' 
+                aria-label="move icon down"
+                onClick={() => handleMove(index, 'down')}
+              >
+                <DynamicIcon name='ArrowDown'/>
               </div>
             </div>
           </div>
         );
       })}
       <div className='menu-item ci-add'>
-        <button onClick={handleAdd}>
+        <button onClick={handleAdd} aria-label='add icon'>
           <DynamicIcon name='Plus'/>
         </button>
       </div>
-    </>
+    </div>
   );
 }
 
-export default IconsDetailForm;
+export default IconsForm;

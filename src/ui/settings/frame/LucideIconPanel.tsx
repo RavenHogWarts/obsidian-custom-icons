@@ -4,21 +4,25 @@ import { useVirtualizer } from '@tanstack/react-virtual';
 import { icons } from 'lucide-react';
 import DynamicIcon from '../../componets/DynamicIcon';
 import { convertCamelCaseToKebabCase, convertKebabCaseToCamelCase } from '@/src/util/case';
+import { IconType } from '@/src/manager/types';
 
 function LucideIconPanel(props: {
   showIcon: boolean;
   anchorElement: Element;
   onOpenChange?: (open: boolean) => void;
-  style?: CSSProperties;
-  onSelect: (icon: string) => void;
+  src: string;
+  type: IconType;
+  onSrcSelect: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onTypeSelect: (e: React.ChangeEvent<HTMLSelectElement>) => void;
+  onIconSelect: (icon: string) => void;
 }): JSX.Element {
-  const { showIcon, anchorElement, onOpenChange, onSelect } = props;
+  const { showIcon, anchorElement, onOpenChange, src, type, onSrcSelect, onTypeSelect, onIconSelect } = props;
   const [query, setQuery] = useState("");
 
   const { refs, floatingStyles } = useFloating({
     open: showIcon,
     onOpenChange: onOpenChange,
-    placement: 'left-start',
+    placement: 'right-start',
     whileElementsMounted: autoUpdate,
     elements: {
       reference: anchorElement,
@@ -56,7 +60,7 @@ function LucideIconPanel(props: {
 
   const onRandom = () => {
     const randomIcon = filteredIcons[Math.floor(Math.random() * filteredIcons.length)];
-    onSelect(randomIcon);
+    onIconSelect(randomIcon);
   };
 
   const rowVirtualizer = useVirtualizer({
@@ -90,42 +94,63 @@ function LucideIconPanel(props: {
       {showIcon && (
         <div className='ci-floating-container' ref={refs.setFloating} style={{...floatingStyles}}>
           <div className='iconPanel' ref={iconPanelRef}>
-            <div className='iconPanel-Header'>
-              <div className='iconPanel-Search'>
-                <input className='iconPanel-Search-Input'
-                  type='text'
-                  placeholder='Search icons...'
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                />
-              </div>
-              <div className='iconPanel-Random' aria-label='Random Icon' onClick={onRandom}>
-                <DynamicIcon name='Dices'/>
-              </div>
-            </div>
-            <div className='iconPanel-Body' ref={parentRef}>
-              <div className='iconPanel-Body-Inner' style={{
-                height: `${rowVirtualizer.getTotalSize()}px`,
-              }}>
-                {rowVirtualizer.getVirtualItems().map(virtualRow => (
-                  <div key={virtualRow.index} style={{
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    width: '100%',
-                    transform: `translateY(${virtualRow.start}px)`,
-                  }}>
-                    <div className='iconPanel-Row'>
-                      {iconRows[virtualRow.index].map(iconName => (
-                        <div key={iconName} className='iconPanel-Cell' aria-label={convertCamelCaseToKebabCase(iconName)} onClick={() => onSelect(iconName)}>
-                          <DynamicIcon name={iconName}/>
-                        </div>
-                      ))}
-                    </div>
+            <select
+              className='select'
+              value={type}
+              onChange={onTypeSelect}
+            >
+              <option value="lucide">Lucide</option>
+              <option value="local">Local</option>
+              <option value="url">URL</option>
+              <option value="svg">SVG</option>
+              <option value="base64">Base64</option>
+            </select>
+            <input
+              type="text"
+              placeholder="Image Source"
+              value={src}
+              onChange={onSrcSelect}
+            />
+            {type === 'lucide' && 
+              <>
+                <div className='iconPanel-Header'>
+                  <div className='iconPanel-Search'>
+                    <input className='iconPanel-Search-Input'
+                      type='text'
+                      placeholder='Search icons...'
+                      value={query}
+                      onChange={(e) => setQuery(e.target.value)}
+                    />
                   </div>
-                ))}
-              </div>
-            </div>
+                  <div className='iconPanel-Random' aria-label='Random Icon' onClick={onRandom}>
+                    <DynamicIcon name='Dices'/>
+                  </div>
+                </div>
+                <div className='iconPanel-Body' ref={parentRef}>
+                  <div className='iconPanel-Body-Inner' style={{
+                    height: `${rowVirtualizer.getTotalSize()}px`,
+                  }}>
+                    {rowVirtualizer.getVirtualItems().map(virtualRow => (
+                      <div key={virtualRow.index} style={{
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        width: '100%',
+                        transform: `translateY(${virtualRow.start}px)`,
+                      }}>
+                        <div className='iconPanel-Row'>
+                          {iconRows[virtualRow.index].map(iconName => (
+                            <div key={iconName} className='iconPanel-Cell' aria-label={convertCamelCaseToKebabCase(iconName)} onClick={() => onIconSelect(iconName)}>
+                              <DynamicIcon name={iconName}/>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </>  
+            }
           </div>
         </div>
       )}

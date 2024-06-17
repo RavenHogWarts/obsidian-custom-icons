@@ -17,7 +17,7 @@ export default class CustomIconsSettingTab extends PluginSettingTab {
     this.plugin = plugin;
     this.state = { 
       activeTab: 'SidebarTab',
-      activeSubTab: ''
+      activeSubTab: 'sidePinFileTab'
     };
   }
 
@@ -26,7 +26,6 @@ export default class CustomIconsSettingTab extends PluginSettingTab {
     this.display();
   }
   
-
   display() {
     const { containerEl } = this;
     if(!this.root) this.root = createRoot(containerEl);
@@ -39,7 +38,6 @@ export default class CustomIconsSettingTab extends PluginSettingTab {
             tips="Configure your custom icons here."
           />
           <TabGroup 
-            tabs={['SidebarTab', 'FolderTab', 'EditorTab', 'AboutTab']}
             activeTab={this.state.activeTab}
             setActiveTab={(tab: string) => {
               this.updateState({ activeTab: tab });

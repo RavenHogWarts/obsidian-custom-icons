@@ -3,10 +3,9 @@ import { CustomIconsConfig, IconDetail, IconsConfig, IconType } from "@/src/mana
 import { DEFAULT_SETTINGS } from '@/src/setting/defaultSetting';
 import { convertCamelCaseToKebabCase } from "@/src/util/case";
 import DynamicIcon from '@/src/ui/componets/DynamicIcon';
-import IconsDispaly from "../../componets/IconsDispaly";
 import IconSelector from "../../componets/IconSelector";
 
-function DefaultIconDetailForm(porps:{
+function DefaultIconForm(porps:{
   configKey: keyof CustomIconsConfig;
   defaultIconConfig: IconDetail;
   onChange: (newIcon: IconDetail) => void;
@@ -50,44 +49,29 @@ function DefaultIconDetailForm(porps:{
   };
 
   return(
-    <div className='form-item'>
-      <div className='form-toolbar'>
-        <div className='form-label'>DefaultIcon Setting</div>
+    <div className="default-icon-form">
+      <div className="form-title">DefaultIcon Setting</div>
+      <div className="form-item">
+        <div className='form-content'>
+          <IconSelector 
+            src={defaultIconConfig.image.src}
+            type={defaultIconConfig.type}
+            onSrcSelect={handleSrcChange}
+            onTypeSelect={handleTypeChange}
+            onIconSelect={handleIconSelect}
+          />
+        </div>
         <div className='form-tools'>
-          <div className='menu-item' onClick={() => handleReset()}>
+          <div className='menu-item ci-reset' 
+            aria-label='Reset'
+            onClick={() => handleReset()}
+          >
             <DynamicIcon name="RotateCw"/>
           </div>
-        </div>
-      </div>
-      <div className='form-content'>
-        <div className='form-iconSetting'>
-          <>
-            <IconsDispaly src={defaultIconConfig.image.src} type={defaultIconConfig.type}/>
-          </>
-          <input
-            type="text"
-            placeholder="Image Source"
-            value={iconName}
-            onChange={handleSrcChange}
-          />
-          <select 
-            className='select'
-            value={defaultIconConfig.type}
-            onChange={handleTypeChange}
-          >
-            <option value="lucide">Lucide</option>
-            <option value="local">Local</option>
-            <option value="url">URL</option>
-            <option value="svg">SVG</option>
-            <option value="base64">Base64</option>
-          </select>
-          {defaultIconConfig.type === 'lucide' && 
-            <IconSelector onSelect={handleIconSelect} />
-          }
         </div>
       </div>
     </div>
   );
 }
 
-export default DefaultIconDetailForm;
+export default DefaultIconForm;

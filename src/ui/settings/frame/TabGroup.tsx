@@ -2,7 +2,6 @@ import SubTabGroup from "./SubTabGroup";
 import { getLocal } from '@/src/i18n/i18n';
 
 interface TabGroupProps {
-  tabs: string[],
   activeTab: string,
   setActiveTab: (tab: string) => void,
   activeSubTab: string,
@@ -12,11 +11,13 @@ interface TabGroupProps {
 const tabToSubTabsMapping: {[key: string]: string[]} = {
   SidebarTab: ["sidePinFileTab"],
   FolderTab: ["navFileTab", "navFolderTab"],
-  EditorTab: ["EditorSubTab1"],
+  // EditorTab: ["internalFileTab"],
   AboutTab: []
 };
 
-const TabGroup: React.FC<TabGroupProps> = ({ tabs, activeTab, setActiveTab, activeSubTab, setActiveSubTab }) => {
+const TabGroup: React.FC<TabGroupProps> = ({ activeTab, setActiveTab, activeSubTab, setActiveSubTab }) => {
+  const tabs = Object.keys(tabToSubTabsMapping);
+
   const currentSubTabs = tabToSubTabsMapping[activeTab] || [];
   return (
     <nav className="ci-setting-header">
@@ -27,7 +28,7 @@ const TabGroup: React.FC<TabGroupProps> = ({ tabs, activeTab, setActiveTab, acti
             className={`ci-tab ${activeTab === tab ? 'active' : ''}`}
             onClick={() => {
               setActiveTab(tab);
-              setActiveSubTab("");
+              setActiveSubTab(tabToSubTabsMapping[tab].length > 0 ? tabToSubTabsMapping[tab][0] : '');
             }}
           >
             {getLocal()[tab]}

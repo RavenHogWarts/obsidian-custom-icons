@@ -47,7 +47,7 @@ export function getThemeColorVariable(variableName: string): string {
 }
 
 export function getResourcePathOfLucide(iconName: string): string {
-  return convertKebabCaseToCamelCase(iconName);
+  return convertKebabCaseToCamelCase(iconName || "file");
 }
 
 export function getResourcePathWithType(src: string, type: IconType): string {

@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { CustomIconsConfig, ExtraProps, IconDetail } from "@/src/manager/types";
 import DefaultIconDetailForm from "./DefaultIconDetailForm";
 import IconsDetailForm from "./IconsDetailForm";
+import DefaultIconForm from "./DefaultIconForm";
+import IconsForm from "./IconsForm";
 
 
 function SubComponentForm(props: {
@@ -46,12 +48,12 @@ function SubComponentForm(props: {
 
   return (
     <div className='ci-setting-form'>
-      <DefaultIconDetailForm 
+      <DefaultIconForm 
         configKey={configKey}
         defaultIconConfig={defaultIcon}
         onChange={handleDefaultIconChange}
       />
-      <IconsDetailForm 
+      <IconsForm 
         configKey={configKey}
         extraProps={extraProps}
         iconConfig={icons}

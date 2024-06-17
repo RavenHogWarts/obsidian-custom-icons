@@ -13,17 +13,17 @@ function IconsDispaly(props:{
   switch (type) {
     case "svg": 
       return(
-        <div className="image-preview" dangerouslySetInnerHTML={{__html: iconSrc}}/>
+        <div className="form-image-preview" dangerouslySetInnerHTML={{__html: iconSrc}}/>
       );
     case "lucide":
       return(
-        <div className="image-preview">
+        <div className="form-image-preview">
           <DynamicIcon name={iconSrc} />
         </div>
       );
     default:
       return(
-        <div className="image-preview">
+        <div className="form-image-preview">
           <img src={iconSrc} alt={type} />
         </div>
       );

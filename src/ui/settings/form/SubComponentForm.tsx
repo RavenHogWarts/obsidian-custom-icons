@@ -1,7 +1,5 @@
 import { useEffect, useState } from "react";
 import { CustomIconsConfig, ExtraProps, IconDetail } from "@/src/manager/types";
-import DefaultIconDetailForm from "./DefaultIconDetailForm";
-import IconsDetailForm from "./IconsDetailForm";
 import DefaultIconForm from "./DefaultIconForm";
 import IconsForm from "./IconsForm";
 

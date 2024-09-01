@@ -7,7 +7,7 @@ function DynamicIcon(props: {
 }) {
   const { name, color, size }=props;
   // @ts-ignore
-  const LucideIcon = icons[name];
+  const LucideIcon = icons[name] ? icons[name] : icons['File'];
   return <LucideIcon color={color} size={size} />;
 }
 

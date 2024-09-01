@@ -21,7 +21,9 @@ function IconSelector(props:{
   return(
     <>
       <div className="form-image" ref={menuRef} onClick={handleIconSelect} aria-label="select icon">
-        <IconsDispaly src={src} type={type} />
+        <div className="form-image-preview">
+          <IconsDispaly src={src} type={type} />
+        </div>
       </div>
       {menuRef.current && (
         <IconFloatingPanel 

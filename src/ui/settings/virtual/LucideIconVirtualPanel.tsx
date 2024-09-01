@@ -59,7 +59,7 @@ function LucideIconVirtualPanel(props:{
     <>
       <div className='selector-Header'>
         <div className='selector-Search'>
-          <input className='selector-Search-Input'
+          <input className='form-input selector-Search-Input'
             aria-label='input icon name'
             type='text'
             placeholder='Search icons...'
@@ -67,7 +67,7 @@ function LucideIconVirtualPanel(props:{
             onChange={(e) => setQuery(e.target.value)}
           />
         </div>
-        <div className='selector-Random'
+        <div className='menu-item selector-Random'
           aria-label='Random Icon'
           onClick={onRandom}
         >

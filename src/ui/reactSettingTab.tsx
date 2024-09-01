@@ -21,7 +21,7 @@ export default class CustomIconsSettingTab extends PluginSettingTab {
     };
   }
 
-  updateState(newState: Record<string, any>) {
+  updateState(newState: Record<string, unknown>) {
     Object.assign(this.state, newState);
     this.display();
   }

@@ -93,9 +93,8 @@ function IconsForm(props:{
       {iconConfig.map((rule, index) => {
         const extraPropsValue = extraProps === 'extension' ? (rule[extraProps] || []).join(',') : rule[extraProps] || '';
         return(
-          <div className='form-item' key={index}>
+          <div className='form-item' key={index} aria-label={rule.id}>
             <div className='form-content'>
-              <label className="form-label">{rule.id}</label>
               <IconSelector 
                 src={rule.image.src}
                 type={rule.type}

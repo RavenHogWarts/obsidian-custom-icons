@@ -1,18 +1,14 @@
+English | [中文](./README-zh.md)
+
 # Custom Icons
 
 Enhance your workspace with customizable icons for documents and folders.
 
-<div align="center">
-
-![Obsidian Downloads](https://img.shields.io/badge/dynamic/json?logo=obsidian&color=%23483699&label=downloads&query=%24%5B%22custom-sidebar-icons%22%5D.downloads&url=https%3A%2F%2Fraw.githubusercontent.com%2Fobsidianmd%2Fobsidian-releases%2Fmaster%2Fcommunity-plugin-stats.json)
-![GitHub stars](https://img.shields.io/github/stars/RavenHogWarts/obsidian-custom-icons?style=flat)
-![latest download](https://img.shields.io/github/downloads/RavenHogWarts/obsidian-custom-icons/latest/total?style=plastic)
-[![Github release](https://img.shields.io/github/manifest-json/v/RavenHogWarts/obsidian-custom-icons?color=blue)](https://github.com/RavenHogWarts/obsidian-custom-icons/releases/latest)
-![GitHub release (latest by date including pre-releases)](https://img.shields.io/github/v/release/RavenHogWarts/obsidian-custom-icons?include_prereleases&label=BRAT%20beta)
-
-[中文](https://github.com/RavenHogWarts/obsidian-custom-icons/blob/master/README_ZH.md) | [English](README.md)
-
-</div>
+[![GitHub stars](https://img.shields.io/github/stars/RavenHogWarts/obsidian-custom-icons?style=flat&label=Stars)](https://github.com/RavenHogWarts/obsidian-custom-icons/stargazers)
+[![Total Downloads](https://img.shields.io/github/downloads/RavenHogWarts/obsidian-custom-icons/total?style=flat&label=Total%20Downloads)](https://github.com/RavenHogWarts/obsidian-custom-icons/releases)
+[![GitHub License](https://img.shields.io/github/license/RavenHogWarts/obsidian-custom-icons?style=flat&label=License)](https://github.com/RavenHogWarts/obsidian-custom-icons/blob/master/LICENSE)
+[![GitHub Issues](https://img.shields.io/github/issues/RavenHogWarts/obsidian-custom-icons?style=flat&label=Issues)](https://github.com/RavenHogWarts/obsidian-custom-icons/issues)
+[![GitHub Last Commit](https://img.shields.io/github/last-commit/RavenHogWarts/obsidian-custom-icons?style=flat&label=Last%20Commit)](https://github.com/RavenHogWarts/obsidian-custom-icons/commits/master)
 
 ## Usage
 
@@ -35,8 +31,7 @@ Currently, there are two ways to set the icons:
 ![Usage](attachment/Usage_EN.png)
 
 ## Installation
-
-### Install from Community Plugins
+### Community plugin market installation
 
 [Click to install](obsidian://show-plugin?id=custom-sidebar-icons), or:
 
@@ -44,39 +39,49 @@ Currently, there are two ways to set the icons:
 2. Search for "Custom Icons".
 3. Click "Install".
 
-### Install via BRAT Plugin
-
-1. Install the [BRAT plugin](obsidian://show-plugin?id=obsidian42-brat) from Community Plugins.
-2. In the BRAT plugin settings, click "Add Beta Plugin".
-3. Enter the URL `https://github.com/RavenHogWarts/obsidian-custom-icons`.
-4. Enable "Custom Icons" in "Third-party Plugins".
-
 ### Manual Installation
 
-1. Download the latest release from [Releases](https://github.com/RavenHogWarts/obsidian-custom-icons/releases/latest).
-2. Copy `main.js`, `styles.css` and `manifest.json` to `VaultFolder/.obsidian/plugins/custom-sidebar-icons/`.
-3. Reload plugins and enable "Custom Icons" in "Third-party Plugins".
+1. Download the latest release
+2. Copy `main.js`, `styles.css`, and `manifest.json` to your vault's plugins folder: `<vault>/.obsidian/plugins/obsidian-custom-icons/`
+3. Reload Obsidian
+4. Enable the plugin in Settings → Community Plugins
 
-## How to Build
+### BRAT (Recommended for Beta Users)
 
-1. Clone the repository: `git clone https://github.com/RavenHogWarts/obsidian-custom-icons`.
-2. Install dependencies: `npm install`.
-3. Start development: `npm run dev`.
-4. Build for production: `npm run build`.
+1. Install [BRAT](https://github.com/TfTHacker/obsidian42-brat) plugin
+2. Click "Add Beta plugin" in BRAT settings
+3. Enter `RavenHogWarts/obsidian-custom-icons`
+4. Enable the plugin
+
+## Development
+
+- Clone this repo
+- Make sure your NodeJS is at least v16 (`node --version`)
+- `npm i` or `yarn` to install dependencies
+- `npm run dev` to start compilation in watch mode
+- `npm run build` to build the plugin
+- `npm run build:local` to build the plugin and copy it to your vault's plugins folder(need create a .env file in the project root and add the line: VAULT_PATH=/path/to/your/vault)
+- `npm run version` to bump the version number and update the manifest.json, version.json, package.json
+- `npm run release` to build the plugin and bump the version number
+
+## Support
+
+If you encounter any issues or have suggestions:
+- [Open an issue](https://github.com/RavenHogWarts/obsidian-custom-icons/issues) on GitHub
+- [Join the discussion](https://github.com/RavenHogWarts/obsidian-custom-icons/discussions) for questions and ideas
+
+If you find this plugin helpful, you can support the development through:
+- WeChat/Alipay: [QR Code](https://s2.loli.net/2024/05/06/lWBj3ObszUXSV2f.png)
 
 ## License
 
-[Custom Icons](https://github.com/RavenHogWarts/obsidian-custom-icons) is licensed under the MIT License. See [LICENSE](https://github.com/RavenHogWarts/obsidian-custom-icons/blob/master/LICENSE) for more information.
+This project is licensed under the MIT LICENSE - see the [LICENSE](LICENSE) file for details.
+
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=RavenHogWarts/obsidian-custom-icons&type=Timeline)](https://www.star-history.com/#RavenHogWarts/obsidian-custom-icons&Timeline)
 
 ## Acknowledgements
 
 - [obsidian-metadata-icon](https://github.com/Benature/obsidian-metadata-icon)
 - [Templater](https://github.com/SilentVoid13/Templater)
-
-## Support
-
-If you find this plugin useful and wish to support its development, you can do so through the following methods: WeChat, Alipay, [Love Power Donation](https://afdian.net/a/ravenhogwarts) or [Paypal](https://www.paypal.com/paypalme/RavenHogwarts). Any amount of support is appreciated. Thank you!
-
-<p align="center">
-<img src="https://s2.loli.net/2024/05/06/lWBj3ObszUXSV2f.png" width="500px">
-</p>

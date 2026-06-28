@@ -1,6 +1,7 @@
 export interface IPluginSettings {
 	communityPlugins: {
 		enable: boolean;
+		enableSearchResults: boolean;
 		default: ICommunityPluginIcon;
 		data: Record<string, ICommunityPluginIconOverride>;
 	};
@@ -51,6 +52,7 @@ export interface ICustomSVGIcon {
 export const DEFAULT_SETTINGS: IPluginSettings = {
 	communityPlugins: {
 		enable: false,
+		enableSearchResults: false,
 		default: { id: "", icon: "puzzle", type: "lucide", color: "" },
 		data: {},
 	},

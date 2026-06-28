@@ -162,6 +162,23 @@ export const CommunityPlugin: FC = () => {
 					}
 				/>
 				<SettingItem
+					name={LL.settings.communityPlugin.searchResults.name()}
+					desc={LL.settings.communityPlugin.searchResults.desc()}
+					control={
+						<>
+							<Toggle
+								value={settings.communityPlugins.enableSearchResults}
+								onChange={async (value) => {
+									await settingsStore.updateSettingByPath(
+										"communityPlugins.enableSearchResults",
+										value,
+									);
+								}}
+							/>
+						</>
+					}
+				/>
+				<SettingItem
 					name={LL.settings.communityPlugin.default.name()}
 					desc={LL.settings.communityPlugin.default.desc()}
 					control={

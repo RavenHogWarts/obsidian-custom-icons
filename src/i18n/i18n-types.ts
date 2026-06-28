@@ -32,6 +32,16 @@ type RootTranslation = {
 				 */
 				desc: string
 			}
+			searchResults: {
+				/**
+				 * 在​搜​索​结​果​中​显​示​图​标
+				 */
+				name: string
+				/**
+				 * 在​设​置​搜​索​结​果​中​显​示​插​件​图​标​（​仅​在​ ​O​b​s​i​d​i​a​n​ ​1​.​1​3​.​0​+​ ​生​效​）
+				 */
+				desc: string
+			}
 			'default': {
 				/**
 				 * 默​认​图​标
@@ -183,6 +193,16 @@ export type TranslationFunctions = {
 				name: () => LocalizedString
 				/**
 				 * 为没有图标的第三方插件设置添加图标
+				 */
+				desc: () => LocalizedString
+			}
+			searchResults: {
+				/**
+				 * 在搜索结果中显示图标
+				 */
+				name: () => LocalizedString
+				/**
+				 * 在设置搜索结果中显示插件图标（仅在 Obsidian 1.13.0+ 生效）
 				 */
 				desc: () => LocalizedString
 			}

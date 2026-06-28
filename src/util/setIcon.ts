@@ -29,6 +29,31 @@ function createDetachedDiv(ownerDocument: Document): HTMLDivElement {
 	return ownerDocument.createElement("div");
 }
 
+function parseSvgMarkup(
+	ownerDocument: Document,
+	svgMarkup: string,
+): SVGElement | null {
+	const parser = new DOMParser();
+	const parsedDocument = parser.parseFromString(svgMarkup, "image/svg+xml");
+	const svgElement = parsedDocument.documentElement;
+	const svgView = ownerDocument.defaultView?.SVGElement;
+
+	if (
+		svgElement.tagName.toLowerCase() !== "svg" ||
+		svgElement.namespaceURI !== "http://www.w3.org/2000/svg"
+	) {
+		return null;
+	}
+
+	const importedNode = ownerDocument.importNode(svgElement, true);
+
+	if (svgView && importedNode instanceof svgView) {
+		return importedNode;
+	}
+
+	return null;
+}
+
 function createLucideSvg(
 	ownerDocument: Document,
 	IconComponent: React.ComponentType<{
@@ -49,11 +74,7 @@ function createLucideSvg(
 		}),
 	);
 
-	const tempContainer = createDetachedDiv(ownerDocument);
-	tempContainer.innerHTML = svgString;
-	const svgElement = tempContainer.firstElementChild;
-
-	return svgElement instanceof SVGElement ? svgElement : null;
+	return parseSvgMarkup(ownerDocument, svgString);
 }
 
 /**

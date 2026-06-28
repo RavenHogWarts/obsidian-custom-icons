@@ -8,6 +8,10 @@ const en = {
 				name: "Enable feature",
 				desc: "Add icons for community plugins without icons",
 			},
+			searchResults: {
+				name: "Show icons in search results",
+				desc: "Show plugin icons in settings search results (only effective in Obsidian 1.13.0+)",
+			},
 			default: {
 				name: "Default icon",
 				desc: "Set a default icon for community plugins without icons",

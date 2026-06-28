@@ -8,6 +8,10 @@ const zh = {
 				name: "启用功能",
 				desc: "为没有图标的第三方插件设置添加图标",
 			},
+			searchResults: {
+				name: "在搜索结果中显示图标",
+				desc: "在设置搜索结果中显示插件图标（仅在 Obsidian 1.13.0+ 生效）",
+			},
 			default: {
 				name: "默认图标",
 				desc: "为没有图标的第三方插件设置添加默认图标",

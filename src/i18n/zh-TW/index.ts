@@ -8,6 +8,10 @@ const zh_TW = {
 				name: "啟用功能",
 				desc: "為沒有圖示的第三方外掛程式設定添加圖示",
 			},
+			searchResults: {
+				name: "在搜尋結果中顯示圖示",
+				desc: "在設定搜尋結果中顯示外掛程式圖示（僅在 Obsidian 1.13.0+ 生效）",
+			},
 			default: {
 				name: "預設圖示",
 				desc: "為沒有圖示的第三方外掛程式設定添加預設圖示",

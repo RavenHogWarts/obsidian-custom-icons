@@ -8,6 +8,7 @@ import setIcon from "@src/util/setIcon";
 
 interface ICommunityPluginConfig {
 	enable: boolean;
+	enableSearchResults: boolean;
 	default: ICommunityPluginIcon;
 	data: Record<string, ICommunityPluginIconOverride>;
 }
@@ -18,6 +19,19 @@ interface ICommunityPluginConfig {
  */
 export default class CommunityPluginIconHandler extends AbstractIconHandler<ICommunityPluginConfig> {
 	readonly id = "communityPlugins";
+	private readonly pluginListContainerClassName =
+		"custom-icon-community-plugins";
+	private readonly searchResultsContainerClassName =
+		"custom-icon-community-plugin-search-results";
+	private readonly pluginListItemClassName =
+		"custom-icon-community-plugin-item";
+	private readonly searchResultItemClassName =
+		"custom-icon-community-plugin-search-result-item";
+	private readonly pluginNavItemSelector =
+		".vertical-tab-nav-item[data-setting-id]";
+	private readonly searchResultItemSelector = ".setting-search-result-tab";
+	private readonly searchResultCleanupSelector =
+		".setting-search-result-tab, .setting-search-result-group-items .setting-search-result-item";
 
 	private mutationObserver: MutationObserver | null = null;
 
@@ -29,7 +43,20 @@ export default class CommunityPluginIconHandler extends AbstractIconHandler<ICom
 
 		// 等待布局准备好
 		this.app.workspace.onLayoutReady(() => {
-			this.addContainerClassName();
+			if (this.isPluginListEnabled()) {
+				this.addPluginListContainerClassName();
+			} else {
+				this.removePluginListContainerClassName();
+				this.removePluginListIcons();
+			}
+
+			if (this.isSearchResultsEnabled()) {
+				this.addSearchResultsContainerClassName();
+			} else {
+				this.removeSearchResultsContainerClassName();
+				this.removeSearchResultIcons();
+			}
+
 			this.applyIconsToExistingPlugins();
 			this.setupMutationObserver();
 		});
@@ -42,40 +69,58 @@ export default class CommunityPluginIconHandler extends AbstractIconHandler<ICom
 		}
 
 		// 移除容器类名
-		this.removeContainerClassName();
+		this.removePluginListContainerClassName();
+		this.removeSearchResultsContainerClassName();
 
 		// 移除所有自定义图标
 		this.removeCustomIcons();
 	}
 
 	isEnabled(): boolean {
+		return this.isPluginListEnabled() || this.isSearchResultsEnabled();
+	}
+
+	private isPluginListEnabled(): boolean {
 		return this.settings?.enable ?? false;
+	}
+
+	private isSearchResultsEnabled(): boolean {
+		return this.settings?.enableSearchResults ?? false;
 	}
 
 	/**
 	 * 为容器添加自定义类名
 	 */
-	private addContainerClassName(): void {
-		// @ts-ignore
+	private addPluginListContainerClassName(): void {
 		const container = this.app.setting?.communityPluginTabContainer;
 
 		if (container) {
-			(container as HTMLElement).classList.add(
-				"custom-icon-community-plugins",
-			);
+			container.classList.add(this.pluginListContainerClassName);
 		}
 	}
 
 	/**
 	 * 移除容器的自定义类名
 	 */
-	private removeContainerClassName(): void {
-		// @ts-ignore
+	private removePluginListContainerClassName(): void {
 		const container = this.app.setting?.communityPluginTabContainer;
 		if (container) {
-			(container as HTMLElement).classList.remove(
-				"custom-icon-community-plugins",
-			);
+			container.classList.remove(this.pluginListContainerClassName);
+		}
+	}
+
+	private addSearchResultsContainerClassName(): void {
+		const container = this.app.setting?.tabHeadersEl;
+
+		if (container) {
+			container.classList.add(this.searchResultsContainerClassName);
+		}
+	}
+
+	private removeSearchResultsContainerClassName(): void {
+		const container = this.app.setting?.tabHeadersEl;
+		if (container) {
+			container.classList.remove(this.searchResultsContainerClassName);
 		}
 	}
 
@@ -83,16 +128,25 @@ export default class CommunityPluginIconHandler extends AbstractIconHandler<ICom
 	 * 为已存在的插件项添加图标
 	 */
 	private applyIconsToExistingPlugins(): void {
-		// @ts-ignore
-		const communityPluginTabContainer =
-			this.app.setting?.communityPluginTabContainer;
-
-		if (!communityPluginTabContainer) {
-			return;
+		if (this.isPluginListEnabled()) {
+			const pluginListContainer =
+				this.app.setting?.communityPluginTabContainer;
+			if (pluginListContainer) {
+				this.applyPluginListIconsInContainer(pluginListContainer);
+			}
 		}
 
-		const pluginNavItems = communityPluginTabContainer.querySelectorAll(
-			".vertical-tab-nav-item[data-setting-id]",
+		if (this.isSearchResultsEnabled()) {
+			const searchContainer = this.app.setting?.tabHeadersEl;
+			if (searchContainer) {
+				this.applySearchResultIconsInContainer(searchContainer);
+			}
+		}
+	}
+
+	private applyPluginListIconsInContainer(container: ParentNode): void {
+		const pluginNavItems = container.querySelectorAll(
+			this.pluginNavItemSelector,
 		) as NodeListOf<HTMLElement>;
 
 		pluginNavItems.forEach((navItemEl) => {
@@ -100,10 +154,22 @@ export default class CommunityPluginIconHandler extends AbstractIconHandler<ICom
 		});
 	}
 
+	private applySearchResultIconsInContainer(container: ParentNode): void {
+		const searchResultItems = container.querySelectorAll(
+			this.searchResultItemSelector,
+		) as NodeListOf<HTMLElement>;
+
+		searchResultItems.forEach((resultEl) => {
+			this.applyIconToSearchResult(resultEl);
+		});
+	}
+
 	/**
 	 * 为单个导航项应用图标
 	 */
 	private applyIconToNavItem(navItemEl: HTMLElement): void {
+		if (!this.isPluginListEnabled()) return;
+
 		const pluginId = navItemEl.getAttribute("data-setting-id");
 		if (!pluginId) return;
 
@@ -116,10 +182,50 @@ export default class CommunityPluginIconHandler extends AbstractIconHandler<ICom
 		this.addIconToPluginNavItem(navItemEl, iconConfig);
 	}
 
+	private applyIconToSearchResult(resultEl: HTMLElement): void {
+		if (!this.isSearchResultsEnabled()) return;
+
+		const pluginId = this.resolvePluginIdFromSearchResult(resultEl);
+		if (!pluginId) return;
+
+		const iconConfig = resolveCommunityPluginIcon(
+			pluginId,
+			this.settings.default,
+			this.settings.data[pluginId],
+		);
+
+		this.addIconToPluginNavItem(resultEl, iconConfig);
+	}
+
+	private resolvePluginIdFromSearchResult(
+		resultEl: HTMLElement,
+	): string | null {
+		const pluginId = resultEl.getAttribute("data-setting-id");
+		if (pluginId) return pluginId;
+
+		const labelEl = resultEl.querySelector(
+			".setting-search-result-tab-label, .vertical-tab-nav-item-title",
+		);
+		const pluginName = labelEl?.textContent?.replace(/\s+/g, " ").trim();
+		if (!pluginName) return null;
+
+		const matches = Object.entries(this.app.plugins.manifests).filter(
+			([, manifest]) => manifest.name === pluginName,
+		);
+
+		if (matches.length !== 1) {
+			return null;
+		}
+
+		return matches[0][0];
+	}
+
 	private addIconToPluginNavItem(
 		navItemEl: HTMLElement,
 		communityPlugin: ICommunityPluginIcon,
 	) {
+		this.addItemClassName(navItemEl);
+
 		// 检查是否存在原生图标（没有 custom-icon 类的）
 		const nativeIcon = navItemEl.querySelector(
 			".vertical-tab-nav-item-icon:not(.custom-icon)",
@@ -181,11 +287,9 @@ export default class CommunityPluginIconHandler extends AbstractIconHandler<ICom
 			this.mutationObserver.disconnect();
 		}
 
-		// @ts-ignore
-		const communityPluginTabContainer =
-			this.app.setting?.communityPluginTabContainer;
+		const observedContainers = this.getObservedContainers();
 
-		if (!communityPluginTabContainer) {
+		if (observedContainers.length === 0) {
 			return;
 		}
 
@@ -197,35 +301,111 @@ export default class CommunityPluginIconHandler extends AbstractIconHandler<ICom
 
 			mutations.forEach((mutation) => {
 				mutation.addedNodes.forEach((node) => {
-					if (
-						node.instanceOf(HTMLElement) &&
-						node.classList.contains("vertical-tab-nav-item") &&
-						node.hasAttribute("data-setting-id")
-					) {
-						this.applyIconToNavItem(node);
-					}
+					if (!node.instanceOf(HTMLElement)) return;
+
+					this.applyIconsForElementTree(node);
 				});
 			});
 		});
 
-		// 开始观察社区插件容器的子元素变化
-		this.mutationObserver.observe(communityPluginTabContainer, {
-			childList: true,
-			subtree: true,
+		observedContainers.forEach((container) => {
+			this.mutationObserver?.observe(container, {
+				childList: true,
+				subtree: true,
+			});
 		});
+	}
+
+	private applyIconsForElementTree(rootEl: HTMLElement): void {
+		if (
+			this.isPluginListEnabled() &&
+			rootEl.matches(this.pluginNavItemSelector)
+		) {
+			this.applyIconToNavItem(rootEl);
+		}
+
+		if (
+			this.isSearchResultsEnabled() &&
+			rootEl.matches(this.searchResultItemSelector)
+		) {
+			this.applyIconToSearchResult(rootEl);
+		}
+
+		if (this.isPluginListEnabled()) {
+			this.applyPluginListIconsInContainer(rootEl);
+		}
+
+		if (this.isSearchResultsEnabled()) {
+			this.applySearchResultIconsInContainer(rootEl);
+		}
+	}
+
+	private getObservedContainers(): HTMLElement[] {
+		const containers = [
+			this.isPluginListEnabled()
+				? this.app.setting?.communityPluginTabContainer
+				: null,
+			this.isSearchResultsEnabled()
+				? this.app.setting?.tabHeadersEl
+				: null,
+		].filter((container): container is HTMLElement => Boolean(container));
+
+		return Array.from(new Set(containers));
 	}
 
 	/**
 	 * 移除所有自定义图标
 	 */
 	private removeCustomIcons(): void {
-		const communityPluginTabContainer =
-			this.app.setting.communityPluginTabContainer;
+		this.removePluginListIcons();
+		this.removeSearchResultIcons();
+	}
 
-		const customIcons = communityPluginTabContainer.querySelectorAll(
-			".vertical-tab-nav-item-icon.custom-icon",
+	private removePluginListIcons(): void {
+		const container = this.app.setting?.communityPluginTabContainer;
+		if (!container) return;
+
+		this.removeCustomIconsFromContainer(
+			container,
+			this.pluginNavItemSelector,
 		);
+	}
 
-		customIcons.forEach((icon) => icon.remove());
+	private removeSearchResultIcons(): void {
+		const container = this.app.setting?.tabHeadersEl;
+		if (!container) return;
+
+		this.removeCustomIconsFromContainer(
+			container,
+			this.searchResultCleanupSelector,
+		);
+	}
+
+	private removeCustomIconsFromContainer(
+		container: ParentNode,
+		itemSelector: string,
+	): void {
+		const items = container.querySelectorAll(itemSelector);
+		items.forEach((item) => {
+			if (item.instanceOf(HTMLElement)) {
+				item.classList.remove(this.pluginListItemClassName);
+				item.classList.remove(this.searchResultItemClassName);
+			}
+
+			const customIcons = item.querySelectorAll(
+				".vertical-tab-nav-item-icon.custom-icon",
+			);
+			customIcons.forEach((icon) => icon.remove());
+		});
+	}
+
+	private addItemClassName(itemEl: HTMLElement): void {
+		if (itemEl.matches(this.pluginNavItemSelector)) {
+			itemEl.classList.add(this.pluginListItemClassName);
+		}
+
+		if (itemEl.matches(this.searchResultItemSelector)) {
+			itemEl.classList.add(this.searchResultItemClassName);
+		}
 	}
 }

@@ -48,6 +48,13 @@ const zh = {
 				customized: "已自定义",
 			},
 		},
+		experimental: {
+			name: "实验性",
+			keepPluginFirst: {
+				name: "始终最先加载本插件",
+				desc: "自动把本插件保持在 .obsidian/community-plugins.json 数组首位（社区插件按此顺序加载），避免其他插件因加载顺序出现图标空白。每次启用/禁用插件后 Obsidian 会重写该数组，本功能会在本插件加载时自动修正。仅调整顺序、不增删条目；对当前会话无效，下次启动生效。实验性功能，如出现异常请关闭。",
+			},
+		},
 	},
 	common: {
 		save: "保存",

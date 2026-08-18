@@ -48,6 +48,13 @@ const en = {
 				customized: "Customized",
 			},
 		},
+		experimental: {
+			name: "Experimental",
+			keepPluginFirst: {
+				name: "Always load this plugin first",
+				desc: "Automatically keep this plugin at the front of the .obsidian/community-plugins.json array (community plugins load in this order) so other plugins never miss icons due to load order. Obsidian rewrites that array on every enable/disable; this feature re-enforces it whenever this plugin loads. It only reorders entries — never adds or removes any. Takes effect on the next restart, not the current session. Experimental: disable it if anything looks wrong.",
+			},
+		},
 	},
 	common: {
 		save: "Save",

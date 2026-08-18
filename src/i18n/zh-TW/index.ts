@@ -48,6 +48,13 @@ const zh_TW = {
 				customized: "已自訂",
 			},
 		},
+		experimental: {
+			name: "實驗性",
+			keepPluginFirst: {
+				name: "始終最先載入本插件",
+				desc: "自動把本插件保持在 .obsidian/community-plugins.json 陣列首位（社群插件按此順序載入），避免其他插件因載入順序出現圖示空白。每次啟用/停用插件後 Obsidian 會重寫該陣列，本功能會在本插件載入時自動修正。僅調整順序、不增刪條目；對目前工作階段無效，下次啟動生效。實驗性功能，如出現異常請關閉。",
+			},
+		},
 	},
 	common: {
 		save: "儲存",

@@ -21,6 +21,10 @@ export interface IPluginSettings {
 		enable: boolean;
 		data: Record<string, IRibbonIconOverride>;
 	};
+	// 实验性功能
+	experimental: {
+		keepPluginFirst: boolean;
+	};
 	customIconLib: ICustomIconLib;
 }
 
@@ -70,6 +74,9 @@ export const DEFAULT_SETTINGS: IPluginSettings = {
 	ribbon: {
 		enable: false,
 		data: {},
+	},
+	experimental: {
+		keepPluginFirst: false,
 	},
 	customIconLib: {
 		svg: [],

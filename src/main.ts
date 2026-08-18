@@ -3,6 +3,7 @@ import { Notice, Plugin } from "obsidian";
 import { LL } from "./i18n/i18n";
 import CommunityPluginIconHandler from "./service/CommunityPluginIconHandler";
 import CustomIconLibHandler from "./service/CustomIconLibHandler";
+import KeepPluginFirstHandler from "./service/KeepPluginFirstHandler";
 import RibbonIconHandler from "./service/RibbonIconHandler";
 import { PluginSettingTab } from "./settings/PluginSettingTab";
 import SettingsStore from "./settings/SettingsStore";
@@ -104,6 +105,10 @@ export default class CIPlugin extends Plugin {
 		this.iconManager.registerHandler(new CustomIconLibHandler());
 		this.iconManager.registerHandler(new CommunityPluginIconHandler());
 		this.iconManager.registerHandler(new RibbonIconHandler());
+		// 实验性功能（非图标处理器，仅复用生命周期编排）
+		this.iconManager.registerHandler(
+			new KeepPluginFirstHandler(this.manifest.id),
+		);
 
 		// 扩展示例：添加更多处理器
 		// this.iconManager.registerHandler(new SidebarViewIconHandler());

@@ -97,6 +97,56 @@ type RootTranslation = {
 				dicesTooltip: string
 			}
 		}
+		ribbon: {
+			/**
+			 * R​i​b​b​o​n​ ​侧​边​栏
+			 */
+			name: string
+			enable: {
+				/**
+				 * 启​用​功​能
+				 */
+				name: string
+				/**
+				 * 为​左​侧​ ​R​i​b​b​o​n​ ​按​钮​自​定​义​图​标
+				 */
+				desc: string
+			}
+			list: {
+				/**
+				 * 按​钮​列​表
+				 */
+				name: string
+				/**
+				 * 为​ ​R​i​b​b​o​n​ ​按​钮​分​配​图​标​（​按​按​钮​提​示​文​本​识​别​）
+				 */
+				desc: string
+				/**
+				 * 未​找​到​ ​R​i​b​b​o​n​ ​按​钮
+				 */
+				noneFound: string
+				/**
+				 * 重​置​为​原​始​图​标
+				 */
+				resetTooltip: string
+				/**
+				 * 刷​新​列​表
+				 */
+				refreshTooltip: string
+				/**
+				 * 已​有​图​标
+				 */
+				hasIcon: string
+				/**
+				 * 无​图​标
+				 */
+				noIcon: string
+				/**
+				 * 已​自​定​义
+				 */
+				customized: string
+			}
+		}
 	}
 	common: {
 		/**
@@ -267,6 +317,56 @@ export type TranslationFunctions = {
 				 * 随机图标
 				 */
 				dicesTooltip: () => LocalizedString
+			}
+		}
+		ribbon: {
+			/**
+			 * Ribbon 侧边栏
+			 */
+			name: () => LocalizedString
+			enable: {
+				/**
+				 * 启用功能
+				 */
+				name: () => LocalizedString
+				/**
+				 * 为左侧 Ribbon 按钮自定义图标
+				 */
+				desc: () => LocalizedString
+			}
+			list: {
+				/**
+				 * 按钮列表
+				 */
+				name: () => LocalizedString
+				/**
+				 * 为 Ribbon 按钮分配图标（按按钮提示文本识别）
+				 */
+				desc: () => LocalizedString
+				/**
+				 * 未找到 Ribbon 按钮
+				 */
+				noneFound: () => LocalizedString
+				/**
+				 * 重置为原始图标
+				 */
+				resetTooltip: () => LocalizedString
+				/**
+				 * 刷新列表
+				 */
+				refreshTooltip: () => LocalizedString
+				/**
+				 * 已有图标
+				 */
+				hasIcon: () => LocalizedString
+				/**
+				 * 无图标
+				 */
+				noIcon: () => LocalizedString
+				/**
+				 * 已自定义
+				 */
+				customized: () => LocalizedString
 			}
 		}
 	}

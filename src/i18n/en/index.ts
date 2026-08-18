@@ -31,6 +31,23 @@ const en = {
 				dicesTooltip: "Random icon",
 			},
 		},
+		ribbon: {
+			name: "Ribbon",
+			enable: {
+				name: "Enable feature",
+				desc: "Customize icons for the left ribbon actions",
+			},
+			list: {
+				name: "Action list",
+				desc: "Assign icons to ribbon actions (identified by tooltip text)",
+				noneFound: "No ribbon actions found",
+				resetTooltip: "Reset to original icon",
+				refreshTooltip: "Refresh list",
+				hasIcon: "Has icon",
+				noIcon: "No icon",
+				customized: "Customized",
+			},
+		},
 	},
 	common: {
 		save: "Save",

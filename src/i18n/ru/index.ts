@@ -31,6 +31,23 @@ const ru = {
 				dicesTooltip: "Случайная иконка",
 			},
 		},
+		ribbon: {
+			name: "Ribbon",
+			enable: {
+				name: "Включить функцию",
+				desc: "Настроить значки для кнопок левой боковой панели (Ribbon)",
+			},
+			list: {
+				name: "Список кнопок",
+				desc: "Назначить значки кнопкам Ribbon (распознаются по тексту подсказки)",
+				noneFound: "Кнопки Ribbon не найдены",
+				resetTooltip: "Сбросить к исходному значку",
+				refreshTooltip: "Обновить список",
+				hasIcon: "Есть значок",
+				noIcon: "Нет значка",
+				customized: "Настроено",
+			},
+		},
 	},
 	common: {
 		save: "Сохранить",

@@ -3,6 +3,7 @@ import {
 	DEFAULT_SETTINGS,
 	ICommunityPluginIconOverride,
 	IPluginSettings,
+	IRibbonIconOverride,
 } from "@src/types/types";
 import {
 	normalizeCommunityPluginOverride,
@@ -135,10 +136,48 @@ export default class SettingsStore {
 		return normalizedSettings;
 	}
 
+	#normalizeRibbonSettings(settings: IPluginSettings): IPluginSettings {
+		const normalizedSettings = JSON.parse(
+			JSON.stringify(settings),
+		) as IPluginSettings;
+		const normalizedData: Record<string, IRibbonIconOverride> = {};
+
+		Object.entries(normalizedSettings.ribbon?.data ?? {}).forEach(
+			([label, override]) => {
+				// 防原型污染 + 丢弃无意义条目（无图标则不覆盖）
+				if (
+					!label ||
+					label === "__proto__" ||
+					label === "constructor" ||
+					label === "prototype" ||
+					!override?.icon ||
+					!override.type
+				) {
+					return;
+				}
+				normalizedData[label] = {
+					id: label,
+					icon: override.icon,
+					type: override.type,
+					color: normalizeIconColor(override.color) ?? "",
+				};
+			},
+		);
+
+		normalizedSettings.ribbon.data = normalizedData;
+		return normalizedSettings;
+	}
+
+	#normalizeSettings(settings: IPluginSettings): IPluginSettings {
+		return this.#normalizeRibbonSettings(
+			this.#normalizeCommunityPluginSettings(settings),
+		);
+	}
+
 	async loadSettings() {
 		const saved: unknown = await this.#plugin.loadData();
 		// 与默认配置深度对齐：只保留定义内字段并填充缺省
-		this.#plugin.settings = this.#normalizeCommunityPluginSettings(
+		this.#plugin.settings = this.#normalizeSettings(
 			this.#mergeWithDefaults(saved ?? {}, DEFAULT_SETTINGS),
 		);
 		await this.#plugin.saveSettings();
@@ -146,7 +185,7 @@ export default class SettingsStore {
 	}
 
 	async updateSettings(settings: IPluginSettings) {
-		this.#plugin.settings = this.#normalizeCommunityPluginSettings(
+		this.#plugin.settings = this.#normalizeSettings(
 			Object.assign({}, settings),
 		);
 		await this.#plugin.saveSettings();

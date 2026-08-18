@@ -31,6 +31,23 @@ const zh_TW = {
 				dicesTooltip: "隨機圖示",
 			},
 		},
+		ribbon: {
+			name: "Ribbon 側邊欄",
+			enable: {
+				name: "啟用功能",
+				desc: "為左側 Ribbon 按鈕自訂圖示",
+			},
+			list: {
+				name: "按鈕列表",
+				desc: "為 Ribbon 按鈕分配圖示（按按鈕提示文字識別）",
+				noneFound: "未找到 Ribbon 按鈕",
+				resetTooltip: "重置為原始圖示",
+				refreshTooltip: "重新整理列表",
+				hasIcon: "已有圖示",
+				noIcon: "無圖示",
+				customized: "已自訂",
+			},
+		},
 	},
 	common: {
 		save: "儲存",

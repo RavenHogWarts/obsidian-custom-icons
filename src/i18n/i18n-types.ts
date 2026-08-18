@@ -147,6 +147,22 @@ type RootTranslation = {
 				customized: string
 			}
 		}
+		experimental: {
+			/**
+			 * 实​验​性
+			 */
+			name: string
+			keepPluginFirst: {
+				/**
+				 * 始​终​最​先​加​载​本​插​件
+				 */
+				name: string
+				/**
+				 * 自​动​把​本​插​件​保​持​在​ ​.​o​b​s​i​d​i​a​n​/​c​o​m​m​u​n​i​t​y​-​p​l​u​g​i​n​s​.​j​s​o​n​ ​数​组​首​位​（​社​区​插​件​按​此​顺​序​加​载​）​，​避​免​其​他​插​件​因​加​载​顺​序​出​现​图​标​空​白​。​每​次​启​用​/​禁​用​插​件​后​ ​O​b​s​i​d​i​a​n​ ​会​重​写​该​数​组​，​本​功​能​会​在​本​插​件​加​载​时​自​动​修​正​。​仅​调​整​顺​序​、​不​增​删​条​目​；​对​当​前​会​话​无​效​，​下​次​启​动​生​效​。​实​验​性​功​能​，​如​出​现​异​常​请​关​闭​。
+				 */
+				desc: string
+			}
+		}
 	}
 	common: {
 		/**
@@ -367,6 +383,22 @@ export type TranslationFunctions = {
 				 * 已自定义
 				 */
 				customized: () => LocalizedString
+			}
+		}
+		experimental: {
+			/**
+			 * 实验性
+			 */
+			name: () => LocalizedString
+			keepPluginFirst: {
+				/**
+				 * 始终最先加载本插件
+				 */
+				name: () => LocalizedString
+				/**
+				 * 自动把本插件保持在 .obsidian/community-plugins.json 数组首位（社区插件按此顺序加载），避免其他插件因加载顺序出现图标空白。每次启用/禁用插件后 Obsidian 会重写该数组，本功能会在本插件加载时自动修正。仅调整顺序、不增删条目；对当前会话无效，下次启动生效。实验性功能，如出现异常请关闭。
+				 */
+				desc: () => LocalizedString
 			}
 		}
 	}

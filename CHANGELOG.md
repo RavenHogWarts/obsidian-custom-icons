@@ -1,15 +1,3 @@
-# [2.1.0](https://github.com/Raven-Pensieve/obsidian-custom-icons/compare/2.0.5...2.1.0) (2026-06-28)
-
-
-### Bug Fixes
-
-* 修改SVG解析逻辑 ([32fa1cb](https://github.com/Raven-Pensieve/obsidian-custom-icons/commit/32fa1cbeae53420637146d529b1e5b2c7db70c36))
-
-
-### Features
-
-* 为设置搜索页的插件设置项补充图标 ([168be40](https://github.com/Raven-Pensieve/obsidian-custom-icons/commit/168be40f2daa86e0ec291e721229648ec1facce6))
-
 ## [2.2.0](https://github.com/Raven-Pensieve/obsidian-custom-icons/compare/2.1.0...2.2.0) (2026-08-18)
 
 
@@ -32,6 +20,18 @@
 ### 📝 文档 (Documentation)
 
 * 更新相关文档 ([a3212cf](https://github.com/Raven-Pensieve/obsidian-custom-icons/commit/a3212cf46abfa1099bc361a5c3e26241a76b41d0))
+
+## [2.1.0](https://github.com/Raven-Pensieve/obsidian-custom-icons/compare/2.0.5...2.1.0) (2026-06-28)
+
+
+### Bug Fixes
+
+* 修改SVG解析逻辑 ([32fa1cb](https://github.com/Raven-Pensieve/obsidian-custom-icons/commit/32fa1cbeae53420637146d529b1e5b2c7db70c36))
+
+
+### Features
+
+* 为设置搜索页的插件设置项补充图标 ([168be40](https://github.com/Raven-Pensieve/obsidian-custom-icons/commit/168be40f2daa86e0ec291e721229648ec1facce6))
 
 ## [2.0.5](https://github.com/Raven-Pensieve/obsidian-custom-icons/compare/2.0.4...2.0.5) (2026-05-20)
 

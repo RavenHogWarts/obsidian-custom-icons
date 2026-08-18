@@ -16,12 +16,23 @@ export interface IPluginSettings {
 	// 	folderIcons: Record<string, IFolderIcon>;
 	// 	fileIcons: Record<string, IFileIcon>;
 	// };
+	// Ribbon 按钮（左侧 .side-dock-actions），以 aria-label 为映射键
+	ribbon: {
+		enable: boolean;
+		data: Record<string, IRibbonIconOverride>;
+	};
 	customIconLib: ICustomIconLib;
 }
 
 // Reference
 export interface ICommunityPluginIcon extends IIcon {}
 export interface ICommunityPluginIconOverride {
+	id: string;
+	icon?: string;
+	type?: IconType;
+	color?: string;
+}
+export interface IRibbonIconOverride {
 	id: string;
 	icon?: string;
 	type?: IconType;
@@ -54,6 +65,10 @@ export const DEFAULT_SETTINGS: IPluginSettings = {
 		enable: false,
 		enableSearchResults: false,
 		default: { id: "", icon: "puzzle", type: "lucide", color: "" },
+		data: {},
+	},
+	ribbon: {
+		enable: false,
 		data: {},
 	},
 	customIconLib: {

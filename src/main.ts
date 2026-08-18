@@ -3,6 +3,7 @@ import { Notice, Plugin } from "obsidian";
 import { LL } from "./i18n/i18n";
 import CommunityPluginIconHandler from "./service/CommunityPluginIconHandler";
 import CustomIconLibHandler from "./service/CustomIconLibHandler";
+import RibbonIconHandler from "./service/RibbonIconHandler";
 import { PluginSettingTab } from "./settings/PluginSettingTab";
 import SettingsStore from "./settings/SettingsStore";
 import { IPluginSettings } from "./types/types";
@@ -102,11 +103,11 @@ export default class CIPlugin extends Plugin {
 		// 详见 dev/260818/handler顺序与重启空白修复.md
 		this.iconManager.registerHandler(new CustomIconLibHandler());
 		this.iconManager.registerHandler(new CommunityPluginIconHandler());
+		this.iconManager.registerHandler(new RibbonIconHandler());
 
 		// 扩展示例：添加更多处理器
 		// this.iconManager.registerHandler(new SidebarViewIconHandler());
 		// this.iconManager.registerHandler(new FileExplorerIconHandler());
-		// this.iconManager.registerHandler(new RibbonIconHandler());
 	}
 
 	// private manageLeaf(leaf: WorkspaceLeaf) {

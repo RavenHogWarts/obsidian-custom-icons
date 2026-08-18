@@ -64,10 +64,11 @@ function createLucideSvg(
 	}>,
 	resolvedColor?: string,
 	className = "svg-icon",
+	size = 16,
 ): SVGElement | null {
 	const svgString = renderToStaticMarkup(
 		React.createElement(IconComponent, {
-			size: 16,
+			size,
 			strokeWidth: 2,
 			color: resolvedColor,
 			className,
@@ -85,15 +86,17 @@ function createLucideSvg(
  * @param options - 配置选项
  * @param options.append - 如果为 true，将图标作为子元素追加；否则替换元素内容
  * @param options.color - 图标颜色，留空时继承默认颜色
+ * @param options.size - 图标尺寸（px），默认 16；如 Ribbon 按钮原生为 24
  * @returns 渲染图标的容器元素（仅当 append 为 true 时）
  */
 export default function (
 	el: HTMLElement,
 	iconType: IconType,
 	icon: string,
-	options?: { append?: boolean; color?: string },
+	options?: { append?: boolean; color?: string; size?: number },
 ): HTMLElement | void {
 	const resolvedColor = normalizeColor(options?.color);
+	const size = options?.size ?? 16;
 
 	// 检查图标是否已经是目标图标，如果是则跳过渲染（仅对非 append 模式）
 	if (!options?.append) {
@@ -120,6 +123,7 @@ export default function (
 						IconComponent,
 						resolvedColor,
 						"lucide-icon",
+						size,
 					);
 					if (svgElement) {
 						applyIconColor(svgElement, resolvedColor);
@@ -134,6 +138,8 @@ export default function (
 						el.ownerDocument,
 						IconComponent,
 						resolvedColor,
+						"svg-icon",
+						size,
 					);
 					if (svgElement) {
 						applyIconColor(svgElement, resolvedColor);
@@ -154,9 +160,15 @@ export default function (
 					iconStateMap.delete(el);
 				}
 			}
-		} else {
-			console.warn(`Lucide icon "${icon}" not found`);
-		}
+			} else {
+				console.warn(`Lucide icon "${icon}" not found`);
+				if (!options?.append) {
+					// 替换模式下清空旧内容并移除状态，与 svg 分支保持一致的替换语义
+					// （否则色块/容器会残留上一次的图标，如重置后的 IconPicker）
+					el.empty();
+					iconStateMap.delete(el);
+				}
+			}
 	} else if (iconType === "svg") {
 		if (options?.append) {
 			const tempContainer = createDetachedDiv(el.ownerDocument);
@@ -168,10 +180,10 @@ export default function (
 			const svgElement = tempContainer.querySelector("svg");
 			if (svgElement) {
 				if (!svgElement.getAttribute("width")) {
-					svgElement.setAttribute("width", "16");
+					svgElement.setAttribute("width", String(size));
 				}
 				if (!svgElement.getAttribute("height")) {
-					svgElement.setAttribute("height", "16");
+					svgElement.setAttribute("height", String(size));
 				}
 				svgElement.classList.add("svg-icon");
 				applyIconColor(svgElement, resolvedColor);
@@ -198,10 +210,10 @@ export default function (
 				});
 
 				if (!svgElement.getAttribute("width")) {
-					svgElement.setAttribute("width", "16");
+					svgElement.setAttribute("width", String(size));
 				}
 				if (!svgElement.getAttribute("height")) {
-					svgElement.setAttribute("height", "16");
+					svgElement.setAttribute("height", String(size));
 				}
 				svgElement.classList.add("svg-icon");
 				applyIconColor(svgElement, resolvedColor);

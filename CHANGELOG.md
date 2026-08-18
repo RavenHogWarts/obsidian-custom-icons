@@ -10,6 +10,29 @@
 
 * 为设置搜索页的插件设置项补充图标 ([168be40](https://github.com/Raven-Pensieve/obsidian-custom-icons/commit/168be40f2daa86e0ec291e721229648ec1facce6))
 
+## [2.2.0](https://github.com/Raven-Pensieve/obsidian-custom-icons/compare/2.1.0...2.2.0) (2026-08-18)
+
+
+### ✨ 新增功能 (Features)
+
+* 保证插件第一个加载 ([5344cc9](https://github.com/Raven-Pensieve/obsidian-custom-icons/commit/5344cc9b4774eca65b8ed93f0ea67dd37a5a720c))
+* 新增 Ribbon 图标处理器 ([6eb6bb2](https://github.com/Raven-Pensieve/obsidian-custom-icons/commit/6eb6bb25d107d4996df9990bae221af8b0547928))
+
+
+### 🐛 问题修复 (Bug Fixes)
+
+* 修复 CustomIconLib 启动显示问题 ([a6c4c1c](https://github.com/Raven-Pensieve/obsidian-custom-icons/commit/a6c4c1c6849bbaa0957391f451364c8593db8e6d))
+
+
+### ♻️ 重构 (Refactor)
+
+* 移除合作协议 ([85373ef](https://github.com/Raven-Pensieve/obsidian-custom-icons/commit/85373ef93f94a6456239d36d75cb60feff0fe8cb))
+
+
+### 📝 文档 (Documentation)
+
+* 更新相关文档 ([a3212cf](https://github.com/Raven-Pensieve/obsidian-custom-icons/commit/a3212cf46abfa1099bc361a5c3e26241a76b41d0))
+
 ## [2.0.5](https://github.com/Raven-Pensieve/obsidian-custom-icons/compare/2.0.4...2.0.5) (2026-05-20)
 
 
@@ -177,6 +200,3 @@
 
 * Add manifest-beta.json for custom sidebar icons ([2151799](https://github.com/RavenHogWarts/obsidian-custom-icons/commit/2151799f1e9ab86d64e48540e8dddc962f1f8aaf))
 * **release:** 更新发布工作流并添加赞助信息 (#24) ([8162c2a](https://github.com/RavenHogWarts/obsidian-custom-icons/commit/8162c2a032fd294a13d022107996753f8800167d)), closes [#24](https://github.com/RavenHogWarts/obsidian-custom-icons/issues/24)
-
-
-

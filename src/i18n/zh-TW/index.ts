@@ -1,4 +1,4 @@
-import type { BaseTranslation } from "../i18n-types";
+import type { BaseTranslation } from '../i18n-types'
 
 const zh_TW = {
 	settings: {
@@ -43,6 +43,8 @@ const zh_TW = {
 		CustomIconLib: {
 			name: "自訂圖示庫",
 			command: "打開自訂圖示庫",
+			reapplyCommand: "重新套用所有圖示",
+			reapplyNotice: "已重新套用所有自訂圖示",
 			searchPlaceholder: "搜索圖示...",
 			svg: {
 				tabName: "SVG（實驗性）",
@@ -53,8 +55,7 @@ const zh_TW = {
 					idPlaceholder: "圖示ID (例如: my-icon)",
 					contentPlaceholder: "SVG 內容 (<svg>...</svg>)",
 					selectFiles: "選擇 SVG 檔案",
-					selectFilesDesc:
-						"可以選擇多個 SVG 檔案進行批量添加，將使用檔案名作為圖示 ID。",
+					selectFilesDesc: "可以選擇多個 SVG 檔案進行批量添加，將使用檔案名作為圖示 ID。",
 					selectedFiles: "已選擇 {count:number} 個檔案",
 				},
 			},

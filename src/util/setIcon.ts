@@ -138,14 +138,15 @@ export default function (
 					if (svgElement) {
 						applyIconColor(svgElement, resolvedColor);
 						el.appendChild(svgElement);
-					}
 
-					// 更新图标状态
-					iconStateMap.set(el, {
-						type: iconType,
-						icon,
-						color: resolvedColor,
-					});
+						// 更新图标状态（仅当实际渲染出图标时记录，
+						// 避免"渲染失败却被去重跳过"的空白固化）
+						iconStateMap.set(el, {
+							type: iconType,
+							icon,
+							color: resolvedColor,
+						});
+					}
 				}
 			} catch (error) {
 				console.error(`Error rendering Lucide icon "${icon}":`, error);
@@ -184,14 +185,18 @@ export default function (
 			if (el.children.length === 0) {
 				obsidianSetIcon(el, `CI-${icon}`);
 			}
-			iconStateMap.set(el, {
-				type: iconType,
-				icon,
-				color: resolvedColor,
-			});
 
 			const svgElement = el.querySelector("svg");
+			// 仅当实际渲染出图标时记录状态并应用样式；
+			// 渲染失败（如库图标尚未注册）时不记录，让下一轮 apply 重试，
+			// 避免"渲染失败却被去重跳过"的空白固化
 			if (svgElement) {
+				iconStateMap.set(el, {
+					type: iconType,
+					icon,
+					color: resolvedColor,
+				});
+
 				if (!svgElement.getAttribute("width")) {
 					svgElement.setAttribute("width", "16");
 				}

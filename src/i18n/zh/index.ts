@@ -43,6 +43,8 @@ const zh = {
 		CustomIconLib: {
 			name: "自定义图标库",
 			command: "打开自定义图标库",
+			reapplyCommand: "重新应用所有图标",
+			reapplyNotice: "已重新应用所有自定义图标",
 			searchPlaceholder: "搜索图标...",
 			svg: {
 				tabName: "SVG（实验性）",

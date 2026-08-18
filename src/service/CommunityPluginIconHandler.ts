@@ -269,13 +269,17 @@ export default class CommunityPluginIconHandler extends AbstractIconHandler<ICom
 			color: communityPlugin.color,
 		});
 
-		// 保存图标信息到数据属性
-		iconContainer.setAttribute("data-icon-type", communityPlugin.type);
-		iconContainer.setAttribute("data-icon-name", communityPlugin.icon);
-		iconContainer.setAttribute(
-			"data-icon-color",
-			communityPlugin.color || "",
-		);
+		// 仅当实际渲染出图标时记录 data-icon-* 属性；
+		// 渲染失败（如库图标尚未注册）时不记录，
+		// 让下一轮 apply 重试而非跳过（避免空白固化）
+		if (iconContainer.querySelector("svg")) {
+			iconContainer.setAttribute("data-icon-type", communityPlugin.type);
+			iconContainer.setAttribute("data-icon-name", communityPlugin.icon);
+			iconContainer.setAttribute(
+				"data-icon-color",
+				communityPlugin.color || "",
+			);
+		}
 	}
 
 	/**

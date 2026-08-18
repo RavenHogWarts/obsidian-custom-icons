@@ -1,4 +1,4 @@
-import type { BaseTranslation } from "../i18n-types";
+import type { BaseTranslation } from '../i18n-types'
 
 const ru = {
 	settings: {
@@ -43,6 +43,8 @@ const ru = {
 		CustomIconLib: {
 			name: "Пользовательская библиотека иконок",
 			command: "Открыть пользовательскую библиотеку иконок",
+			reapplyCommand: "Повторно применить все значки",
+			reapplyNotice: "Все пользовательские значки применены повторно",
 			searchPlaceholder: "Поиск иконки...",
 			svg: {
 				tabName: "SVG (экспериментально)",
@@ -53,8 +55,7 @@ const ru = {
 					idPlaceholder: "Идентификатор иконки (например: my-icon)",
 					contentPlaceholder: "Содержание SVG (<svg>...</svg>)",
 					selectFiles: "Выбрать SVG файлы",
-					selectFilesDesc:
-						"Вы можете выбрать несколько SVG файлов для пакетного добавления иконок. Имена файлов будут использоваться в качестве идентификаторов иконок.",
+					selectFilesDesc: "Вы можете выбрать несколько SVG файлов для пакетного добавления иконок. Имена файлов будут использоваться в качестве идентификаторов иконок.",
 					selectedFiles: "Выбрано файлов: {count:number}",
 				},
 			},

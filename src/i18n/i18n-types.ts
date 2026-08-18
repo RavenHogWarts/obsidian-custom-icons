@@ -131,6 +131,14 @@ type RootTranslation = {
 			 */
 			command: string
 			/**
+			 * 重​新​应​用​所​有​图​标
+			 */
+			reapplyCommand: string
+			/**
+			 * 已​重​新​应​用​所​有​自​定​义​图​标
+			 */
+			reapplyNotice: string
+			/**
 			 * 搜​索​图​标​.​.​.
 			 */
 			searchPlaceholder: string
@@ -294,6 +302,14 @@ export type TranslationFunctions = {
 			 * 打开自定义图标库
 			 */
 			command: () => LocalizedString
+			/**
+			 * 重新应用所有图标
+			 */
+			reapplyCommand: () => LocalizedString
+			/**
+			 * 已重新应用所有自定义图标
+			 */
+			reapplyNotice: () => LocalizedString
 			/**
 			 * 搜索图标...
 			 */

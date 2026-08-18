@@ -1,4 +1,4 @@
-import type { BaseTranslation } from "../i18n-types";
+import type { BaseTranslation } from '../i18n-types'
 
 const en = {
 	settings: {
@@ -43,6 +43,8 @@ const en = {
 		CustomIconLib: {
 			name: "Custom icon library",
 			command: "Open custom icon library",
+			reapplyCommand: "Reapply all icons",
+			reapplyNotice: "All custom icons reapplied",
 			searchPlaceholder: "Search icon...",
 			svg: {
 				tabName: "SVG (Experimental)",
@@ -53,8 +55,7 @@ const en = {
 					idPlaceholder: "Icon ID (e.g: my-icon)",
 					contentPlaceholder: "SVG content (<svg>...</svg>)",
 					selectFiles: "Select svg files",
-					selectFilesDesc:
-						"You can select multiple svg files to batch add icons. File names will be used as icon IDs.",
+					selectFilesDesc: "You can select multiple svg files to batch add icons. File names will be used as icon IDs.",
 					selectedFiles: "{count:number} file(s) selected",
 				},
 			},

@@ -17,7 +17,7 @@ Please be aware of these changes to ensure your setup continues to work correctl
 
 ## Usage
 
-![Usage](attachment/Usage.EN.png)
+![Usage](docs/Usage.EN.png)
 
 ## Installation
 ### Community plugin market installation
@@ -34,6 +34,23 @@ Please be aware of these changes to ensure your setup continues to work correctl
 2. Click "Add Beta plugin" in BRAT settings
 3. Enter `Raven-Pensieve/obsidian-custom-icons`
 4. Enable the plugin
+
+## FAQ
+
+### Can other plugins use my custom SVG icons?
+
+Yes. Library icons are registered as **regular Obsidian global icons** with the id `CI-<icon-id>`. Any plugin can render them with `setIcon(el, "CI-my-icon")`, and newly added SVGs take effect **immediately — no app reload required**.
+
+### My icon shows blank inside another plugin?
+
+Obsidian's `setIcon` is a one-shot render: if that plugin rendered the icon **before** Custom Icons was loaded (plugin load order varies by user), the spot stays blank. Try in order:
+
+1. Run the command **"Custom Icons: Reapply all icons"** (refreshes icons on surfaces managed by this plugin);
+2. Reopen the affected view / panel;
+3. Enable **Settings → Experimental → "Always load this plugin first"** and restart (see below — the root fix);
+4. Reload that plugin, or restart Obsidian.
+
+**Advanced: always load this plugin first.** Community plugins load in the order of the array in `.obsidian/community-plugins.json`. Moving `"custom-sidebar-icons"` to the front of the array (then restarting Obsidian) makes it register icons before any other plugin loads — completely avoiding blank icons on one-shot surfaces such as ribbon actions. Or enable **"Always load this plugin first"** under **Settings → Experimental** of this plugin — it automatically re-enforces the front position whenever the plugin loads (reorders only, never adds/removes entries; takes effect on next restart; experimental). Note: when reordering manually, never remove entries; enabling new plugins may rewrite the array. Ribbon actions can also be assigned icons directly in Settings → Ribbon sidebar of this plugin.
 
 ## License
 

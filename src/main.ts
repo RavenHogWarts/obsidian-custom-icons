@@ -9,10 +9,6 @@ import { PluginSettingTab } from "./settings/PluginSettingTab";
 import SettingsStore from "./settings/SettingsStore";
 import { IPluginSettings } from "./types/types";
 import IconManager from "./util/IconManager";
-import {
-	installCustomIconsGlobal,
-	removeCustomIconsGlobal,
-} from "./util/customIconsGlobal";
 import openPluginView from "./util/openPluginView";
 import {
 	CustomIconLibView,
@@ -26,10 +22,6 @@ export default class CIPlugin extends Plugin {
 
 	async onload() {
 		this.registerIconHandlers();
-
-		// 全局 API 需先于首次图标注册安装，
-		// 保证 custom-icons:changed 的监听者总能调用 window.customIcons
-		installCustomIconsGlobal();
 
 		// loadSettings 内部会触发 saveSettings → applyAll，
 		// 图标库在此完成首次注册（早于 onLayoutReady）
@@ -47,7 +39,6 @@ export default class CIPlugin extends Plugin {
 	}
 
 	onunload() {
-		removeCustomIconsGlobal();
 		this.iconManager.cleanupAll();
 	}
 
@@ -78,8 +69,8 @@ export default class CIPlugin extends Plugin {
 			id: "reapply-icons",
 			name: LL.view.CustomIconLib.reapplyCommand(),
 			callback: () => {
-				// 重新注册全部图标并广播 custom-icons:changed，
-				// 供合作式消费方与自身管辖区刷新；用于第三方界面空白时的用户自救
+				// 重新注册全部图标并重应用所有处理器管理的界面，
+				// 用于界面图标异常时的快速自修复
 				this.iconManager.applyAll();
 				new Notice(LL.view.CustomIconLib.reapplyNotice());
 			},

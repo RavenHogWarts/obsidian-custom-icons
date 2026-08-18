@@ -62,7 +62,7 @@ export default class RibbonIconHandler extends AbstractIconHandler<IRibbonConfig
 
 	private getContainers(): HTMLElement[] {
 		// ribbon 位于 workspace.containerEl 之外、仅存在于主窗口，
-		// 因此直接查询主窗口 document（先例：customIconsGlobal.ts）
+		// 因此直接查询主窗口 document
 		// eslint-disable-next-line obsidianmd/prefer-active-doc
 		const containers = document.querySelectorAll<HTMLElement>(
 			this.containerSelector,

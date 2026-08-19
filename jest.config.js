@@ -7,6 +7,10 @@ module.exports = {
 		"^.+\\.ts$": "ts-jest",
 	},
 	moduleFileExtensions: ["ts", "js", "json"],
+	moduleNameMapper: {
+		"^@src/(.*)$": "<rootDir>/src/$1",
+		"^@styles/(.*)$": "<rootDir>/styles/$1",
+	},
 	collectCoverageFrom: [
 		"src/**/*.ts",
 		"!src/**/*.d.ts",

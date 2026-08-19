@@ -55,9 +55,9 @@ export const Ribbon: FC = () => {
 		const actions: RibbonActionInfo[] = [];
 		const seenLabels = new Set<string>();
 
-		// ribbon 仅存在于主窗口，直接查询主窗口 document
-		// eslint-disable-next-line obsidianmd/prefer-active-doc
-		document
+		// ribbon 仅存在于主窗口，查询主窗口 document
+		// （workspace.containerEl 恒在主窗口，其 .doc 即主窗口 document）
+		settingsStore.app.workspace.containerEl.doc
 			.querySelectorAll(RIBBON_ACTION_SELECTOR)
 			.forEach((el) => {
 				const label = el.getAttribute("aria-label");

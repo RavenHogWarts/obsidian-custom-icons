@@ -25,10 +25,6 @@ function applyIconColor(el: HTMLElement | SVGElement, color?: string): void {
 	el.style.removeProperty("color");
 }
 
-function createDetachedDiv(ownerDocument: Document): HTMLDivElement {
-	return ownerDocument.createElement("div");
-}
-
 function parseSvgMarkup(
 	ownerDocument: Document,
 	svgMarkup: string,
@@ -47,7 +43,7 @@ function parseSvgMarkup(
 
 	const importedNode = ownerDocument.importNode(svgElement, true);
 
-	if (svgView && importedNode instanceof svgView) {
+	if (svgView && importedNode.instanceOf(svgView)) {
 		return importedNode;
 	}
 
@@ -171,7 +167,9 @@ export default function (
 			}
 	} else if (iconType === "svg") {
 		if (options?.append) {
-			const tempContainer = createDetachedDiv(el.ownerDocument);
+			// 游离容器仅作 obsidianSetIcon 的暂存区，
+			// svg 节点 append 到目标元素时会自动跨文档 adopt
+			const tempContainer = createDiv();
 			obsidianSetIcon(tempContainer, icon);
 			if (tempContainer.children.length === 0) {
 				obsidianSetIcon(tempContainer, `CI-${icon}`);

@@ -199,7 +199,9 @@ export default class SettingsStore {
 	 */
 	async updateSettingByPath<T>(path: string, value: T) {
 		// 创建设置的深拷贝
-		const newSettings = JSON.parse(JSON.stringify(this.#plugin.settings));
+		const newSettings = JSON.parse(
+			JSON.stringify(this.#plugin.settings),
+		) as IPluginSettings;
 		const pathParts = path.split(".");
 
 		// 防止原型污染：验证路径中不包含危险属性
@@ -252,7 +254,9 @@ export default class SettingsStore {
 	 */
 	async deleteSettingByPath(path: string) {
 		// 创建设置的深拷贝
-		const newSettings = JSON.parse(JSON.stringify(this.#plugin.settings));
+		const newSettings = JSON.parse(
+			JSON.stringify(this.#plugin.settings),
+		) as IPluginSettings;
 		const pathParts = path.split(".");
 
 		// 防止原型污染：验证路径中不包含危险属性

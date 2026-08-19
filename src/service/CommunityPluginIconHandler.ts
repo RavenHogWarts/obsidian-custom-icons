@@ -145,9 +145,9 @@ export default class CommunityPluginIconHandler extends AbstractIconHandler<ICom
 	}
 
 	private applyPluginListIconsInContainer(container: ParentNode): void {
-		const pluginNavItems = container.querySelectorAll(
+		const pluginNavItems = container.querySelectorAll<HTMLElement>(
 			this.pluginNavItemSelector,
-		) as NodeListOf<HTMLElement>;
+		);
 
 		pluginNavItems.forEach((navItemEl) => {
 			this.applyIconToNavItem(navItemEl);
@@ -155,9 +155,9 @@ export default class CommunityPluginIconHandler extends AbstractIconHandler<ICom
 	}
 
 	private applySearchResultIconsInContainer(container: ParentNode): void {
-		const searchResultItems = container.querySelectorAll(
+		const searchResultItems = container.querySelectorAll<HTMLElement>(
 			this.searchResultItemSelector,
-		) as NodeListOf<HTMLElement>;
+		);
 
 		searchResultItems.forEach((resultEl) => {
 			this.applyIconToSearchResult(resultEl);

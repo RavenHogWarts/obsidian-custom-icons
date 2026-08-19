@@ -27,7 +27,7 @@ export default class IconManager {
 			return;
 		}
 		// 类型擦除：运行时不需要知道具体类型
-		this.handlers.set(handler.id, handler as IIconHandler<unknown>);
+		this.handlers.set(handler.id, handler);
 	}
 
 	/**
@@ -47,7 +47,7 @@ export default class IconManager {
 	 * @param handlerId 处理器 ID
 	 */
 	getHandler<T>(handlerId: string): IIconHandler<T> | undefined {
-		return this.handlers.get(handlerId) as IIconHandler<T> | undefined;
+		return this.handlers.get(handlerId);
 	}
 
 	/**

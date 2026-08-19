@@ -61,7 +61,7 @@ export default class CIPlugin extends Plugin {
 			id: "open-icon-library",
 			name: LL.view.CustomIconLib.command(),
 			callback: () => {
-				openPluginView(this.app, VIEW_TYPE_CUSTOM_ICON_LIB);
+				void openPluginView(this.app, VIEW_TYPE_CUSTOM_ICON_LIB);
 			},
 		});
 
@@ -79,7 +79,7 @@ export default class CIPlugin extends Plugin {
 
 	private registerRibbonCommands() {
 		this.addRibbonIcon("library", LL.view.CustomIconLib.command(), () => {
-			openPluginView(this.app, VIEW_TYPE_CUSTOM_ICON_LIB);
+			void openPluginView(this.app, VIEW_TYPE_CUSTOM_ICON_LIB);
 		});
 	}
 

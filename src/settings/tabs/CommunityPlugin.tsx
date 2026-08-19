@@ -93,9 +93,10 @@ export const CommunityPlugin: FC = () => {
 		const communityPluginTabContainer =
 			settingsStore.app.setting.communityPluginTabContainer;
 
-		const pluginNavItems = communityPluginTabContainer.querySelectorAll(
-			".vertical-tab-nav-item[data-setting-id]",
-		) as NodeListOf<HTMLElement>;
+		const pluginNavItems =
+			communityPluginTabContainer.querySelectorAll<HTMLElement>(
+				".vertical-tab-nav-item[data-setting-id]",
+			);
 
 		const plugins: Array<{
 			id: string;
@@ -308,8 +309,6 @@ export const CommunityPlugin: FC = () => {
 				)}
 
 				{filteredPlugins.map((plugin, index) => {
-					const pluginIcon =
-						settings.communityPlugins.data[plugin.id];
 					const effectivePluginIcon = getEffectivePluginIcon(
 						plugin.id,
 					);

@@ -29,7 +29,7 @@ export interface IPluginSettings {
 }
 
 // Reference
-export interface ICommunityPluginIcon extends IIcon {}
+export type ICommunityPluginIcon = IIcon;
 export interface ICommunityPluginIconOverride {
 	id: string;
 	icon?: string;

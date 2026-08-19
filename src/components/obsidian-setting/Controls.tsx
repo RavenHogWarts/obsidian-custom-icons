@@ -11,6 +11,7 @@ import {
 	TextAreaComponent,
 	TextComponent,
 	ToggleComponent,
+	TooltipOptions,
 } from "obsidian";
 import { FC, ReactNode, useEffect, useMemo, useRef } from "react";
 import { createPortal } from "react-dom";
@@ -26,7 +27,7 @@ export interface ButtonProps {
 	disabled?: boolean;
 	cta?: boolean;
 	warning?: boolean;
-	tooltip?: string | { text: string; options?: any };
+	tooltip?: string | { text: string; options?: TooltipOptions };
 	onClick?: (evt: MouseEvent) => void;
 }
 
@@ -64,11 +65,11 @@ export const Button: FC<ButtonProps> = ({
 		if (cta) button.setCta();
 		if (warning) button.setWarning();
 		if (tooltip) {
-			const args =
-				typeof tooltip === "string"
-					? [tooltip, undefined]
-					: [tooltip.text, tooltip.options];
-			button.setTooltip(args[0], args[1]);
+			if (typeof tooltip === "string") {
+				button.setTooltip(tooltip);
+			} else {
+				button.setTooltip(tooltip.text, tooltip.options);
+			}
 		}
 	}, [button, icon, children, className, disabled, cta, warning, tooltip]);
 
@@ -83,8 +84,8 @@ export interface ExtraButtonProps {
 	children?: ReactNode;
 	icon: string;
 	disabled?: boolean;
-	tooltip?: string | { text: string; options?: any };
-	onClick?: () => void;
+	tooltip?: string | { text: string; options?: TooltipOptions };
+	onClick?: () => void | Promise<void>;
 }
 
 export const ExtraButton: FC<ExtraButtonProps> = ({
@@ -114,11 +115,11 @@ export const ExtraButton: FC<ExtraButtonProps> = ({
 		button.setIcon(icon);
 		if (disabled !== undefined) button.setDisabled(disabled);
 		if (tooltip) {
-			const args =
-				typeof tooltip === "string"
-					? [tooltip, undefined]
-					: [tooltip.text, tooltip.options];
-			button.setTooltip(args[0], args[1]);
+			if (typeof tooltip === "string") {
+				button.setTooltip(tooltip);
+			} else {
+				button.setTooltip(tooltip.text, tooltip.options);
+			}
 		}
 	}, [button, icon, disabled, tooltip]);
 
@@ -132,8 +133,8 @@ export const ExtraButton: FC<ExtraButtonProps> = ({
 export interface ToggleProps {
 	value?: boolean;
 	disabled?: boolean;
-	tooltip?: string | { text: string; options?: any };
-	onChange?: (value: boolean) => void;
+	tooltip?: string | { text: string; options?: TooltipOptions };
+	onChange?: (value: boolean) => void | Promise<void>;
 }
 
 export const Toggle: FC<ToggleProps> = ({
@@ -162,11 +163,11 @@ export const Toggle: FC<ToggleProps> = ({
 		if (value !== undefined) toggle.setValue(value);
 		if (disabled !== undefined) toggle.setDisabled(disabled);
 		if (tooltip) {
-			const args =
-				typeof tooltip === "string"
-					? [tooltip, undefined]
-					: [tooltip.text, tooltip.options];
-			toggle.setTooltip(args[0], args[1]);
+			if (typeof tooltip === "string") {
+				toggle.setTooltip(tooltip);
+			} else {
+				toggle.setTooltip(tooltip.text, tooltip.options);
+			}
 		}
 	}, [toggle, value, disabled, tooltip]);
 
@@ -373,7 +374,7 @@ export const Slider: FC<SliderProps> = ({
 export interface ColorProps {
 	value?: string;
 	disabled?: boolean;
-	onChange?: (value: string) => void;
+	onChange?: (value: string) => void | Promise<void>;
 }
 
 export const Color: FC<ColorProps> = ({ value, disabled, onChange }) => {
@@ -391,7 +392,7 @@ export const Color: FC<ColorProps> = ({ value, disabled, onChange }) => {
 		if (onChange) {
 			color.onChange((v) => {
 				if (!programmaticSetRef.current) {
-					onChange(v);
+					void onChange(v);
 				}
 			});
 		}

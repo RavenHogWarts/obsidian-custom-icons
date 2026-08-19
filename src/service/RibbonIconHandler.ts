@@ -62,11 +62,12 @@ export default class RibbonIconHandler extends AbstractIconHandler<IRibbonConfig
 
 	private getContainers(): HTMLElement[] {
 		// ribbon 位于 workspace.containerEl 之外、仅存在于主窗口，
-		// 因此直接查询主窗口 document
-		// eslint-disable-next-line obsidianmd/prefer-active-doc
-		const containers = document.querySelectorAll<HTMLElement>(
-			this.containerSelector,
-		);
+		// 因此查询主窗口 document（containerEl 恒在主窗口，
+		// 其 .doc 即主窗口 document，不受 popout 聚焦影响）
+		const containers =
+			this.app.workspace.containerEl.doc.querySelectorAll<HTMLElement>(
+				this.containerSelector,
+			);
 		return Array.from(containers);
 	}
 
@@ -173,10 +174,11 @@ export default class RibbonIconHandler extends AbstractIconHandler<IRibbonConfig
 	}
 
 	private restoreAll(): void {
-		// eslint-disable-next-line obsidianmd/prefer-active-doc
-		const markedActions = document.querySelectorAll(
-			`[${this.markerAttribute}]`,
-		);
+		// 同 getContainers：标记仅存在于主窗口的 ribbon 按钮
+		const markedActions =
+			this.app.workspace.containerEl.doc.querySelectorAll(
+				`[${this.markerAttribute}]`,
+			);
 		markedActions.forEach((el) => {
 			if (el.instanceOf(HTMLElement)) {
 				this.restoreAction(el);

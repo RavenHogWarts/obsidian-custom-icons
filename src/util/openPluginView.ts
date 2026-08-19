@@ -6,7 +6,7 @@ export default async function (app: App, viewType: string) {
 
 	if (existingLeaves.length > 0) {
 		// 如果存在，则激活第一个视图
-		app.workspace.revealLeaf(existingLeaves[0]);
+		await app.workspace.revealLeaf(existingLeaves[0]);
 	} else {
 		// 如果不存在，则创建新的视图
 		const leaf = app.workspace.getLeaf("tab");
@@ -15,6 +15,6 @@ export default async function (app: App, viewType: string) {
 			active: true,
 		});
 
-		app.workspace.revealLeaf(leaf);
+		await app.workspace.revealLeaf(leaf);
 	}
 }

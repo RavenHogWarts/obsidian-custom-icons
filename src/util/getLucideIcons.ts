@@ -1,4 +1,13 @@
 import * as icons from "lucide-react";
+import { getIconIds } from "obsidian";
+
+/** Lucide 图标组件实际消费的 props（与 setIcon.ts 渲染时一致） */
+export type LucideIconProps = {
+	size?: number;
+	strokeWidth?: number;
+	color?: string;
+	className?: string;
+};
 
 /**
  * 获取所有可用的 Lucide 图标名称列表
@@ -70,6 +79,16 @@ export function getLucideIconNames(): string[] {
 }
 
 /**
+ * 获取插件引入的 Lucide 中、Obsidian 原生未内置的图标名称
+ * 与 Obsidian 内置图标注册表（getIconIds）做差集，
+ * 用于自定义图标库的 Lucide 只读展示页
+ */
+export function getExtraLucideIconNames(): string[] {
+	const obsidianIconIds = new Set<string>(getIconIds());
+	return getLucideIconNames().filter((name) => !obsidianIconIds.has(name));
+}
+
+/**
  * 将 kebab-case 图标名称转换为 PascalCase 组件名称
  * 例如：arrow-right -> ArrowRight
  */
@@ -89,7 +108,7 @@ export function iconNameToComponentName(iconName: string): string {
  */
 export function getLucideIcon(
 	iconName: string,
-): React.ComponentType<any> | undefined {
+): React.ComponentType<LucideIconProps> | undefined {
 	if (!iconName) {
 		console.warn("getLucideIcon: iconName is empty");
 		return undefined;
@@ -99,7 +118,7 @@ export function getLucideIcon(
 
 	// 直接获取 PascalCase 格式的图标组件
 	const component = icons[componentName as keyof typeof icons] as
-		| React.ComponentType<any>
+		| React.ComponentType<LucideIconProps>
 		| undefined;
 
 	if (!component) {

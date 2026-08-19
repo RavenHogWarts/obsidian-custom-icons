@@ -8,13 +8,13 @@ import "./IconCard.css";
 export interface CustomAction {
 	icon: React.ReactNode;
 	title: string;
-	onClick: (id: string) => void;
+	onClick: (id: string) => void | Promise<void>;
 }
 
 interface IconCardProps {
 	id: string;
 	onDelete?: (id: string) => void;
-	onEdit?: (id: string) => void;
+	onEdit?: (id: string) => void | Promise<void>;
 	customActions?: CustomAction[];
 }
 
@@ -56,7 +56,7 @@ export const IconCard: React.FC<IconCardProps> = ({
 						className="ci-lib-icon__card-action ci-lib-icon__card-edit clickable-icon"
 						onClick={(e) => {
 							e.stopPropagation();
-							onEdit(id);
+							void onEdit(id);
 						}}
 						aria-label={LL.common.edit()}
 					>
@@ -70,7 +70,7 @@ export const IconCard: React.FC<IconCardProps> = ({
 						className="ci-lib-icon__card-action ci-lib-icon__card-custom clickable-icon"
 						onClick={(e) => {
 							e.stopPropagation();
-							action.onClick(id);
+							void action.onClick(id);
 						}}
 						aria-label={action.title}
 					>
@@ -95,7 +95,9 @@ export const IconCard: React.FC<IconCardProps> = ({
 			<div ref={iconRef} className="ci-lib-icon__card-icon"></div>
 			<button
 				className="ci-lib-icon__card-name clickable-icon"
-				onClick={handleCopyName}
+				onClick={(e) => {
+					void handleCopyName(e);
+				}}
 				title="Click to copy icon name"
 				aria-label={id}
 			>

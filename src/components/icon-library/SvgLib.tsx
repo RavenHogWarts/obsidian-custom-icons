@@ -22,12 +22,6 @@ export const SvgLib: React.FC = () => {
 	const filteredIcons = useMemo(() => {
 		const icons = [...settings.customIconLib.svg]; // Shallow copy
 
-		if (searchQuery) {
-			const query = searchQuery.toLowerCase();
-			// In-place filtering not possible on readonly store array if we want to be safe, so filtering new array
-			// But wait, filter returns new array.
-		}
-
 		const result = icons.filter(
 			(icon) =>
 				!searchQuery ||

@@ -12,7 +12,7 @@ interface IconPickerProps {
 	value: string;
 	type: IconType;
 	color?: string;
-	onChange: (value: string, type: IconType) => void;
+	onChange: (value: string, type: IconType) => void | Promise<void>;
 }
 
 export const IconPicker: React.FC<IconPickerProps> = ({
@@ -45,7 +45,7 @@ export const IconPicker: React.FC<IconPickerProps> = ({
 			(icon, type) => {
 				setSelectedIcon(icon);
 				setSelectedType(type);
-				onChange(icon, type);
+				void onChange(icon, type);
 			},
 		);
 		modal.open();

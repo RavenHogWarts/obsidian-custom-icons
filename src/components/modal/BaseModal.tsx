@@ -47,7 +47,7 @@ export class BaseModal<T extends BaseModalProps> extends Modal {
 		);
 	}
 
-	async onClose(): Promise<void> {
+	onClose(): void {
 		if (this.root) {
 			this.root.unmount();
 			this.root = null;

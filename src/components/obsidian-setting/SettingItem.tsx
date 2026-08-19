@@ -156,7 +156,9 @@ export const SettingItem: FC<SettingItemProps> = ({
 		if (!className) return;
 
 		const classes = className.split(/\s+/).filter(Boolean);
-		classes.forEach((cls) => setting.setClass(cls));
+		classes.forEach((cls) => {
+			setting.setClass(cls);
+		});
 
 		// 清理函数：在 className 变化或组件卸载时移除旧的类
 		return () => {

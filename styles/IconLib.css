@@ -30,10 +30,62 @@
 	padding: 4px;
 }
 
-/* Lucide 只读图标较多，跳过屏外卡片的渲染以提升滚动性能 */
+/*
+ * Lucide / 包详情只读网格：这是「浏览 + 复制名称」的图标墙，
+ * 让字形成为主角、名称作为紧贴其下的安静副标题——去掉强制正方形与
+ * 上下对齐留出的大片空白，收紧成一枚枚紧凑的图块。
+ */
 .ci-lib__grid--lucide .ci-lib-icon__card {
 	content-visibility: auto;
-	contain-intrinsic-size: auto 130px;
+	contain-intrinsic-size: auto 88px;
+	aspect-ratio: auto;
+	justify-content: center;
+	gap: var(--size-4-1);
+	padding: var(--size-4-2);
+}
+
+.ci-lib__grid--lucide .ci-lib-icon__card-icon {
+	flex: none;
+	max-height: none;
+
+	svg {
+		width: 1.75rem;
+		height: 1.75rem;
+		transition: color 0.15s ease;
+	}
+}
+
+/* 悬停时整块上浮（沿用基础卡片），字形点亮为强调色 */
+.ci-lib__grid--lucide .ci-lib-icon__card:hover .ci-lib-icon__card-icon svg {
+	color: var(--interactive-accent);
+}
+
+/* 名称作为副标题：更小、更淡，最多两行，保证每行卡片等高 */
+.ci-lib__grid--lucide .ci-lib-icon__card-name {
+	margin-top: 0;
+	font-size: var(--font-ui-smaller);
+	line-height: 1.25;
+	display: -webkit-box;
+	-webkit-box-orient: vertical;
+	-webkit-line-clamp: 2;
+	overflow: hidden;
+}
+
+/* ------------------------------ 虚拟化网格 ------------------------------ */
+/*
+ * VirtualIconGrid 结构：viewport(滚动) > sizer(撑总高) > row(绝对定位，内部 grid)。
+ * 取代原 .ci-lib__grid 的 overflow 角色；仅挂载可视区 + overscan 的卡片。
+ */
+.ci-vgrid__viewport {
+	flex: 1;
+	min-height: 0; /* flex 容器内可滚动的关键 */
+	overflow-y: auto;
+	padding: 4px;
+}
+
+/* 每一虚拟行：列数由内联 style 的 grid-template-columns 动态给出 */
+.ci-vgrid__row {
+	display: grid;
 }
 
 /* Lucide 页统计与说明 */
@@ -106,8 +158,36 @@
 	font-size: var(--font-ui-small);
 	font-weight: var(--font-medium);
 	color: var(--text-muted);
-	padding-bottom: var(--size-4-1);
+	padding: 0 0 var(--size-4-1) 0;
 	border-bottom: 1px solid var(--background-modifier-border);
+	/* 作为折叠触发按钮：清除 Obsidian 默认按钮外观 */
+	width: 100%;
+	background-color: transparent;
+	box-shadow: none;
+	border-radius: 0;
+	text-align: start;
+	cursor: pointer;
+}
+
+.ci-pack__section-title:hover {
+	color: var(--text-normal);
+	background-color: transparent;
+	box-shadow: none;
+}
+
+/* 折叠箭头：收起时指向右，展开时旋转 90° 指向下 */
+.ci-pack__section-chevron {
+	flex: none;
+	transition: transform 0.15s ease;
+}
+
+.ci-pack__section-chevron.is-open {
+	transform: rotate(90deg);
+}
+
+/* 标题文字占据中间弹性空间，把尾部徽标推到右侧 */
+.ci-pack__section-label {
+	margin-inline-end: auto;
 }
 
 .ci-pack__section-count {
@@ -215,6 +295,16 @@
 		opacity: 0.5;
 		cursor: default;
 	}
+}
+
+/* 已安装的图标集：强调色边框 + 左上角标记，一眼区分 */
+.ci-pack__card.is-installed {
+	border-color: var(--interactive-accent);
+	background-color: var(--background-secondary-alt);
+}
+
+.ci-pack__card.is-installed .ci-pack__card-meta {
+	color: var(--text-accent);
 }
 
 /* 名称最多两行，超出省略——避免长名被单行 ellipsis 截断显示不全 */

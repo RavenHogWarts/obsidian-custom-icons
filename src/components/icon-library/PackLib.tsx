@@ -11,15 +11,55 @@ import {
 } from "@src/service/icon-packs/sources/presets";
 import { packIconId } from "@src/service/icon-packs/types";
 import { IIconPackManifest, IconSourceConfig } from "@src/types/types";
-import { ArrowLeft, Eye, Globe, Layers, RefreshCw, Trash2 } from "lucide-react";
+import {
+	ArrowLeft,
+	ChevronRight,
+	Eye,
+	Globe,
+	Layers,
+	RefreshCw,
+	Trash2,
+} from "lucide-react";
 import { Notice } from "obsidian";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { IconCard } from "../icon-card/IconCard";
 import { ConfirmDialog } from "../modal/ConfirmDialog";
 import { NpmSvgForm } from "./NpmSvgForm";
+import { VirtualIconGrid } from "./VirtualIconGrid";
 
 /** 大包确认阈值：超过该图标数时在确认弹窗中附加提示 */
 const BIG_PACK_THRESHOLD = 3000;
+
+/**
+ * 可折叠区块：点击标题栏展开/收起内容。
+ * 标题栏由左侧箭头 + 图标 + 标题 + 可选尾部（计数/状态徽标）组成。
+ */
+const CollapsibleSection: React.FC<{
+	icon: React.ReactNode;
+	title: React.ReactNode;
+	trailing?: React.ReactNode;
+	defaultOpen?: boolean;
+	children: React.ReactNode;
+}> = ({ icon, title, trailing, defaultOpen = true, children }) => {
+	const [open, setOpen] = useState(defaultOpen);
+	return (
+		<div className="ci-pack__section">
+			<div
+				className="ci-pack__section-title"
+				aria-expanded={open}
+				onClick={() => setOpen((v) => !v)}
+			>
+				<ChevronRight
+					className={`svg-icon ci-pack__section-chevron${open ? " is-open" : ""}`}
+				/>
+				{icon}
+				<span className="ci-pack__section-label">{title}</span>
+				{trailing}
+			</div>
+			{open && children}
+		</div>
+	);
+};
 
 export const PackLib: React.FC = () => {
 	const store = useSettingsStore();
@@ -338,16 +378,15 @@ export const PackLib: React.FC = () => {
 			{/* 单一滚动体：三个区块自然排列，避免多级滚动导致内容被裁切 */}
 			<div className="ci-pack__body">
 				{/* Installed packs */}
-				<div className="ci-pack__section">
-					<div className="ci-pack__section-title">
-						<Layers className="svg-icon" />
-						<span>
-							{LL.view.CustomIconLib.pack.installedSection()}
-						</span>
+				<CollapsibleSection
+					icon={<Layers className="svg-icon" />}
+					title={LL.view.CustomIconLib.pack.installedSection()}
+					trailing={
 						<span className="ci-pack__section-count">
 							{installedPacks.length}
 						</span>
-					</div>
+					}
+				>
 					{installedPacks.length === 0 ? (
 						<div className="ci-pack__empty">
 							{LL.view.CustomIconLib.pack.noPacksInstalled()}
@@ -417,16 +456,14 @@ export const PackLib: React.FC = () => {
 							))}
 						</div>
 					)}
-				</div>
+				</CollapsibleSection>
 
 				{/* Iconify catalog */}
-				<div className="ci-pack__section">
-					<div className="ci-pack__section-title">
-						<Globe className="svg-icon" />
-						<span>
-							{LL.view.CustomIconLib.pack.catalogSection()}
-						</span>
-						{catalogMeta && (
+				<CollapsibleSection
+					icon={<Globe className="svg-icon" />}
+					title={LL.view.CustomIconLib.pack.catalogSection()}
+					trailing={
+						catalogMeta && (
 							<span
 								className="ci-pack__section-meta"
 								title={LL.view.CustomIconLib.pack.cachedAt({
@@ -439,8 +476,9 @@ export const PackLib: React.FC = () => {
 									? LL.view.CustomIconLib.pack.catalogCached()
 									: LL.view.CustomIconLib.pack.catalogOnline()}
 							</span>
-						)}
-					</div>
+						)
+					}
+				>
 					{catalogError ? (
 						<div className="ci-pack__empty ci-pack__empty--error">
 							{LL.view.CustomIconLib.pack.catalogLoadFailed()}
@@ -454,56 +492,62 @@ export const PackLib: React.FC = () => {
 						</div>
 					) : (
 						<div className="ci-pack__grid">
-							{filteredCatalog.map((info) => (
-								<div
-									key={info.prefix}
-									className={`ci-pack__card${installing ? " is-disabled" : ""}`}
-									role="button"
-									tabIndex={0}
-									aria-disabled={installing}
-									onClick={() => {
-										if (!installing) {
-											handleInstallIconify(info);
-										}
-									}}
-									onKeyDown={(e) => {
-										if (
-											e.key === "Enter" ||
-											e.key === " "
-										) {
-											e.preventDefault();
+							{filteredCatalog.map((info) => {
+								const installed = Boolean(
+									settings.customIconLib.packs[info.prefix],
+								);
+								return (
+									<div
+										key={info.prefix}
+										className={`ci-pack__card${installing ? " is-disabled" : ""}${
+											installed ? " is-installed" : ""
+										}`}
+										role="button"
+										tabIndex={0}
+										aria-disabled={installing}
+										onClick={() => {
 											if (!installing) {
 												handleInstallIconify(info);
 											}
-										}
-									}}
-								>
-									<span className="ci-pack__card-name">
-										{info.name}
-									</span>
-									<span className="ci-pack__card-meta">
-										{info.total !== undefined
-											? LL.view.CustomIconLib.pack.iconCountLabel(
-													{
-														count: info.total,
-													},
-												)
-											: info.prefix}
-									</span>
-								</div>
-							))}
+										}}
+										onKeyDown={(e) => {
+											if (
+												e.key === "Enter" ||
+												e.key === " "
+											) {
+												e.preventDefault();
+												if (!installing) {
+													handleInstallIconify(info);
+												}
+											}
+										}}
+									>
+										<span className="ci-pack__card-name">
+											{info.name}
+										</span>
+										<span className="ci-pack__card-meta">
+											{installed
+												? LL.view.CustomIconLib.pack.alreadyInstalled()
+												: info.total !== undefined
+													? LL.view.CustomIconLib.pack.iconCountLabel(
+															{
+																count: info.total,
+															},
+														)
+													: info.prefix}
+										</span>
+									</div>
+								);
+							})}
 						</div>
 					)}
-				</div>
+				</CollapsibleSection>
 
 				{/* npm presets */}
-				<div className="ci-pack__section">
-					<div className="ci-pack__section-title">
-						<Globe className="svg-icon" />
-						<span>
-							{LL.view.CustomIconLib.pack.presetsSection()}
-						</span>
-					</div>
+				<CollapsibleSection
+					icon={<Globe className="svg-icon" />}
+					title={LL.view.CustomIconLib.pack.presetsSection()}
+				>
 					<div className="ci-pack__grid">
 						{filteredPresets.map((preset) => {
 							const installed = Boolean(
@@ -512,7 +556,9 @@ export const PackLib: React.FC = () => {
 							return (
 								<div
 									key={preset.id}
-									className="ci-pack__card"
+									className={`ci-pack__card${installing ? " is-disabled" : ""}${
+										installed ? " is-installed" : ""
+									}`}
 									onClick={() => handleInstallPreset(preset)}
 								>
 									<span className="ci-pack__card-name">
@@ -528,7 +574,7 @@ export const PackLib: React.FC = () => {
 							);
 						})}
 					</div>
-				</div>
+				</CollapsibleSection>
 			</div>
 		</div>
 	);
@@ -544,7 +590,6 @@ const PackDetail: React.FC<{
 }> = ({ manifest, iconPackStore, onBack }) => {
 	const [names, setNames] = useState<string[] | null>(null);
 	const [searchQuery, setSearchQuery] = useState("");
-	const [renderCap, setRenderCap] = useState(500);
 
 	useEffect(() => {
 		void (async () => {
@@ -559,8 +604,6 @@ const PackDetail: React.FC<{
 			(name) => !query || name.toLowerCase().includes(query),
 		);
 	}, [names, searchQuery]);
-
-	const visibleNames = filteredNames.slice(0, renderCap);
 
 	return (
 		<div className="ci-lib-container">
@@ -595,28 +638,16 @@ const PackDetail: React.FC<{
 				</span>
 			</div>
 
-			<div className="ci-lib__grid ci-lib__grid--lucide">
-				{names === null
-					? null
-					: visibleNames.map((name) => (
-							<IconCard
-								key={name}
-								id={packIconId(manifest.id, name)}
-								type="svg"
-							/>
-						))}
-			</div>
-
-			{names !== null && filteredNames.length > visibleNames.length && (
-				<div className="ci-pack__show-more">
-					<button onClick={() => setRenderCap((cap) => cap + 1000)}>
-						{LL.view.CustomIconLib.pack.showMore({
-							shown: visibleNames.length,
-							total: filteredNames.length,
-						})}
-					</button>
-				</div>
-			)}
+			<VirtualIconGrid
+				items={names === null ? [] : filteredNames}
+				getKey={(name) => name}
+				renderItem={(name) => (
+					<IconCard id={packIconId(manifest.id, name)} type="svg" />
+				)}
+				minColumnWidth={92}
+				estimateRowHeight={88}
+				className="ci-lib__grid--lucide"
+			/>
 		</div>
 	);
 };

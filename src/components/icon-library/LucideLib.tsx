@@ -3,6 +3,7 @@ import { getExtraLucideIconNames } from "@src/util/getLucideIcons";
 import { setIcon } from "obsidian";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { IconCard } from "../icon-card/IconCard";
+import { VirtualIconGrid } from "./VirtualIconGrid";
 
 /**
  * Lucide 只读图标页
@@ -82,11 +83,14 @@ export const LucideLib: React.FC = () => {
 			</div>
 
 			{/* Icon Grid */}
-			<div className="ci-lib__grid ci-lib__grid--lucide">
-				{filteredIcons.map((name) => (
-					<IconCard key={name} id={name} type="lucide" />
-				))}
-			</div>
+			<VirtualIconGrid
+				items={filteredIcons}
+				getKey={(name) => name}
+				renderItem={(name) => <IconCard id={name} type="lucide" />}
+				minColumnWidth={92}
+				estimateRowHeight={88}
+				className="ci-lib__grid--lucide"
+			/>
 		</div>
 	);
 };

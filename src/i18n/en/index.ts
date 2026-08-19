@@ -83,6 +83,11 @@ const en = {
 					selectedFiles: "{count:number} file(s) selected",
 				},
 			},
+			lucide: {
+				tabName: "Lucide",
+				count: "{count:number} icon(s)",
+				descHint: "Read-only. These Lucide icons are bundled with the plugin but not built into Obsidian. Click an icon to copy its name.",
+			},
 		},
 	},
 } satisfies BaseTranslation;

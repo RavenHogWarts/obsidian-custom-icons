@@ -84,6 +84,12 @@ const zh = {
 					selectedFiles: "已选择 {count:number} 个文件",
 				},
 			},
+			lucide: {
+				tabName: "Lucide",
+				count: "共 {count:number} 个图标",
+				descHint:
+					"只读展示。以下为插件内置 Lucide 中 Obsidian 原生未包含的图标，点击图标可复制名称。",
+			},
 		},
 	},
 } satisfies BaseTranslation;

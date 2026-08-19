@@ -19,6 +19,11 @@
 	}
 }
 
+/* 只读卡片（无操作按钮）：无需为按钮预留顶部空间 */
+.ci-lib-icon__card--readonly {
+	padding-top: var(--size-4-3);
+}
+
 .ci-lib-icon__card-icon {
 	flex: 1;
 	display: flex;
@@ -39,9 +44,11 @@
 	color: var(--text-muted);
 	text-align: center;
 	width: 100%;
-	overflow: hidden;
-	text-overflow: ellipsis;
-	white-space: nowrap;
+	/* 允许换行以完整显示长名称（kebab 名在连字符处自然断行），
+	   居中对齐下 nowrap+ellipsis 会左右截断且省略号失效 */
+	white-space: normal;
+	overflow-wrap: break-word;
+	line-height: 1.3;
 	margin-top: var(--size-4-2);
 	background: transparent;
 	border: none;

@@ -30,6 +30,28 @@
 	padding: 4px;
 }
 
+/* Lucide 只读图标较多，跳过屏外卡片的渲染以提升滚动性能 */
+.ci-lib__grid--lucide .ci-lib-icon__card {
+	content-visibility: auto;
+	contain-intrinsic-size: auto 130px;
+}
+
+/* Lucide 页统计与说明 */
+.ci-lib__hint {
+	display: flex;
+	flex-direction: column;
+	gap: var(--size-4-1);
+	font-size: var(--font-ui-small);
+
+	.ci-lib__hint-count {
+		color: var(--text-muted);
+	}
+
+	.ci-lib__hint-desc {
+		color: var(--text-faint);
+	}
+}
+
 .ci-lib__form {
 	display: flex;
 	flex-direction: column;

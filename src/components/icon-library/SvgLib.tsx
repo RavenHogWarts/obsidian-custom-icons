@@ -8,6 +8,7 @@ import { IconCard } from "../icon-card/IconCard";
 import { ConfirmDialog } from "../modal/ConfirmDialog";
 import { AddSvg } from "./AddSvg";
 import { EditSvg } from "./EditSvg";
+import { VirtualIconGrid } from "./VirtualIconGrid";
 
 export const SvgLib: React.FC = () => {
 	const store = useSettingsStore();
@@ -206,10 +207,11 @@ export const SvgLib: React.FC = () => {
 			</div>
 
 			{/* Icon Grid */}
-			<div className="ci-lib__grid">
-				{filteredIcons.map((icon) => (
+			<VirtualIconGrid
+				items={filteredIcons}
+				getKey={(icon) => icon.id}
+				renderItem={(icon) => (
 					<IconCard
-						key={icon.id}
 						id={icon.id}
 						onDelete={handleDeleteIcon}
 						onEdit={handleOpenEditModal}
@@ -221,8 +223,8 @@ export const SvgLib: React.FC = () => {
 							},
 						]}
 					/>
-				))}
-			</div>
+				)}
+			/>
 		</div>
 	);
 };

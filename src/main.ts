@@ -1,4 +1,6 @@
 import "@styles/styles";
+import IconPackService from "@src/service/icon-packs/IconPackService";
+import IconPackStore from "@src/service/icon-packs/IconPackStore";
 import { Notice, Plugin } from "obsidian";
 import { LL } from "./i18n/i18n";
 import CommunityPluginIconHandler from "./service/CommunityPluginIconHandler";
@@ -19,6 +21,13 @@ export default class CIPlugin extends Plugin {
 	settings: IPluginSettings;
 	readonly settingsStore = new SettingsStore(this);
 	readonly iconManager = new IconManager(this.app);
+	/** 图标库文件存储（插件目录 icon-packs/，全程本地、离线可用） */
+	readonly iconPackStore = new IconPackStore(
+		this.app.vault.adapter,
+		`${this.manifest.dir}/icon-packs`,
+	);
+	/** 图标库安装/卸载编排（网络只出现在显式安装/更新动作中） */
+	readonly iconPackService = new IconPackService(this);
 
 	async onload() {
 		this.registerIconHandlers();
@@ -26,6 +35,11 @@ export default class CIPlugin extends Plugin {
 		// loadSettings 内部会触发 saveSettings → applyAll，
 		// 图标库在此完成首次注册（早于 onLayoutReady）
 		await this.settingsStore.loadSettings();
+
+		// 预载图标库包文件进内存缓存后重新应用，
+		// 保证包图标在 onLayoutReady 前完成注册（保持提供方最先契约）
+		await this.iconPackStore.preload(this.settings.customIconLib.packs);
+		this.iconManager.applyAll();
 
 		this.registerLeafViews();
 		this.registerCommands();
@@ -93,7 +107,7 @@ export default class CIPlugin extends Plugin {
 		// 若消费方先 apply，在运行时重启插件（layout 已就绪）场景下，
 		// 其 onLayoutReady 回调会同步执行，导致在库图标注册前渲染而空白。
 		// 详见 dev/260818/handler顺序与重启空白修复.md
-		this.iconManager.registerHandler(new CustomIconLibHandler());
+		this.iconManager.registerHandler(new CustomIconLibHandler(this.iconPackStore));
 		this.iconManager.registerHandler(new CommunityPluginIconHandler());
 		this.iconManager.registerHandler(new RibbonIconHandler());
 		// 实验性功能（非图标处理器，仅复用生命周期编排）

@@ -56,12 +56,44 @@ export type IconType = "lucide" | "svg";
 // Library
 export interface ICustomIconLib {
 	svg: ICustomSVGIcon[];
+	/** 已安装图标库的 manifest（仅元数据，图标内容存插件目录 icon-packs/ 文件） */
+	packs: Record<string, IIconPackManifest>;
 }
 
 // Definition
 export interface ICustomSVGIcon {
 	id: string;
 	content: string;
+}
+
+/** 图标库数据源配置（安装时快照，重装/更新时复用） */
+export type IconSourceConfig =
+	| {
+			type: "iconify";
+			/** Iconify 图标集前缀，如 "fa6"、"tabler" */
+			prefix: string;
+	  }
+	| {
+			type: "npm-svg";
+			/** npm 包名，如 "@fortawesome/fontawesome-free" */
+			package: string;
+			/** 固定版本（安装时解析快照） */
+			version: string;
+			/** SVG 文件路径 glob，如 "svgs/{solid,regular,brands}/*.svg" */
+			glob: string;
+	  };
+
+/** data.json 中每个图标库的 manifest 条目（不含图标内容） */
+export interface IIconPackManifest {
+	/** 包 id，同时是图标命名空间：注册 id = CI-{packId}-{name} */
+	id: string;
+	name: string;
+	version?: string;
+	license?: string;
+	iconCount: number;
+	enabled: boolean;
+	installedAt: number;
+	source: IconSourceConfig;
 }
 
 export const DEFAULT_SETTINGS: IPluginSettings = {
@@ -80,5 +112,6 @@ export const DEFAULT_SETTINGS: IPluginSettings = {
 	},
 	customIconLib: {
 		svg: [],
+		packs: {},
 	},
 };

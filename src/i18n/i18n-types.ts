@@ -249,6 +249,179 @@ type RootTranslation = {
 					selectedFiles: RequiredParams<'count'>
 				}
 			}
+			pack: {
+				/**
+				 * 图​标​库
+				 */
+				tabName: string
+				/**
+				 * 正​在​下​载​图​标​库​…
+				 */
+				installing: string
+				/**
+				 * 正​在​下​载​图​标​ ​{​d​o​n​e​}​/​{​t​o​t​a​l​}​…
+				 * @param {number} done
+				 * @param {number} total
+				 */
+				progress: RequiredParams<'done' | 'total'>
+				/**
+				 * 已​安​装​ ​{​c​o​u​n​t​}​ ​个​图​标​，​立​即​生​效
+				 * @param {number} count
+				 */
+				installed: RequiredParams<'count'>
+				/**
+				 * 图​标​库​安​装​失​败
+				 */
+				installFailed: string
+				/**
+				 * 图​标​数
+				 */
+				iconCount: string
+				/**
+				 * 许​可​证
+				 */
+				licenseLabel: string
+				/**
+				 * 图​标​ ​I​D​ ​前​缀
+				 */
+				idLabel: string
+				/**
+				 * 来​源​包
+				 */
+				sourcePackage: string
+				/**
+				 * 该​图​标​集​包​含​ ​{​c​o​u​n​t​}​ ​个​图​标​，​体​积​较​大​，​安​装​与​同​步​耗​时​可​能​较​长​，​确​定​继​续​？
+				 * @param {number} count
+				 */
+				bigPackWarning: RequiredParams<'count'>
+				/**
+				 * 安​装​完​成​后​图​标​存​储​在​本​地​，​离​线​可​用​。
+				 */
+				offlineHint: string
+				npmModal: {
+					/**
+					 * 自​定​义​ ​n​p​m​ ​图​标​包
+					 */
+					title: string
+					/**
+					 * 包​ ​I​D​（​小​写​字​母​/​数​字​/​连​字​符​，​如​ ​m​y​-​i​c​o​n​s​）
+					 */
+					packIdPlaceholder: string
+					/**
+					 * n​p​m​ ​包​名​（​如​ ​@​t​a​b​l​e​r​/​i​c​o​n​s​）
+					 */
+					packagePlaceholder: string
+					/**
+					 * S​V​G​ ​路​径​ ​g​l​o​b​（​如​ ​i​c​o​n​s​/​o​u​t​l​i​n​e​/​*​.​s​v​g​）
+					 */
+					globPlaceholder: string
+					/**
+					 * 版​本​（​可​选​，​默​认​最​新​）
+					 */
+					versionPlaceholder: string
+					/**
+					 * 从​ ​n​p​m​ ​C​D​N​ ​抓​取​包​内​散​装​ ​S​V​G​ ​文​件​；​支​持​ ​*​、​*​*​ ​与​逗​号​分​组​多​选​一​语​法​。
+					 */
+					hint: string
+				}
+				/**
+				 * 将​删​除​ ​{​c​o​u​n​t​}​ ​个​图​标​（​本​地​文​件​与​设​置​清​单​）​，​已​使​用​该​图​标​的​界​面​将​回​退​为​空​白​。
+				 * @param {number} count
+				 */
+				uninstallHint: RequiredParams<'count'>
+				/**
+				 * 图​标​库​卸​载​失​败
+				 */
+				uninstallFailed: string
+				/**
+				 * 刷​新​目​录
+				 */
+				refreshTooltip: string
+				/**
+				 * 已​安​装
+				 */
+				installedSection: string
+				/**
+				 * 尚​未​安​装​任​何​图​标​库​，​从​下​方​目​录​选​择​安​装​。
+				 */
+				noPacksInstalled: string
+				/**
+				 * {​c​o​u​n​t​}​ ​个​图​标
+				 * @param {number} count
+				 */
+				iconCountLabel: RequiredParams<'count'>
+				/**
+				 * 浏​览​图​标
+				 */
+				browseTooltip: string
+				/**
+				 * 启​用​/​停​用​该​图​标​库
+				 */
+				enabledTooltip: string
+				/**
+				 * 图​标​集​目​录​（​I​c​o​n​i​f​y​，​2​2​0​+​ ​集​）
+				 */
+				catalogSection: string
+				/**
+				 * 目​录​缓​存​于​ ​{​t​i​m​e​}
+				 * @param {unknown} time
+				 */
+				cachedAt: RequiredParams<'time'>
+				/**
+				 * 离​线​缓​存
+				 */
+				catalogCached: string
+				/**
+				 * 在​线
+				 */
+				catalogOnline: string
+				/**
+				 * 图​标​集​目​录​加​载​失​败​（​网​络​不​可​用​且​无​缓​存​）
+				 */
+				catalogLoadFailed: string
+				/**
+				 * 正​在​加​载​图​标​集​目​录​…
+				 */
+				catalogLoading: string
+				/**
+				 * 常​用​ ​n​p​m​ ​图​标​包​（​一​键​安​装​）
+				 */
+				presetsSection: string
+				/**
+				 * 已​安​装
+				 */
+				alreadyInstalled: string
+				/**
+				 * 返​回
+				 */
+				backTooltip: string
+				/**
+				 * 只​读​展​示​。​点​击​图​标​可​复​制​完​整​ ​I​D​（​C​I​-​ ​前​缀​）​。
+				 */
+				detailHint: string
+				/**
+				 * 预​览
+				 */
+				previewTitle: string
+				/**
+				 * 正​在​加​载​预​览​…
+				 */
+				previewLoading: string
+				/**
+				 * 暂​无​预​览​样​例
+				 */
+				previewEmpty: string
+				/**
+				 * 预​览​加​载​失​败
+				 */
+				previewFailed: string
+				/**
+				 * 显​示​更​多​（​{​s​h​o​w​n​}​/​{​t​o​t​a​l​}​）
+				 * @param {number} shown
+				 * @param {number} total
+				 */
+				showMore: RequiredParams<'shown' | 'total'>
+			}
 			lucide: {
 				/**
 				 * L​u​c​i​d​e
@@ -500,6 +673,170 @@ export type TranslationFunctions = {
 					 */
 					selectedFiles: (arg: { count: number }) => LocalizedString
 				}
+			}
+			pack: {
+				/**
+				 * 图标库
+				 */
+				tabName: () => LocalizedString
+				/**
+				 * 正在下载图标库…
+				 */
+				installing: () => LocalizedString
+				/**
+				 * 正在下载图标 {done}/{total}…
+				 */
+				progress: (arg: { done: number, total: number }) => LocalizedString
+				/**
+				 * 已安装 {count} 个图标，立即生效
+				 */
+				installed: (arg: { count: number }) => LocalizedString
+				/**
+				 * 图标库安装失败
+				 */
+				installFailed: () => LocalizedString
+				/**
+				 * 图标数
+				 */
+				iconCount: () => LocalizedString
+				/**
+				 * 许可证
+				 */
+				licenseLabel: () => LocalizedString
+				/**
+				 * 图标 ID 前缀
+				 */
+				idLabel: () => LocalizedString
+				/**
+				 * 来源包
+				 */
+				sourcePackage: () => LocalizedString
+				/**
+				 * 该图标集包含 {count} 个图标，体积较大，安装与同步耗时可能较长，确定继续？
+				 */
+				bigPackWarning: (arg: { count: number }) => LocalizedString
+				/**
+				 * 安装完成后图标存储在本地，离线可用。
+				 */
+				offlineHint: () => LocalizedString
+				npmModal: {
+					/**
+					 * 自定义 npm 图标包
+					 */
+					title: () => LocalizedString
+					/**
+					 * 包 ID（小写字母/数字/连字符，如 my-icons）
+					 */
+					packIdPlaceholder: () => LocalizedString
+					/**
+					 * npm 包名（如 @tabler/icons）
+					 */
+					packagePlaceholder: () => LocalizedString
+					/**
+					 * SVG 路径 glob（如 icons/outline/*.svg）
+					 */
+					globPlaceholder: () => LocalizedString
+					/**
+					 * 版本（可选，默认最新）
+					 */
+					versionPlaceholder: () => LocalizedString
+					/**
+					 * 从 npm CDN 抓取包内散装 SVG 文件；支持 *、** 与逗号分组多选一语法。
+					 */
+					hint: () => LocalizedString
+				}
+				/**
+				 * 将删除 {count} 个图标（本地文件与设置清单），已使用该图标的界面将回退为空白。
+				 */
+				uninstallHint: (arg: { count: number }) => LocalizedString
+				/**
+				 * 图标库卸载失败
+				 */
+				uninstallFailed: () => LocalizedString
+				/**
+				 * 刷新目录
+				 */
+				refreshTooltip: () => LocalizedString
+				/**
+				 * 已安装
+				 */
+				installedSection: () => LocalizedString
+				/**
+				 * 尚未安装任何图标库，从下方目录选择安装。
+				 */
+				noPacksInstalled: () => LocalizedString
+				/**
+				 * {count} 个图标
+				 */
+				iconCountLabel: (arg: { count: number }) => LocalizedString
+				/**
+				 * 浏览图标
+				 */
+				browseTooltip: () => LocalizedString
+				/**
+				 * 启用/停用该图标库
+				 */
+				enabledTooltip: () => LocalizedString
+				/**
+				 * 图标集目录（Iconify，220+ 集）
+				 */
+				catalogSection: () => LocalizedString
+				/**
+				 * 目录缓存于 {time}
+				 */
+				cachedAt: (arg: { time: unknown }) => LocalizedString
+				/**
+				 * 离线缓存
+				 */
+				catalogCached: () => LocalizedString
+				/**
+				 * 在线
+				 */
+				catalogOnline: () => LocalizedString
+				/**
+				 * 图标集目录加载失败（网络不可用且无缓存）
+				 */
+				catalogLoadFailed: () => LocalizedString
+				/**
+				 * 正在加载图标集目录…
+				 */
+				catalogLoading: () => LocalizedString
+				/**
+				 * 常用 npm 图标包（一键安装）
+				 */
+				presetsSection: () => LocalizedString
+				/**
+				 * 已安装
+				 */
+				alreadyInstalled: () => LocalizedString
+				/**
+				 * 返回
+				 */
+				backTooltip: () => LocalizedString
+				/**
+				 * 只读展示。点击图标可复制完整 ID（CI- 前缀）。
+				 */
+				detailHint: () => LocalizedString
+				/**
+				 * 预览
+				 */
+				previewTitle: () => LocalizedString
+				/**
+				 * 正在加载预览…
+				 */
+				previewLoading: () => LocalizedString
+				/**
+				 * 暂无预览样例
+				 */
+				previewEmpty: () => LocalizedString
+				/**
+				 * 预览加载失败
+				 */
+				previewFailed: () => LocalizedString
+				/**
+				 * 显示更多（{shown}/{total}）
+				 */
+				showMore: (arg: { shown: number, total: number }) => LocalizedString
 			}
 			lucide: {
 				/**

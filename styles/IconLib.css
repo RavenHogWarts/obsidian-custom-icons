@@ -74,3 +74,267 @@
 	justify-content: flex-end;
 	gap: "8px";
 }
+
+/* ------------------------------ 图标库（Pack）页 ------------------------------ */
+
+/*
+ * 页面结构：toolbar 固定，其余区块全部装进 .ci-pack__body 单一滚动体。
+ * 不要在各 section/grid 上再设 overflow，多级滚动在 flex 容器里会互相挤压，
+ * 导致底部区块（如 npm 预设）被裁切不可见。
+ */
+.ci-pack__body {
+	flex: 1;
+	min-height: 0;
+	overflow-y: auto;
+	display: flex;
+	flex-direction: column;
+	gap: var(--size-4-3);
+	padding-right: var(--size-4-1);
+}
+
+.ci-pack__section {
+	display: flex;
+	flex-direction: column;
+	gap: var(--size-4-2);
+	flex: none;
+}
+
+.ci-pack__section-title {
+	display: flex;
+	align-items: center;
+	gap: var(--size-4-2);
+	font-size: var(--font-ui-small);
+	font-weight: var(--font-medium);
+	color: var(--text-muted);
+	padding-bottom: var(--size-4-1);
+	border-bottom: 1px solid var(--background-modifier-border);
+}
+
+.ci-pack__section-count {
+	color: var(--text-faint);
+}
+
+.ci-pack__section-meta {
+	margin-inline-start: auto;
+	color: var(--text-faint);
+	font-size: var(--font-ui-smaller);
+}
+
+.ci-pack__empty {
+	color: var(--text-faint);
+	font-size: var(--font-ui-small);
+	padding: var(--size-4-2) 0;
+}
+
+.ci-pack__empty--error {
+	color: var(--text-error);
+}
+
+.ci-pack__error-detail {
+	color: var(--text-faint);
+	font-size: var(--font-ui-smaller);
+	margin-top: var(--size-4-1);
+	word-break: break-all;
+}
+
+/* 已安装列表（随页面滚动体，不设内部滚动） */
+.ci-pack__list {
+	display: flex;
+	flex-direction: column;
+	gap: var(--size-4-1);
+}
+
+.ci-pack__item {
+	display: flex;
+	align-items: center;
+	gap: var(--size-4-2);
+	padding: var(--size-4-1) var(--size-4-2);
+	border: 1px solid var(--background-modifier-border);
+	border-radius: var(--radius-s);
+	background-color: var(--background-secondary);
+}
+
+.ci-pack__item-main {
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+	gap: 2px;
+	flex: 1;
+	min-width: 0;
+}
+
+.ci-pack__item-name {
+	text-align: start;
+	font-weight: var(--font-medium);
+	color: var(--text-normal);
+
+	&:hover {
+		color: var(--text-accent);
+	}
+}
+
+.ci-pack__item-meta {
+	color: var(--text-faint);
+	font-size: var(--font-ui-smaller);
+}
+
+.ci-pack__item-actions {
+	display: flex;
+	align-items: center;
+	gap: var(--size-4-1);
+}
+
+/* 目录 / 预设卡片网格（不单独滚动，随页面滚动体走） */
+.ci-pack__grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+	gap: var(--size-4-2);
+}
+
+.ci-pack__card {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 2px;
+	padding: var(--size-4-2);
+	border: 1px solid var(--background-modifier-border);
+	border-radius: var(--radius-s);
+	background-color: var(--background-secondary);
+	text-align: start;
+	cursor: pointer;
+	width: 100%;
+	min-height: 0;
+
+	&:hover:not(:disabled) {
+		border-color: var(--interactive-accent);
+		background-color: var(--background-secondary-alt);
+	}
+
+	&:disabled {
+		opacity: 0.5;
+		cursor: default;
+	}
+}
+
+/* 名称最多两行，超出省略——避免长名被单行 ellipsis 截断显示不全 */
+.ci-pack__card-name {
+	font-weight: var(--font-medium);
+	color: var(--text-normal);
+	max-width: 100%;
+	overflow: hidden;
+	display: -webkit-box;
+	-webkit-box-orient: vertical;
+	-webkit-line-clamp: 2;
+	overflow-wrap: anywhere;
+	line-height: var(--line-height-normal);
+	align-self: stretch;
+}
+
+.ci-pack__card-meta {
+	color: var(--text-faint);
+	font-size: var(--font-ui-smaller);
+	max-width: 100%;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	align-self: stretch;
+}
+
+/* 安装确认弹窗 */
+.ci-pack__confirm {
+	display: flex;
+	flex-direction: column;
+	gap: var(--size-4-2);
+	padding: var(--size-4-2) 0;
+}
+
+.ci-pack__confirm-row {
+	display: flex;
+	justify-content: space-between;
+	gap: var(--size-4-3);
+	font-size: var(--font-ui-small);
+}
+
+.ci-pack__confirm-warning {
+	color: var(--text-warning);
+	font-size: var(--font-ui-small);
+}
+
+.ci-pack__confirm-hint {
+	color: var(--text-faint);
+	font-size: var(--font-ui-smaller);
+}
+
+/* 包详情「显示更多」 */
+.ci-pack__show-more {
+	display: flex;
+	justify-content: center;
+	padding: var(--size-4-2) 0;
+}
+
+/* 下载前预览（确认弹窗内） */
+.ci-pack__preview {
+	display: flex;
+	flex-direction: column;
+	gap: var(--size-4-2);
+	padding: var(--size-4-2);
+	border: 1px solid var(--background-modifier-border);
+	border-radius: var(--radius-s);
+	background-color: var(--background-secondary);
+}
+
+.ci-pack__preview-title {
+	font-size: var(--font-ui-small);
+	font-weight: var(--font-medium);
+	color: var(--text-muted);
+}
+
+.ci-pack__preview-status {
+	color: var(--text-faint);
+	font-size: var(--font-ui-small);
+	padding: var(--size-4-2) 0;
+}
+
+.ci-pack__preview-status--error {
+	color: var(--text-error);
+}
+
+.ci-pack__preview-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
+	gap: var(--size-4-2);
+}
+
+.ci-pack__preview-tile {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: var(--size-4-1);
+	padding: var(--size-4-2) var(--size-4-1);
+	border: 1px solid var(--background-modifier-border);
+	border-radius: var(--radius-s);
+	background-color: var(--background-primary);
+	min-width: 0;
+}
+
+.ci-pack__preview-svg {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+
+	svg {
+		width: 24px;
+		height: 24px;
+	}
+}
+
+.ci-pack__preview-name {
+	font-size: var(--font-ui-smaller);
+	color: var(--text-muted);
+	max-width: 100%;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	direction: ltr;
+}

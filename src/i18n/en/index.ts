@@ -83,6 +83,57 @@ const en = {
 					selectedFiles: "{count:number} file(s) selected",
 				},
 			},
+			pack: {
+				tabName: "Icon packs",
+				installing: "Downloading icon pack…",
+				progress: "Downloading icons {done:number}/{total:number}…",
+				installed: "Installed {count:number} icons, effective immediately",
+				installFailed: "Failed to install icon pack",
+				iconCount: "Icons",
+				licenseLabel: "License",
+				idLabel: "Icon ID prefix",
+				sourcePackage: "Source package",
+				bigPackWarning:
+					"This set contains {count:number} icons and may take a while to install and sync. Continue?",
+				offlineHint:
+					"After installation, icons are stored locally and work offline.",
+				npmModal: {
+					title: "Custom npm icon pack",
+					packIdPlaceholder:
+						"Pack ID (lowercase/digits/hyphens, e.g. my-icons)",
+					packagePlaceholder: "npm package (e.g. @tabler/icons)",
+					globPlaceholder: "SVG path glob (e.g. icons/outline/*.svg)",
+					versionPlaceholder: "Version (optional, defaults to latest)",
+					hint: "Fetches loose SVG files from an npm CDN; supports *, ** and comma-separated alternatives.",
+				},
+				uninstallHint:
+					"This removes {count:number} icons (local file and manifest). UI using them will fall back to blank.",
+				uninstallFailed: "Failed to uninstall icon pack",
+				refreshTooltip: "Refresh catalog",
+				installedSection: "Installed",
+				noPacksInstalled:
+					"No icon packs installed yet. Pick one from the catalog below.",
+				iconCountLabel: "{count:number} icons",
+				browseTooltip: "Browse icons",
+				enabledTooltip: "Enable/disable this icon pack",
+				catalogSection: "Icon set catalog (Iconify, 220+ sets)",
+				cachedAt: "Catalog cached at {time}",
+				catalogCached: "offline cache",
+				catalogOnline: "online",
+				catalogLoadFailed:
+					"Failed to load catalog (offline and no cache)",
+				catalogLoading: "Loading icon set catalog…",
+				presetsSection: "Popular npm icon packs (one-click)",
+				alreadyInstalled: "Installed",
+				backTooltip: "Back",
+				detailHint:
+					"Read-only. Click an icon to copy its full ID (CI- prefix).",
+				previewTitle: "Preview",
+				previewLoading: "Loading preview…",
+				previewEmpty: "No preview samples available",
+				previewFailed: "Failed to load preview",
+				showMore: "Show more ({shown:number}/{total:number})",
+			},
 			lucide: {
 				tabName: "Lucide",
 				count: "{count:number} icon(s)",

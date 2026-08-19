@@ -66,6 +66,14 @@ export default defineConfig([
 			reportUnusedDisableDirectives: "off",
 		},
 	},
+	{
+		files: ["**/*.test.ts", "**/*.spec.ts"],
+		languageOptions: {
+			globals: {
+				...globals.jest,
+			},
+		},
+	},
 	globalIgnores([
 		"node_modules",
 		"dist",

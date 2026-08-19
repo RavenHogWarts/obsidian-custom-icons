@@ -28,9 +28,20 @@ export const IconPicker: React.FC<IconPickerProps> = ({
 	const iconItems = React.useMemo(() => {
 		return {
 			lucide: getLucideIconNames(),
-			svg: settings.customIconLib.svg.map((icon) => icon.id),
+			svg: [
+				// 用户单个导入的 SVG（裸 id，渲染走 CI- 回退）
+				...settings.customIconLib.svg.map((icon) => icon.id),
+				// 已启用图标库的图标（完整注册 id CI-{packId}-{name}）
+				...settingsStore.plugin.iconPackStore.getEnabledIconIds(
+					settings.customIconLib.packs,
+				),
+			],
 		};
-	}, [settings.customIconLib.svg]);
+	}, [
+		settings.customIconLib.svg,
+		settings.customIconLib.packs,
+		settingsStore,
+	]);
 
 	const [selectedIcon, setSelectedIcon] = React.useState<string>(value);
 	const [selectedType, setSelectedType] = React.useState<IconType>(type);
@@ -82,6 +93,11 @@ class IconSelector extends FuzzySuggestModal<string> {
 	private iconItems: Record<IconType, string[]>;
 	private currentType: IconType;
 	private previewColor?: string;
+	/**
+	 * 触发选择器时所在的窗口文档（构造发生在用户点击的同步栈中）。
+	 * 防止跨窗口错位：设置界面打开时从 popout 触发，弹窗叠到主窗口设置上。
+	 */
+	private targetDoc: Document;
 
 	constructor(
 		app: App,
@@ -95,6 +111,8 @@ class IconSelector extends FuzzySuggestModal<string> {
 		this.currentType = initialType;
 		this.previewColor = previewColor;
 		this.callback = callback;
+		this.targetDoc =
+			activeDocument ?? app.workspace.containerEl.ownerDocument;
 		this.setInstructions([
 			{ command: "↑↓", purpose: "Navigate" },
 			{ command: "↵", purpose: "Select" },
@@ -104,6 +122,10 @@ class IconSelector extends FuzzySuggestModal<string> {
 
 	onOpen(): void {
 		super.onOpen();
+		// 防御性挂载：核心若把弹窗挂到了其他文档，移回触发窗口
+		if (this.containerEl.ownerDocument !== this.targetDoc) {
+			this.targetDoc.body.appendChild(this.containerEl);
+		}
 		this.addTypeSwitcher();
 	}
 

@@ -1,4 +1,5 @@
 import { LucideLib } from "@src/components/icon-library/LucideLib";
+import { PackLib } from "@src/components/icon-library/PackLib";
 import { SvgLib } from "@src/components/icon-library/SvgLib";
 import { Tab, TabItem } from "@src/components/tab/Tab";
 import { SettingsStoreContext } from "@src/context/SettingsStoreContext";
@@ -33,6 +34,11 @@ export class CustomIconLibView extends ItemView {
 	}
 
 	tabItems: TabItem[] = [
+		{
+			id: "pack",
+			title: LL.view.CustomIconLib.pack.tabName(),
+			content: <PackLib />,
+		},
 		{
 			id: "svg",
 			title: LL.view.CustomIconLib.svg.tabName(),

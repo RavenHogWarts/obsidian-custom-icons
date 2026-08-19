@@ -83,6 +83,12 @@ const ru = {
 					selectedFiles: "Выбрано файлов: {count:number}",
 				},
 			},
+			lucide: {
+				tabName: "Lucide",
+				count: "Значков: {count:number}",
+				descHint:
+					"Только просмотр. Это значки Lucide, встроенные в плагин, но отсутствующие в Obsidian. Нажмите на значок, чтобы скопировать его название.",
+			},
 		},
 	},
 } satisfies BaseTranslation;

@@ -83,6 +83,12 @@ const zh_TW = {
 					selectedFiles: "已選擇 {count:number} 個檔案",
 				},
 			},
+			lucide: {
+				tabName: "Lucide",
+				count: "共 {count:number} 個圖示",
+				descHint:
+					"唯讀展示。以下為外掛內建 Lucide 中 Obsidian 原生未包含的圖示，點擊圖示可複製名稱。",
+			},
 		},
 	},
 } satisfies BaseTranslation;

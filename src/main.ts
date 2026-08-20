@@ -1,6 +1,6 @@
-import "@styles/fix.css";
 import IconPackService from "@src/service/icon-packs/IconPackService";
 import IconPackStore from "@src/service/icon-packs/IconPackStore";
+import "@styles/fix.css";
 import { Notice, Plugin } from "obsidian";
 import { LL } from "./i18n/i18n";
 import CommunityPluginIconHandler from "./service/CommunityPluginIconHandler";
@@ -93,9 +93,13 @@ export default class CIPlugin extends Plugin {
 	}
 
 	private registerRibbonCommands() {
-		this.addRibbonIcon("library", LL.view.CustomIconLib.command(), () => {
-			void openPluginView(this.app, VIEW_TYPE_CUSTOM_ICON_LIB);
-		});
+		this.addRibbonIcon(
+			"book-image",
+			LL.view.CustomIconLib.command(),
+			() => {
+				void openPluginView(this.app, VIEW_TYPE_CUSTOM_ICON_LIB);
+			},
+		);
 	}
 
 	/**
@@ -108,7 +112,9 @@ export default class CIPlugin extends Plugin {
 		// 若消费方先 apply，在运行时重启插件（layout 已就绪）场景下，
 		// 其 onLayoutReady 回调会同步执行，导致在库图标注册前渲染而空白。
 		// 详见 dev/260818/handler顺序与重启空白修复.md
-		this.iconManager.registerHandler(new CustomIconLibHandler(this.iconPackStore));
+		this.iconManager.registerHandler(
+			new CustomIconLibHandler(this.iconPackStore),
+		);
 		this.iconManager.registerHandler(new CommunityPluginIconHandler());
 		this.iconManager.registerHandler(new RibbonIconHandler());
 		this.iconManager.registerHandler(new FileExplorerIconHandler(this));

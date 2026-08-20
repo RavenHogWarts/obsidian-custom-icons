@@ -23,6 +23,7 @@
 	},
 	"devDependencies": {
 		"@eslint/js": "^10.0.1",
+		"@obsidian-typings/obsidian-catalyst-latest": "^6.21.0",
 		"@tanstack/react-virtual": "^3.14.10",
 		"@types/jest": "^30.0.0",
 		"@types/node": "^25.9.1",
@@ -35,7 +36,6 @@
 		"jest": "^30.4.2",
 		"lucide-react": "^1.21.0",
 		"obsidian": "^1.13.1",
-		"obsidian-typings": "^6.19.0",
 		"postcss": "^8.5.15",
 		"postcss-nesting": "^14.0.0",
 		"radix-ui": "^1.6.0",

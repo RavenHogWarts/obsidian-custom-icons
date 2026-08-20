@@ -11,6 +11,9 @@ importers:
       '@eslint/js':
         specifier: ^10.0.1
         version: 10.0.1(eslint@10.4.0)
+      '@obsidian-typings/obsidian-catalyst-latest':
+        specifier: ^6.21.0
+        version: 6.21.0(@types/node@25.9.1)
       '@tanstack/react-virtual':
         specifier: ^3.14.10
         version: 3.14.10(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -47,9 +50,6 @@ importers:
       obsidian:
         specifier: ^1.13.1
         version: 1.13.1(@codemirror/state@6.5.0)(@codemirror/view@6.38.6)
-      obsidian-typings:
-        specifier: ^6.19.0
-        version: 6.19.0(@types/node@25.9.1)
       postcss:
         specifier: ^8.5.15
         version: 8.5.15
@@ -650,13 +650,13 @@ packages:
       '@emnapi/core': ^1.7.1
       '@emnapi/runtime': ^1.7.1
 
-  '@obsidian-typings/obsidian-public-1.12.7@6.21.0':
-    resolution: {integrity: sha512-nTz7E9tZMkNaoAjC60GQ75u/CKM89j2F4fEfQq+vRZspe5WPihe79S5nhhyBmjuZTRS060MUYWxijXI2iaP71w==}
+  '@obsidian-typings/obsidian-catalyst-1.13.7@1.1.0':
+    resolution: {integrity: sha512-PUJXIM4WYTZh0+41UG37VMbp9S7YXyBLLLgFp0omgnlkHvzQyQDaaUkMYvvyh3kMQJdgEjFC0ZSP3F5ezEr1Jw==}
     peerDependencies:
       '@types/node': '>=16.0.0'
 
-  '@obsidian-typings/obsidian-public-latest@6.19.0':
-    resolution: {integrity: sha512-5tdOB0Wh0Altmp8fzWzYeHNHdNewVTZnkfxDMIFb80FkkEJBEgkh5hHYbpRPkPCx+qxlbLZWvS+pgkb9y35GOg==}
+  '@obsidian-typings/obsidian-catalyst-latest@6.21.0':
+    resolution: {integrity: sha512-LtonqY6anHjj0C6FDwyTtiTUGg0xnu9fR2KVZVbj9vhthmZ2dLk2t5qNomFCmM9NwC9NWvLI/IcICs7SI0TxAg==}
 
   '@pkgjs/parseargs@0.11.0':
     resolution: {integrity: sha512-+1VkjdD0QBLPodGrJUeqarH8VAIvQODIbwh9XpP5Syisf7YoQgsJKPNFoqqLQlu+VQ/tVSshMR6loPMn8U+dPg==}
@@ -2891,9 +2891,6 @@ packages:
     resolution: {integrity: sha512-gXah6aZrcUxjWg2zR2MwouP2eHlCBzdV4pygudehaKXSGW4v2AsRQUK+lwwXhii6KFZcunEnmSUoYp5CXibxtA==}
     engines: {node: '>= 0.4'}
 
-  obsidian-typings@6.19.0:
-    resolution: {integrity: sha512-qtUaAluUZXyB7Xhyxlw5XEioX3BNBTvP/BAr0ymk23CgeQXtFbd9uHnAIo6Q6wtYjl8R0QIpnyOV2JwvqyHQ7w==}
-
   obsidian@1.13.1:
     resolution: {integrity: sha512-qtTEA2pmhJzhuhJqzbBFRYhpIOqvW+krDYjtFynv66KbxBbumHBlsJfWw3I4jtnK/6fZwbQhCrmmDdRwXmX56w==}
     peerDependencies:
@@ -4169,13 +4166,13 @@ snapshots:
       '@tybys/wasm-util': 0.10.2
     optional: true
 
-  '@obsidian-typings/obsidian-public-1.12.7@6.21.0(@types/node@25.9.1)':
+  '@obsidian-typings/obsidian-catalyst-1.13.7@1.1.0(@types/node@25.9.1)':
     dependencies:
       '@types/node': 25.9.1
 
-  '@obsidian-typings/obsidian-public-latest@6.19.0(@types/node@25.9.1)':
+  '@obsidian-typings/obsidian-catalyst-latest@6.21.0(@types/node@25.9.1)':
     dependencies:
-      '@obsidian-typings/obsidian-public-1.12.7': 6.21.0(@types/node@25.9.1)
+      '@obsidian-typings/obsidian-catalyst-1.13.7': 1.1.0(@types/node@25.9.1)
     transitivePeerDependencies:
       - '@types/node'
 
@@ -6860,12 +6857,6 @@ snapshots:
       call-bound: 1.0.4
       define-properties: 1.2.1
       es-object-atoms: 1.1.1
-
-  obsidian-typings@6.19.0(@types/node@25.9.1):
-    dependencies:
-      '@obsidian-typings/obsidian-public-latest': 6.19.0(@types/node@25.9.1)
-    transitivePeerDependencies:
-      - '@types/node'
 
   obsidian@1.13.1(@codemirror/state@6.5.0)(@codemirror/view@6.38.6):
     dependencies:

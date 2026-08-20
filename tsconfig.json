@@ -1,6 +1,5 @@
 {
 	"compilerOptions": {
-		"baseUrl": ".",
 		"inlineSourceMap": true,
 		"inlineSources": true,
 		"module": "ESNext",
@@ -8,18 +7,41 @@
 		"allowJs": true,
 		"noImplicitAny": false,
 		"moduleResolution": "bundler",
-		"types": ["obsidian", "jest", "obsidian-typings"],
+		"experimentalDecorators": true,
+		"emitDecoratorMetadata": true,
+		"types": [
+			"obsidian",
+			"jest",
+			"@obsidian-typings/obsidian-catalyst-latest"
+		],
 		"importHelpers": true,
 		"isolatedModules": true,
 		"strictNullChecks": true,
 		"jsx": "react-jsx",
-		"lib": ["DOM", "ES5", "ES6", "ES2017", "ES2018", "ES2019", "ES2020"],
+		"lib": [
+			"DOM",
+			"ES5",
+			"ES6",
+			"ES2017",
+			"ES2018",
+			"ES2019",
+			"ES2020"
+		],
 		"paths": {
-			"@src/*": ["src/*"],
-			"@styles/*": ["styles/*"]
+			"@src/*": [
+				"./src/*"
+			],
+			"@styles/*": [
+				"./styles/*"
+			]
 		},
 		"forceConsistentCasingInFileNames": true
 	},
-	"include": ["src/**/*.ts", "src/**/*.tsx", "test/**/*.ts"],
-	"exclude": ["node_modules"]
+	"include": [
+		"src/**/*.ts",
+		"src/**/*.tsx",
+	],
+	"exclude": [
+		"node_modules"
+	]
 }

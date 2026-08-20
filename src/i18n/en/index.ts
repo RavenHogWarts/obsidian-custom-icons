@@ -158,6 +158,11 @@ const en = {
 				uninstallHint:
 					"This removes {count:number} icons (local file and manifest). UI using them will fall back to blank.",
 				uninstallFailed: "Failed to uninstall icon pack",
+				redownload: "Re-download",
+				redownloadTooltip: "Re-download from source",
+				redownloadHint:
+					"Re-fetches this pack from its source and overwrites the local copy (a newer version may replace the current one). Takes effect immediately; if the download fails, the existing pack is kept.",
+				versionLabel: "Version",
 				refreshTooltip: "Refresh catalog",
 				installedSection: "Installed",
 				noPacksInstalled:

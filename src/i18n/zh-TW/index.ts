@@ -150,6 +150,11 @@ const zh_TW = {
 				},
 				uninstallHint: "將刪除 {count:number} 個圖示（本機檔案與設定清單），已使用該圖示的介面將回退為空白。",
 				uninstallFailed: "圖示庫解除安裝失敗",
+				redownload: "重新下載",
+				redownloadTooltip: "從來源重新下載",
+				redownloadHint:
+					"從來源重新拉取該圖示庫並覆蓋本機副本（可能替換為更新的版本），立即生效；下載失敗時保留現有圖示庫。",
+				versionLabel: "版本",
 				refreshTooltip: "重新整理目錄",
 				installedSection: "已安裝",
 				noPacksInstalled: "尚未安裝任何圖示庫，從下方目錄選擇安裝。",

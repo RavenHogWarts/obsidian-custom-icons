@@ -454,6 +454,22 @@ type RootTranslation = {
 				 */
 				uninstallFailed: string
 				/**
+				 * 重​新​下​载
+				 */
+				redownload: string
+				/**
+				 * 从​来​源​重​新​下​载
+				 */
+				redownloadTooltip: string
+				/**
+				 * 从​来​源​重​新​拉​取​该​图​标​库​并​覆​盖​本​地​副​本​（​可​能​替​换​为​更​新​的​版​本​）​，​立​即​生​效​；​下​载​失​败​时​保​留​现​有​图​标​库​。
+				 */
+				redownloadHint: string
+				/**
+				 * 版​本
+				 */
+				versionLabel: string
+				/**
 				 * 刷​新​目​录
 				 */
 				refreshTooltip: string
@@ -1021,6 +1037,22 @@ export type TranslationFunctions = {
 				 * 图标库卸载失败
 				 */
 				uninstallFailed: () => LocalizedString
+				/**
+				 * 重新下载
+				 */
+				redownload: () => LocalizedString
+				/**
+				 * 从来源重新下载
+				 */
+				redownloadTooltip: () => LocalizedString
+				/**
+				 * 从来源重新拉取该图标库并覆盖本地副本（可能替换为更新的版本），立即生效；下载失败时保留现有图标库。
+				 */
+				redownloadHint: () => LocalizedString
+				/**
+				 * 版本
+				 */
+				versionLabel: () => LocalizedString
 				/**
 				 * 刷新目录
 				 */

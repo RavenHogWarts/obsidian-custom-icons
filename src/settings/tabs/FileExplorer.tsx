@@ -12,7 +12,7 @@ import useSettingsStore from "@src/hooks/useSettingsStore";
 import { LL } from "@src/i18n/i18n";
 import { IFileExplorerIconOverride, IconType } from "@src/types/types";
 import { normalizeIconColor } from "@src/util/communityPluginIcon";
-import { normalizeExtensionKey } from "@src/util/fileExplorerIcon";
+import { parseExtensionInput } from "@src/util/fileExplorerIcon";
 import { FC, useState } from "react";
 
 export const FileExplorer: FC = () => {
@@ -20,6 +20,8 @@ export const FileExplorer: FC = () => {
 	const settings = usePluginSettings(settingsStore);
 	const fe = settings.fileExplorer;
 	const [newExt, setNewExt] = useState("");
+	const [newExtIcon, setNewExtIcon] = useState("");
+	const [newExtType, setNewExtType] = useState<IconType>("lucide");
 
 	// 整 map 写入：扩展名/路径键含 "." / "/"，不能拼进按 "." 分割的 updateSettingByPath
 	const writeMap = async (
@@ -51,12 +53,8 @@ export const FileExplorer: FC = () => {
 			control={
 				<>
 					<ExtraButton
-						icon="reset"
-						tooltip={
-							mapKey === "extensions"
-								? LL.settings.fileExplorer.extensions.resetTooltip()
-								: LL.settings.fileExplorer.overrides.resetTooltip()
-						}
+						icon="trash-2"
+						tooltip={LL.common.delete()}
 						onClick={async () => {
 							await writeMap(mapKey, key, undefined);
 						}}
@@ -110,7 +108,12 @@ export const FileExplorer: FC = () => {
 							onClick={async () => {
 								await settingsStore.updateSettingByPath(
 									`fileExplorer.${field}`,
-									{ id: "", icon: "", type: "lucide", color: "" },
+									{
+										id: "",
+										icon: "",
+										type: "lucide",
+										color: "",
+									},
 								);
 							}}
 						/>
@@ -146,20 +149,28 @@ export const FileExplorer: FC = () => {
 	};
 
 	const addExtension = async () => {
-		const ext = normalizeExtensionKey(newExt);
-		if (!ext) return;
-		// 已配置的扩展名不覆盖（避免二次输入同名把已选图标清空）
-		if (fe.extensions[ext]) {
-			setNewExt("");
-			return;
+		// 批量：`.` 开头、逗号/空格分隔一次输入多个（如 `.xdb .js`），配同一图标
+		const exts = parseExtensionInput(newExt);
+		if (exts.length === 0) return;
+		// 一次性构造整 map 写入，避免逐条异步写入相互覆盖
+		const nextMap = { ...fe.extensions };
+		for (const ext of exts) {
+			// 已配置的扩展名不覆盖（避免二次输入同名把已选图标清空）
+			if (nextMap[ext]) continue;
+			nextMap[ext] = {
+				id: ext,
+				icon: newExtIcon,
+				type: newExtType,
+				color: "",
+			};
 		}
-		await writeMap("extensions", ext, {
-			id: ext,
-			icon: "",
-			type: "lucide" as IconType,
-			color: "",
-		});
+		await settingsStore.updateSettingByPath(
+			"fileExplorer.extensions",
+			nextMap,
+		);
 		setNewExt("");
+		setNewExtIcon("");
+		setNewExtType("lucide");
 	};
 
 	const folderEntries = Object.entries(fe.folders);
@@ -194,6 +205,36 @@ export const FileExplorer: FC = () => {
 					LL.settings.fileExplorer.fileDefault.name(),
 					LL.settings.fileExplorer.fileDefault.desc(),
 				)}
+				<SettingItem
+					name={LL.settings.fileExplorer.inherit.subfolder.name()}
+					desc={LL.settings.fileExplorer.inherit.subfolder.desc()}
+					control={
+						<Toggle
+							value={fe.inherit.subfolder}
+							onChange={async (value) => {
+								await settingsStore.updateSettingByPath(
+									"fileExplorer.inherit.subfolder",
+									value,
+								);
+							}}
+						/>
+					}
+				/>
+				<SettingItem
+					name={LL.settings.fileExplorer.inherit.file.name()}
+					desc={LL.settings.fileExplorer.inherit.file.desc()}
+					control={
+						<Toggle
+							value={fe.inherit.file}
+							onChange={async (value) => {
+								await settingsStore.updateSettingByPath(
+									"fileExplorer.inherit.file",
+									value,
+								);
+							}}
+						/>
+					}
+				/>
 			</SettingGroup>
 
 			<SettingGroup title={LL.settings.fileExplorer.extensions.name()}>
@@ -205,6 +246,15 @@ export const FileExplorer: FC = () => {
 								value={newExt}
 								placeholder={LL.settings.fileExplorer.extensions.placeholder()}
 								onChange={(value) => setNewExt(value)}
+							/>
+							<IconPicker
+								app={settingsStore.app}
+								value={newExtIcon}
+								type={newExtType}
+								onChange={(value, type) => {
+									setNewExtIcon(value);
+									setNewExtType(type);
+								}}
 							/>
 							<ExtraButton
 								icon="plus"

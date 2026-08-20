@@ -28,7 +28,9 @@ interface RibbonActionInfo {
  * Obsidian 渲染的 lucide 图标带 `lucide-<name>` class，
  * addIcon 注册的自定义图标（如 BRAT 的 BratIcon）以 iconId 为 class
  */
-function getCurrentIcon(el: Element): Pick<RibbonActionInfo, "currentIcon" | "currentType"> {
+function getCurrentIcon(
+	el: Element,
+): Pick<RibbonActionInfo, "currentIcon" | "currentType"> {
 	const svg = el.querySelector("svg");
 	if (!svg) {
 		return { currentType: "lucide" };
@@ -36,7 +38,10 @@ function getCurrentIcon(el: Element): Pick<RibbonActionInfo, "currentIcon" | "cu
 	for (const cls of Array.from(svg.classList)) {
 		if (cls === "svg-icon" || cls === "lucide") continue;
 		if (cls.startsWith("lucide-")) {
-			return { currentIcon: cls.slice("lucide-".length), currentType: "lucide" };
+			return {
+				currentIcon: cls.slice("lucide-".length),
+				currentType: "lucide",
+			};
 		}
 		return { currentIcon: cls, currentType: "svg" };
 	}
@@ -76,10 +81,7 @@ export const Ribbon: FC = () => {
 
 	// 整 map 写入：aria-label 可能包含 "."，
 	// 不能拼进按 "." 分割路径的 updateSettingByPath
-	const writeOverride = async (
-		label: string,
-		next?: IRibbonIconOverride,
-	) => {
+	const writeOverride = async (label: string, next?: IRibbonIconOverride) => {
 		const nextData = { ...settings.ribbon.data };
 		if (next) {
 			nextData[label] = next;
@@ -149,8 +151,14 @@ export const Ribbon: FC = () => {
 									<IconPicker
 										app={settingsStore.app}
 										// 未分配时显示按钮当前图标（从原生 svg class 提取）
-										value={override?.icon ?? action.currentIcon ?? ""}
-										type={override?.type ?? action.currentType}
+										value={
+											override?.icon ??
+											action.currentIcon ??
+											""
+										}
+										type={
+											override?.type ?? action.currentType
+										}
 										color={override?.color}
 										onChange={async (value, type) => {
 											await writeOverride(action.label, {
@@ -163,7 +171,6 @@ export const Ribbon: FC = () => {
 									/>
 									<Color
 										value={override?.color ?? ""}
-										disabled={!override}
 										onChange={async (rawColor) => {
 											if (!override) return;
 											await writeOverride(action.label, {

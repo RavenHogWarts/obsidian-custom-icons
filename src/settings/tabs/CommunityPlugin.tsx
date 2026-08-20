@@ -168,7 +168,10 @@ export const CommunityPlugin: FC = () => {
 					control={
 						<>
 							<Toggle
-								value={settings.communityPlugins.enableSearchResults}
+								value={
+									settings.communityPlugins
+										.enableSearchResults
+								}
 								onChange={async (value) => {
 									await settingsStore.updateSettingByPath(
 										"communityPlugins.enableSearchResults",

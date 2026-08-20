@@ -26,11 +26,13 @@ export interface IPluginSettings {
 		/** 继承开关：子文件夹 / 子文件 在无自身配置时继承最近祖先文件夹图标（默认关） */
 		inherit: { subfolder: boolean; file: boolean };
 	};
-	// 标签页头（.workspace-tab-header[data-type]），按视图类型（data-type）覆盖
+	// 标签页头（.workspace-tab-header[data-type]），两级解析：单标签 > 按视图类型
 	tabHeader: {
 		enable: boolean;
-		/** 按视图类型覆盖，key = data-type（如 "file-explorer"、"search"） */
+		/** 按视图类型覆盖（兜底层），key = data-type（如 "file-explorer"、"search"） */
 		data: Record<string, ITabHeaderIconOverride>;
+		/** 单标签覆盖（优先层），key = `${data-type}::${aria-label}`（如 "markdown::春节.md"） */
+		tabs: Record<string, ITabHeaderIconOverride>;
 	};
 	// 实验性功能
 	experimental: {
@@ -61,7 +63,10 @@ export interface IFileExplorerIconOverride {
 	color?: string;
 }
 export interface ITabHeaderIconOverride {
-	/** = data-type，冗余存储便于归一化 */
+	/**
+	 * 冗余存储便于归一化：类型层 = data-type；单标签层 = `${data-type}::${aria-label}`
+	 * （data-type 为机器标识不含 `:`，解析取首个 `::`，标签名自身含 `::` 也不歧义）
+	 */
 	id: string;
 	icon?: string;
 	type?: IconType;
@@ -144,6 +149,7 @@ export const DEFAULT_SETTINGS: IPluginSettings = {
 	tabHeader: {
 		enable: false,
 		data: {},
+		tabs: {},
 	},
 	experimental: {
 		keepPluginFirst: false,

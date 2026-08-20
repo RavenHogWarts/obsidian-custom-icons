@@ -5,26 +5,32 @@ import { IIcon, IconType, ITabHeaderIconOverride } from "@src/types/types";
 import { getLucideIconNames } from "@src/util/getLucideIcons";
 import { AbstractIconHandler } from "@src/util/IconHandler";
 import setIcon, { cleanupIcon } from "@src/util/setIcon";
+import { buildTabKey, resolveTabIcon } from "@src/util/tabHeaderIcon";
 import { EventRef, Menu, WorkspaceLeaf } from "obsidian";
 
 interface ITabHeaderConfig {
 	enable: boolean;
 	data: Record<string, ITabHeaderIconOverride>;
+	tabs: Record<string, ITabHeaderIconOverride>;
 }
 
 /**
  * 标签页图标处理器（隐藏原生 + 插入自定义，混合型）。
  *
  * 为工作区标签页头（.workspace-tab-header[data-type]，含侧栏工具页与编辑器标签）
- * 按视图类型（data-type）自定义图标。
+ * 自定义图标，两级解析：单标签（data-type + aria-label）> 按类型（data-type）> 原生。
  *
  * 与其它处理器的定位差异：
  * - vs Ribbon（替换型）：以稳定、非本地化的 data-type 为键，优于 aria-label；
  * - vs 社区插件（插入型）：标签页原生已有图标 svg，用户要求「原生结构不删除，
  *   用 CSS display:none 隐藏，另插自定义图标」——故为「隐藏原生 + 插入自定义」的混合型。
  *
- * 语义为「按类型」而非「按单个标签」：同一 data-type 的所有标签共享一个图标
- * （编辑器 markdown/canvas 会有多个标签，分配后该类型全部标签统一图标）。
+ * 两级语义（见 util/tabHeaderIcon.ts）：
+ * - 单标签层 key = `${data-type}::${aria-label}`，同一类型的标签可各配各的图标
+ *   （如某篇 md 单独换图标）；aria-label 是标签显示名（文件标签=文件名、视图标签=
+ *   本地化名），同名文件共享、换界面语言后视图条目失效——已权衡接受；
+ * - 类型层为兜底，未单配的标签沿用该类型统一图标（编辑器 markdown/canvas 等
+ *   多标签场景的批量入口）。
  *
  * 难点：
  * - 标签页头分布于左右侧栏、主编辑区与所有 popout 窗口，需跨窗口遍历（区别于 Ribbon 仅主窗口）；
@@ -34,6 +40,8 @@ interface ITabHeaderConfig {
  *   leaf 右键菜单打开时向原生 Menu「追加」菜单项，原生项（关闭/固定/移到新窗口等）完整保留，
  *   无需 DOM contextmenu + preventDefault（那会吞掉原生菜单）。leaf.view.getViewType() 即 data-type，
  *   workspace 事件天然覆盖全部窗口（含 popout），无需逐 document 绑定。
+ *   该事件无 source 参数，两条触发面（标签页头右键 / 视图头 ⋮ 菜单）以 menu.sections
+ *   是否含 "title" 段区分，入口仅收敛到前者（见 registerContextMenu）。
  */
 export default class TabHeaderIconHandler extends AbstractIconHandler<ITabHeaderConfig> {
 	readonly id = "tabHeader";
@@ -118,13 +126,6 @@ export default class TabHeaderIconHandler extends AbstractIconHandler<ITabHeader
 		);
 	}
 
-	/** 未分配 → null（不改动，保留原生图标）；已分配 → 归一化后的图标 */
-	private resolve(dataType: string): IIcon | null {
-		const o = this.settings?.data?.[dataType];
-		if (!o?.icon || !o.type) return null;
-		return { id: dataType, icon: o.icon, type: o.type, color: o.color };
-	}
-
 	// ---------------------------------------------------------------------
 	// 渲染单个标签（幂等 + 隐藏原生 + 插入自定义）
 	// ---------------------------------------------------------------------
@@ -142,7 +143,14 @@ export default class TabHeaderIconHandler extends AbstractIconHandler<ITabHeader
 		);
 		if (!inner) return;
 
-		const resolved = this.resolve(dataType);
+		// 两级解析：单标签（aria-label，建头时原生同步设置，observer 回调时已可用；
+		// 极端时序缺失则仅走类型级，layout-change 重扫自愈）> 类型兜底
+		const resolved = resolveTabIcon(
+			this.settings?.tabs,
+			this.settings?.data,
+			dataType,
+			tabEl.getAttribute("aria-label"),
+		);
 		const existing = inner.querySelector<HTMLElement>(
 			`:scope > .${this.customIconClass}`,
 		);
@@ -284,32 +292,67 @@ export default class TabHeaderIconHandler extends AbstractIconHandler<ITabHeader
 			"leaf-menu",
 			(menu: Menu, leaf: WorkspaceLeaf) => {
 				if (!this.isEnabled()) return;
+				// leaf-menu 无 source 参数（不同于 file-menu），但原生有两条触发面：
+				// 标签页头右键菜单（addSections 以 "title" 段开头）与视图头 ⋮
+				// more-options 菜单（无 "title" 段）。本功能定位是「标签页头」，
+				// 仅在含 "title" 段的菜单中提供入口；sections 不可读（未来版本
+				// 变动）时保守放行，退回两处都显示而非入口凭空消失
+				const sections = menu.sections ?? [];
+				if (sections.length > 0 && !sections.includes("title")) return;
+
 				// 标签页 data-type 即 leaf 的视图类型（非本地化机器标识）
 				const dataType = leaf.view?.getViewType();
 				if (!dataType) return;
+
+				// 单标签层键 = data-type + aria-label（渲染层同源，见 applyToTab）；
+				// aria-label 缺失的极端时序回落旧类型级行为
+				const label = leaf.tabHeaderEl?.getAttribute("aria-label") ?? "";
+				const tabKey = buildTabKey(dataType, label);
+				const isTabLayer = Boolean(tabKey);
+				const key = tabKey || dataType;
 
 				menu.addItem((item) =>
 					item
 						.setTitle(LL.settings.tabHeader.menu.setIcon())
 						.setIcon("image")
 						.onClick(() =>
-							this.openIconPickerFor(dataType, leaf.tabHeaderEl),
+							this.openIconPickerFor(
+								dataType,
+								leaf.tabHeaderEl,
+								tabKey || undefined,
+							),
 						),
 				);
-				if (this.settings?.data?.[dataType]?.icon) {
+				const existing = tabKey
+					? this.settings?.tabs?.[tabKey]?.icon
+					: this.settings?.data?.[dataType]?.icon;
+				if (existing) {
 					menu.addItem((item) =>
 						item
 							.setTitle(LL.settings.tabHeader.menu.resetIcon())
 							.setIcon("rotate-ccw")
-							.onClick(() => void this.writeOverride(dataType)),
+							// 单标签层重置 = 删单标签条目（回落类型层）；类型层重置走设置页
+							.onClick(() =>
+								void this.writeOverride(key, isTabLayer, undefined),
+							),
 					);
 				}
 			},
 		);
 	}
 
-	private openIconPickerFor(dataType: string, sourceEl?: HTMLElement): void {
-		const current = this.settings?.data?.[dataType];
+	/**
+	 * 打开图标选择器。tabKey 存在时编辑单标签层（重置=删单标签条目，回落类型层），
+	 * 否则编辑类型层（aria-label 缺失的回落路径）。
+	 */
+	private openIconPickerFor(
+		dataType: string,
+		sourceEl?: HTMLElement,
+		tabKey?: string,
+	): void {
+		const current = tabKey
+			? this.settings?.tabs?.[tabKey]
+			: this.settings?.data?.[dataType];
 		// sourceEl（leaf.tabHeaderEl）的 ownerDocument 保证 popout 下弹窗挂对窗口
 		const modal = new IconSelector(
 			this.app,
@@ -317,12 +360,16 @@ export default class TabHeaderIconHandler extends AbstractIconHandler<ITabHeader
 			current?.type ?? "lucide",
 			current?.color,
 			(icon, type) =>
-				void this.writeOverride(dataType, {
-					id: dataType,
-					icon,
-					type,
-					color: current?.color ?? "",
-				}),
+				void this.writeOverride(
+					tabKey ?? dataType,
+					Boolean(tabKey),
+					{
+						id: tabKey ?? dataType,
+						icon,
+						type,
+						color: current?.color ?? "",
+					},
+				),
 			sourceEl,
 		);
 		modal.open();
@@ -340,21 +387,25 @@ export default class TabHeaderIconHandler extends AbstractIconHandler<ITabHeader
 	}
 
 	// ---------------------------------------------------------------------
-	// 设置写入（整 map 写入，与 Ribbon/文件浏览器保持一致，规避未来含点类型）
+	// 设置写入（整 map 写入，与 Ribbon/文件浏览器保持一致，规避含点键的类型/标签名）
 	// ---------------------------------------------------------------------
 
+	/** isTabLayer=true 写单标签层（tabHeader.tabs），否则写类型层（tabHeader.data） */
 	private async writeOverride(
-		dataType: string,
+		key: string,
+		isTabLayer: boolean,
 		next?: ITabHeaderIconOverride,
 	): Promise<void> {
-		const nextMap = { ...(this.settings?.data ?? {}) };
+		const nextMap = {
+			...((isTabLayer ? this.settings?.tabs : this.settings?.data) ?? {}),
+		};
 		if (next) {
-			nextMap[dataType] = next;
+			nextMap[key] = next;
 		} else {
-			delete nextMap[dataType];
+			delete nextMap[key];
 		}
 		await this.plugin.settingsStore.updateSettingByPath(
-			"tabHeader.data",
+			isTabLayer ? "tabHeader.tabs" : "tabHeader.data",
 			nextMap,
 		);
 	}

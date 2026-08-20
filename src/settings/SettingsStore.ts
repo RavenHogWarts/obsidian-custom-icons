@@ -12,6 +12,7 @@ import {
 	normalizeIconColor,
 } from "@src/util/communityPluginIcon";
 import { normalizeExtensionKey } from "@src/util/fileExplorerIcon";
+import { parseTabKey } from "@src/util/tabHeaderIcon";
 
 export default class SettingsStore {
 	#plugin: CIPlugin;
@@ -254,7 +255,34 @@ export default class SettingsStore {
 			},
 		);
 
+		// 单标签层：key 必须是合法 `${data-type}::${aria-label}` 复合键
+		//（parseTabKey 校验含分隔符且两段非空），其余防护与类型层一致
+		const normalizedTabs: Record<string, ITabHeaderIconOverride> = {};
+		Object.entries(normalizedSettings.tabHeader?.tabs ?? {}).forEach(
+			([rawKey, override]) => {
+				const key = rawKey.trim();
+				if (
+					!key ||
+					key === "__proto__" ||
+					key === "constructor" ||
+					key === "prototype" ||
+					!parseTabKey(key) ||
+					!override?.icon ||
+					!override.type
+				) {
+					return;
+				}
+				normalizedTabs[key] = {
+					id: key,
+					icon: override.icon,
+					type: override.type,
+					color: normalizeIconColor(override.color) ?? "",
+				};
+			},
+		);
+
 		normalizedSettings.tabHeader.data = normalizedData;
+		normalizedSettings.tabHeader.tabs = normalizedTabs;
 		return normalizedSettings;
 	}
 

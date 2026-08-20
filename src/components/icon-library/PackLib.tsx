@@ -180,8 +180,8 @@ export const PackLib: React.FC = () => {
 		}
 	};
 
-	// Handlers
-	const handleInstallIconify = (info: ICollectionInfo) => {
+	// Handlers（sourceEl：触发元素，弹窗挂载到其所在窗口，防跨窗口错位）
+	const handleInstallIconify = (info: ICollectionInfo, sourceEl?: HTMLElement) => {
 		const bigPack = (info.total ?? 0) > BIG_PACK_THRESHOLD;
 		new ConfirmDialog(store.plugin, {
 			title: `${LL.common.add()} "${info.name}"`,
@@ -227,10 +227,10 @@ export const PackLib: React.FC = () => {
 			),
 			onConfirm: () =>
 				doInstall({ type: "iconify", prefix: info.prefix }, {}),
-		}).open();
+		}, { sourceEl }).open();
 	};
 
-	const handleInstallPreset = (preset: INpmSvgPreset) => {
+	const handleInstallPreset = (preset: INpmSvgPreset, sourceEl?: HTMLElement) => {
 		const config = presetToConfig(preset);
 		new ConfirmDialog(store.plugin, {
 			title: `${LL.common.add()} "${preset.name}"`,
@@ -272,10 +272,10 @@ export const PackLib: React.FC = () => {
 					name: preset.name,
 					license: preset.license,
 				}),
-		}).open();
+		}, { sourceEl }).open();
 	};
 
-	const handleOpenNpmForm = () => {
+	const handleOpenNpmForm = (sourceEl?: HTMLElement) => {
 		let submitFn: (() => Promise<void>) | null = null;
 		new ConfirmDialog(store.plugin, {
 			title: LL.view.CustomIconLib.pack.npmModal.title(),
@@ -294,10 +294,10 @@ export const PackLib: React.FC = () => {
 					await submitFn();
 				}
 			},
-		}).open();
+		}, { sourceEl }).open();
 	};
 
-	const handleUninstall = (manifest: IIconPackManifest) => {
+	const handleUninstall = (manifest: IIconPackManifest, sourceEl?: HTMLElement) => {
 		new ConfirmDialog(store.plugin, {
 			title: `${LL.common.delete()} "${manifest.name}"?`,
 			confirmLL: LL.common.delete(),
@@ -318,7 +318,7 @@ export const PackLib: React.FC = () => {
 					new Notice(LL.view.CustomIconLib.pack.uninstallFailed());
 				}
 			},
-		}).open();
+		}, { sourceEl }).open();
 	};
 
 	const handleToggleEnabled = async (
@@ -365,7 +365,7 @@ export const PackLib: React.FC = () => {
 					<RefreshCw className="svg-icon" />
 				</button>
 				<button
-					onClick={handleOpenNpmForm}
+					onClick={(e) => handleOpenNpmForm(e.currentTarget)}
 					disabled={installing}
 					aria-label={LL.view.CustomIconLib.pack.npmModal.title()}
 					title={LL.view.CustomIconLib.pack.npmModal.title()}
@@ -442,8 +442,8 @@ export const PackLib: React.FC = () => {
 										</button>
 										<button
 											className="clickable-icon"
-											onClick={() =>
-												handleUninstall(manifest)
+											onClick={(e) =>
+												handleUninstall(manifest, e.currentTarget)
 											}
 											aria-label={LL.common.delete()}
 											title={LL.common.delete()}
@@ -506,9 +506,9 @@ export const PackLib: React.FC = () => {
 										role="button"
 										tabIndex={0}
 										aria-disabled={installing}
-										onClick={() => {
+										onClick={(e) => {
 											if (!installing) {
-												handleInstallIconify(info);
+												handleInstallIconify(info, e.currentTarget);
 											}
 										}}
 										onKeyDown={(e) => {
@@ -518,7 +518,7 @@ export const PackLib: React.FC = () => {
 											) {
 												e.preventDefault();
 												if (!installing) {
-													handleInstallIconify(info);
+													handleInstallIconify(info, e.currentTarget);
 												}
 											}
 										}}
@@ -576,7 +576,7 @@ export const PackLib: React.FC = () => {
 									className={`ci-pack__card${installing ? " is-disabled" : ""}${
 										installed ? " is-installed" : ""
 									}`}
-									onClick={() => handleInstallPreset(preset)}
+									onClick={(e) => handleInstallPreset(preset, e.currentTarget)}
 								>
 								<span className="ci-pack__card-name">
 									{preset.name}

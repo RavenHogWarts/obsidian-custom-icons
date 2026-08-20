@@ -243,10 +243,16 @@ export default class FileExplorerIconHandler extends AbstractIconHandler<IFileEx
 			(
 				menu: Menu,
 				file: TAbstractFile,
-				_source: string,
+				source: string,
 				leaf?: WorkspaceLeaf,
 			) => {
 				if (!this.isEnabled()) return;
+				// file-menu 不止文件树触发：文件标签页头 / 面板 more-options / graph、
+				// link 等右键也会触发。若不区分来源，本功能的「设置图标」会混入
+				// 标签页菜单——与 TabHeaderIconHandler（leaf-menu）的「设置图标」
+				// 同菜单并存出现两项（新标签页右键实测如此，且其 file 是隐藏的
+				// 关联文件，语义错位）。就地入口只保留在文件浏览器自身的右键菜单。
+				if (source !== "file-explorer-context-menu") return;
 				const isFolder = file instanceof TFolder;
 				const mapKey = isFolder ? "folders" : "files";
 				const hasOverride = Boolean(

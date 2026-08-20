@@ -147,6 +147,112 @@ type RootTranslation = {
 				customized: string
 			}
 		}
+		fileExplorer: {
+			/**
+			 * 文​件​浏​览​器
+			 */
+			name: string
+			enable: {
+				/**
+				 * 启​用​功​能
+				 */
+				name: string
+				/**
+				 * 为​文​件​浏​览​器​中​的​文​件​夹​和​文​件​自​定​义​图​标
+				 */
+				desc: string
+			}
+			folderDefault: {
+				/**
+				 * 文​件​夹​默​认​图​标
+				 */
+				name: string
+				/**
+				 * 为​所​有​文​件​夹​设​置​统​一​的​默​认​图​标​（​留​空​则​不​显​示​）
+				 */
+				desc: string
+				/**
+				 * 重​置
+				 */
+				resetTooltip: string
+			}
+			fileDefault: {
+				/**
+				 * 文​件​默​认​图​标
+				 */
+				name: string
+				/**
+				 * 为​未​匹​配​到​扩​展​名​规​则​的​文​件​设​置​兜​底​图​标​（​留​空​则​不​显​示​）
+				 */
+				desc: string
+				/**
+				 * 重​置
+				 */
+				resetTooltip: string
+			}
+			extensions: {
+				/**
+				 * 按​扩​展​名
+				 */
+				name: string
+				/**
+				 * 为​某​类​扩​展​名​的​文​件​统​一​分​配​图​标​（​如​ ​p​d​f​、​c​a​n​v​a​s​）
+				 */
+				desc: string
+				/**
+				 * 输​入​扩​展​名​（​如​ ​p​d​f​）​.​.​.
+				 */
+				placeholder: string
+				/**
+				 * 添​加​扩​展​名
+				 */
+				addTooltip: string
+				/**
+				 * 移​除​此​扩​展​名
+				 */
+				resetTooltip: string
+				/**
+				 * 尚​未​配​置​扩​展​名​规​则
+				 */
+				noneFound: string
+			}
+			overrides: {
+				/**
+				 * 单​项​覆​盖
+				 */
+				name: string
+				/**
+				 * 在​文​件​树​中​右​键​文​件​/​文​件​夹​「​设​置​图​标​」​可​单​独​指​定​；​此​处​列​出​已​配​置​项
+				 */
+				desc: string
+				/**
+				 * 文​件​夹
+				 */
+				folderSection: string
+				/**
+				 * 文​件
+				 */
+				fileSection: string
+				/**
+				 * 移​除​此​覆​盖
+				 */
+				resetTooltip: string
+				/**
+				 * 暂​无​单​项​覆​盖
+				 */
+				noneFound: string
+			}
+			menu: {
+				/**
+				 * 设​置​图​标
+				 */
+				setIcon: string
+				/**
+				 * 重​置​图​标
+				 */
+				resetIcon: string
+			}
+		}
 		experimental: {
 			/**
 			 * 实​验​性
@@ -432,12 +538,18 @@ type RootTranslation = {
 				 * @param {number} count
 				 */
 				count: RequiredParams<'count'>
-				/**
-				 * 只​读​展​示​。​以​下​为​插​件​内​置​ ​L​u​c​i​d​e​ ​中​ ​O​b​s​i​d​i​a​n​ ​原​生​未​包​含​的​图​标​，​点​击​图​标​可​复​制​名​称​。
-				 */
 				descHints: {
+					/**
+					 * 插​件​内​置​的​全​部​ ​L​u​c​i​d​e​ ​图​标​（​已​去​重​）​，​点​击​图​标​可​复​制​名​称​。
+					 */
 					all: string
+					/**
+					 * O​b​s​i​d​i​a​n​ ​原​生​已​内​置​的​图​标​，​此​处​供​查​阅​对​照​，​点​击​图​标​可​复​制​名​称​。
+					 */
 					builtin: string
+					/**
+					 * 插​件​内​置​ ​L​u​c​i​d​e​ ​中​ ​O​b​s​i​d​i​a​n​ ​原​生​未​包​含​的​图​标​，​点​击​图​标​可​复​制​名​称​。
+					 */
 					extra: string
 				}
 				filter: {
@@ -593,6 +705,112 @@ export type TranslationFunctions = {
 				 * 已自定义
 				 */
 				customized: () => LocalizedString
+			}
+		}
+		fileExplorer: {
+			/**
+			 * 文件浏览器
+			 */
+			name: () => LocalizedString
+			enable: {
+				/**
+				 * 启用功能
+				 */
+				name: () => LocalizedString
+				/**
+				 * 为文件浏览器中的文件夹和文件自定义图标
+				 */
+				desc: () => LocalizedString
+			}
+			folderDefault: {
+				/**
+				 * 文件夹默认图标
+				 */
+				name: () => LocalizedString
+				/**
+				 * 为所有文件夹设置统一的默认图标（留空则不显示）
+				 */
+				desc: () => LocalizedString
+				/**
+				 * 重置
+				 */
+				resetTooltip: () => LocalizedString
+			}
+			fileDefault: {
+				/**
+				 * 文件默认图标
+				 */
+				name: () => LocalizedString
+				/**
+				 * 为未匹配到扩展名规则的文件设置兜底图标（留空则不显示）
+				 */
+				desc: () => LocalizedString
+				/**
+				 * 重置
+				 */
+				resetTooltip: () => LocalizedString
+			}
+			extensions: {
+				/**
+				 * 按扩展名
+				 */
+				name: () => LocalizedString
+				/**
+				 * 为某类扩展名的文件统一分配图标（如 pdf、canvas）
+				 */
+				desc: () => LocalizedString
+				/**
+				 * 输入扩展名（如 pdf）...
+				 */
+				placeholder: () => LocalizedString
+				/**
+				 * 添加扩展名
+				 */
+				addTooltip: () => LocalizedString
+				/**
+				 * 移除此扩展名
+				 */
+				resetTooltip: () => LocalizedString
+				/**
+				 * 尚未配置扩展名规则
+				 */
+				noneFound: () => LocalizedString
+			}
+			overrides: {
+				/**
+				 * 单项覆盖
+				 */
+				name: () => LocalizedString
+				/**
+				 * 在文件树中右键文件/文件夹「设置图标」可单独指定；此处列出已配置项
+				 */
+				desc: () => LocalizedString
+				/**
+				 * 文件夹
+				 */
+				folderSection: () => LocalizedString
+				/**
+				 * 文件
+				 */
+				fileSection: () => LocalizedString
+				/**
+				 * 移除此覆盖
+				 */
+				resetTooltip: () => LocalizedString
+				/**
+				 * 暂无单项覆盖
+				 */
+				noneFound: () => LocalizedString
+			}
+			menu: {
+				/**
+				 * 设置图标
+				 */
+				setIcon: () => LocalizedString
+				/**
+				 * 重置图标
+				 */
+				resetIcon: () => LocalizedString
 			}
 		}
 		experimental: {
@@ -869,12 +1087,18 @@ export type TranslationFunctions = {
 				 * 共 {count} 个图标
 				 */
 				count: (arg: { count: number }) => LocalizedString
-				/**
-				 * 只读展示。以下为插件内置 Lucide 中 Obsidian 原生未包含的图标，点击图标可复制名称。
-				 */
 				descHints: {
+					/**
+					 * 插件内置的全部 Lucide 图标（已去重），点击图标可复制名称。
+					 */
 					all: () => LocalizedString
+					/**
+					 * Obsidian 原生已内置的图标，此处供查阅对照，点击图标可复制名称。
+					 */
 					builtin: () => LocalizedString
+					/**
+					 * 插件内置 Lucide 中 Obsidian 原生未包含的图标，点击图标可复制名称。
+					 */
 					extra: () => LocalizedString
 				}
 				filter: {

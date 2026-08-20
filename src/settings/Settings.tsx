@@ -3,6 +3,7 @@ import { LL } from "@src/i18n/i18n";
 import { FC } from "react";
 import { CommunityPlugin } from "./tabs/CommunityPlugin";
 import { Experimental } from "./tabs/Experimental";
+import { FileExplorer } from "./tabs/FileExplorer";
 import { Ribbon } from "./tabs/Ribbon";
 
 export const Settings: FC = () => {
@@ -16,6 +17,11 @@ export const Settings: FC = () => {
 			id: "ribbon",
 			title: LL.settings.ribbon.name(),
 			content: <Ribbon />,
+		},
+		{
+			id: "file-explorer",
+			title: LL.settings.fileExplorer.name(),
+			content: <FileExplorer />,
 		},
 		{
 			id: "experimental",

@@ -5,21 +5,24 @@ export interface IPluginSettings {
 		default: ICommunityPluginIcon;
 		data: Record<string, ICommunityPluginIconOverride>;
 	};
-	// 扩展示例：侧边栏视图图标
-	// sidebarViews: {
-	// 	enable: boolean;
-	// 	data: Record<string, IViewIcon>;
-	// };
-	// 扩展示例：文件浏览器图标
-	// fileExplorer: {
-	// 	enable: boolean;
-	// 	folderIcons: Record<string, IFolderIcon>;
-	// 	fileIcons: Record<string, IFileIcon>;
-	// };
 	// Ribbon 按钮（左侧 .side-dock-actions），以 aria-label 为映射键
 	ribbon: {
 		enable: boolean;
 		data: Record<string, IRibbonIconOverride>;
+	};
+	// 文件浏览器（data-type="file-explorer"）文件夹/文件图标
+	fileExplorer: {
+		enable: boolean;
+		/** 所有文件夹的统一默认图标；icon 为空 = 文件夹不显示图标 */
+		folderDefault: IIcon;
+		/** 单个文件夹覆盖，key = data-path（如 "Components/basic"） */
+		folders: Record<string, IFileExplorerIconOverride>;
+		/** 所有文件的兜底默认；icon 为空 = 未匹配扩展名的文件不显示图标 */
+		fileDefault: IIcon;
+		/** 按扩展名的默认，key = 小写去点扩展名（如 "md"、"pdf"、"canvas"） */
+		extensions: Record<string, IFileExplorerIconOverride>;
+		/** 单个文件覆盖，key = data-path（如 "YG/春节.md"） */
+		files: Record<string, IFileExplorerIconOverride>;
 	};
 	// 实验性功能
 	experimental: {
@@ -42,9 +45,16 @@ export interface IRibbonIconOverride {
 	type?: IconType;
 	color?: string;
 }
+export interface IFileExplorerIconOverride {
+	/** = data-path 或 扩展名，冗余存储便于归一化 */
+	id: string;
+	icon?: string;
+	type?: IconType;
+	color?: string;
+}
 
 // Definition
-interface IIcon {
+export interface IIcon {
 	id: string;
 	icon: string;
 	type: IconType;
@@ -106,6 +116,14 @@ export const DEFAULT_SETTINGS: IPluginSettings = {
 	ribbon: {
 		enable: false,
 		data: {},
+	},
+	fileExplorer: {
+		enable: false,
+		folderDefault: { id: "", icon: "", type: "lucide", color: "" },
+		folders: {},
+		fileDefault: { id: "", icon: "", type: "lucide", color: "" },
+		extensions: {},
+		files: {},
 	},
 	experimental: {
 		keepPluginFirst: false,

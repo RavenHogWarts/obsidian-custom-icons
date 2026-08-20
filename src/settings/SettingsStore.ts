@@ -2,6 +2,7 @@ import CIPlugin from "@src/main";
 import {
 	DEFAULT_SETTINGS,
 	ICommunityPluginIconOverride,
+	IFileExplorerIconOverride,
 	IPluginSettings,
 	IRibbonIconOverride,
 } from "@src/types/types";
@@ -9,6 +10,7 @@ import {
 	normalizeCommunityPluginOverride,
 	normalizeIconColor,
 } from "@src/util/communityPluginIcon";
+import { normalizeExtensionKey } from "@src/util/fileExplorerIcon";
 
 export default class SettingsStore {
 	#plugin: CIPlugin;
@@ -168,9 +170,64 @@ export default class SettingsStore {
 		return normalizedSettings;
 	}
 
+	#normalizeFileExplorerSettings(
+		settings: IPluginSettings,
+	): IPluginSettings {
+		const normalizedSettings = JSON.parse(
+			JSON.stringify(settings),
+		) as IPluginSettings;
+		const fe = normalizedSettings.fileExplorer;
+
+		// 默认图标颜色归一
+		fe.folderDefault.color =
+			normalizeIconColor(fe.folderDefault.color) ?? "";
+		fe.fileDefault.color = normalizeIconColor(fe.fileDefault.color) ?? "";
+
+		const normalizeMap = (
+			source: Record<string, IFileExplorerIconOverride>,
+			keyTransform: (key: string) => string,
+			dropEmpty: boolean,
+		): Record<string, IFileExplorerIconOverride> => {
+			const result: Record<string, IFileExplorerIconOverride> = {};
+			Object.entries(source ?? {}).forEach(([rawKey, override]) => {
+				const key = keyTransform(rawKey);
+				// 防原型污染 + 丢弃非法键
+				if (
+					!key ||
+					key === "__proto__" ||
+					key === "constructor" ||
+					key === "prototype"
+				) {
+					return;
+				}
+				// folders/files：无图标即无意义（右键分配必带图标），丢弃；
+				// extensions：允许空行持久化——设置页「先添加行、再配置图标」的交互，
+				// 渲染层 resolveFileIcon 对空 icon 天然跳过，无副作用
+				if (dropEmpty && (!override?.icon || !override.type)) {
+					return;
+				}
+				result[key] = {
+					id: key,
+					icon: override?.icon ?? "",
+					type: override?.type ?? "lucide",
+					color: normalizeIconColor(override?.color) ?? "",
+				};
+			});
+			return result;
+		};
+
+		fe.folders = normalizeMap(fe.folders, (k) => k, true);
+		fe.files = normalizeMap(fe.files, (k) => k, true);
+		fe.extensions = normalizeMap(fe.extensions, normalizeExtensionKey, false);
+
+		return normalizedSettings;
+	}
+
 	#normalizeSettings(settings: IPluginSettings): IPluginSettings {
-		return this.#normalizeRibbonSettings(
-			this.#normalizeCommunityPluginSettings(settings),
+		return this.#normalizeFileExplorerSettings(
+			this.#normalizeRibbonSettings(
+				this.#normalizeCommunityPluginSettings(settings),
+			),
 		);
 	}
 

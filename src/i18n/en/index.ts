@@ -1,4 +1,4 @@
-import type { BaseTranslation } from '../i18n-types'
+import type { BaseTranslation } from "../i18n-types";
 
 const en = {
 	settings: {
@@ -77,13 +77,14 @@ const en = {
 			extensions: {
 				name: "By extension",
 				desc: "Assign a shared icon to files of an extension (e.g. pdf, canvas); compound suffixes are supported, e.g. excalidraw.md takes precedence over md",
-				placeholder: "Enter extensions, batch supported (e.g. .xdb .js)...",
+				placeholder:
+					"Enter extensions, batch supported (e.g. .xdb .js)...",
 				addTooltip: "Add extension",
 				noneFound: "No extension rules configured yet",
 			},
 			overrides: {
 				name: "Per-item overrides",
-				desc: "Right-click a file/folder in the tree and choose \"Set icon\" to override individually; configured items are listed here",
+				desc: 'Right-click a file/folder in the tree and choose "Set icon" to override individually; configured items are listed here',
 				folderSection: "Folders",
 				fileSection: "Files",
 				noneFound: "No per-item overrides yet",
@@ -114,17 +115,18 @@ const en = {
 			command: "Open custom icon library",
 			reapplyCommand: "Reapply all icons",
 			reapplyNotice: "All custom icons reapplied",
-			searchPlaceholder: "Search icon...",
+			searchPlaceholder: "Search icons...",
 			svg: {
 				tabName: "SVG (Experimental)",
 				copyAction: "Copy SVG code",
 				modal: {
 					pasteMode: "Paste Code",
 					uploadMode: "Upload Files",
-					idPlaceholder: "Icon ID (e.g: my-icon)",
+					idPlaceholder: "Icon ID (e.g.: my-icon)",
 					contentPlaceholder: "SVG content (<svg>...</svg>)",
 					selectFiles: "Select svg files",
-					selectFilesDesc: "You can select multiple svg files to batch add icons. File names will be used as icon IDs.",
+					selectFilesDesc:
+						"You can select multiple svg files to batch add icons. File names will be used as icon IDs.",
 					selectedFiles: "{count:number} file(s) selected",
 				},
 			},
@@ -132,27 +134,34 @@ const en = {
 				tabName: "Icon packs",
 				installing: "Downloading icon pack…",
 				progress: "Downloading icons {done:number}/{total:number}…",
-				installed: "Installed {count:number} icons, effective immediately",
+				installed:
+					"Installed {count:number} icons, effective immediately",
 				installFailed: "Failed to install icon pack",
 				iconCount: "Icons",
 				licenseLabel: "License",
 				idLabel: "Icon ID prefix",
 				sourcePackage: "Source package",
-				bigPackWarning: "This set contains {count:number} icons and may take a while to install and sync. Continue?",
-				offlineHint: "After installation, icons are stored locally and work offline.",
+				bigPackWarning:
+					"This set contains {count:number} icons and may take a while to install and sync. Continue?",
+				offlineHint:
+					"After installation, icons are stored locally and work offline.",
 				npmModal: {
 					title: "Custom npm icon pack",
-					packIdPlaceholder: "Pack ID (lowercase/digits/hyphens, e.g. my-icons)",
+					packIdPlaceholder:
+						"Pack ID (lowercase/digits/hyphens, e.g. my-icons)",
 					packagePlaceholder: "npm package (e.g. @tabler/icons)",
 					globPlaceholder: "SVG path glob (e.g. icons/outline/*.svg)",
-					versionPlaceholder: "Version (optional, defaults to latest)",
+					versionPlaceholder:
+						"Version (optional, defaults to latest)",
 					hint: "Fetches loose SVG files from an npm CDN; supports *, ** and comma-separated alternatives.",
 				},
-				uninstallHint: "This removes {count:number} icons (local file and manifest). UI using them will fall back to blank.",
+				uninstallHint:
+					"This removes {count:number} icons (local file and manifest). UI using them will fall back to blank.",
 				uninstallFailed: "Failed to uninstall icon pack",
 				refreshTooltip: "Refresh catalog",
 				installedSection: "Installed",
-				noPacksInstalled: "No icon packs installed yet. Pick one from the catalog below.",
+				noPacksInstalled:
+					"No icon packs installed yet. Pick one from the catalog below.",
 				iconCountLabel: "{count:number} icons",
 				browseTooltip: "Browse icons",
 				enabledTooltip: "Enable/disable this icon pack",
@@ -160,12 +169,14 @@ const en = {
 				cachedAt: "Catalog cached at {time}",
 				catalogCached: "offline cache",
 				catalogOnline: "online",
-				catalogLoadFailed: "Failed to load catalog (offline and no cache)",
+				catalogLoadFailed:
+					"Failed to load catalog (offline and no cache)",
 				catalogLoading: "Loading icon set catalog…",
 				presetsSection: "Popular npm icon packs (one-click)",
 				alreadyInstalled: "Installed",
 				backTooltip: "Back",
-				detailHint: "Read-only. Click an icon to copy its full ID (CI- prefix).",
+				detailHint:
+					"Read-only. Click an icon to copy its full ID (CI- prefix).",
 				previewTitle: "Preview",
 				previewLoading: "Loading preview…",
 				previewEmpty: "No preview samples available",
@@ -177,7 +188,8 @@ const en = {
 				count: "{count:number} icon(s)",
 				descHints: {
 					all: "All Lucide icons bundled with the plugin (deduplicated). Click an icon to copy its name.",
-					builtin: "Icons already built into Obsidian natively, listed for reference. Click an icon to copy its name.",
+					builtin:
+						"Icons already built into Obsidian natively, listed for reference. Click an icon to copy its name.",
 					extra: "Lucide icons bundled with the plugin but not built into Obsidian. Click an icon to copy its name.",
 				},
 				filter: {

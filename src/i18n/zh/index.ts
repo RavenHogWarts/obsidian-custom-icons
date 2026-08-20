@@ -133,8 +133,18 @@ const zh = {
 			lucide: {
 				tabName: "Lucide",
 				count: "共 {count:number} 个图标",
-				descHint:
-					"只读展示。以下为插件内置 Lucide 中 Obsidian 原生未包含的图标，点击图标可复制名称。",
+				descHints: {
+					all: "插件内置的全部 Lucide 图标（已去重），点击图标可复制名称。",
+					builtin:
+						"Obsidian 原生已内置的图标，此处供查阅对照，点击图标可复制名称。",
+					extra: "插件内置 Lucide 中 Obsidian 原生未包含的图标，点击图标可复制名称。",
+				},
+				filter: {
+					group: "筛选图标",
+					all: "全部",
+					builtin: "内置",
+					extra: "差异",
+				},
 			},
 		},
 	},

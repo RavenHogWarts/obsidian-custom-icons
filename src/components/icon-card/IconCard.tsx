@@ -123,7 +123,7 @@ export const IconCard = memo(function IconCard({
 				onClick={(e) => {
 					void handleCopyName(e);
 				}}
-				title="Click to copy icon name"
+				title={id}
 				aria-label={id}
 			>
 				{id}

@@ -21,6 +21,28 @@
 
 * 更新相关文档 ([a3212cf](https://github.com/Raven-Pensieve/obsidian-custom-icons/commit/a3212cf46abfa1099bc361a5c3e26241a76b41d0))
 
+## [2.3.0](https://github.com/Raven-Pensieve/obsidian-custom-icons/compare/2.2.0...2.3.0) (2026-08-20)
+
+
+### ✨ 新增功能 (Features)
+
+* 增加 lucide 库，对比与obsidian原生lucide 的差异 ([3cadaa3](https://github.com/Raven-Pensieve/obsidian-custom-icons/commit/3cadaa36095b129d934f20d486432f391063894d))
+* 增加图标包的预览 ([f39850f](https://github.com/Raven-Pensieve/obsidian-custom-icons/commit/f39850ffd9472447ff08687ec22e7bf279abab35))
+* 实现第三方图标库的导入 ([a7a6327](https://github.com/Raven-Pensieve/obsidian-custom-icons/commit/a7a632755259924b60d892340a14d56536b91a43))
+
+
+### 🐛 问题修复 (Bug Fixes)
+
+* 修复1.13弹窗打开位置 ([cb07e97](https://github.com/Raven-Pensieve/obsidian-custom-icons/commit/cb07e97accb63665fc245b14564744a9b765461f))
+* 修复modal打开位置 ([a9d92d8](https://github.com/Raven-Pensieve/obsidian-custom-icons/commit/a9d92d854b59bb8fda97d2798ae76c27bbe15bfe))
+
+
+### ⚡ 性能优化 (Performance)
+
+* 优化显示，lucide增加筛选 ([9110aa6](https://github.com/Raven-Pensieve/obsidian-custom-icons/commit/9110aa660b5259668055ac9c7952176563041153))
+* 使用 @tanstack/react-virtual 优化虚拟加载 ([a459ed3](https://github.com/Raven-Pensieve/obsidian-custom-icons/commit/a459ed3da5a73796b5f3d1953bf4e5e6ce258bcd))
+* 修复 lint error ([b74c37d](https://github.com/Raven-Pensieve/obsidian-custom-icons/commit/b74c37d5a669932efc876aa5ebba7f4f88dbbb80))
+
 ## [2.1.0](https://github.com/Raven-Pensieve/obsidian-custom-icons/compare/2.0.5...2.1.0) (2026-06-28)
 
 

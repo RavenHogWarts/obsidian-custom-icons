@@ -1,4 +1,5 @@
 import IconPackStore, {
+	CATALOG_CACHE_VERSION,
 	ICollectionInfo,
 } from "@src/service/icon-packs/IconPackStore";
 import { sanitizeSvg } from "@src/service/icon-packs/sanitize";
@@ -31,8 +32,13 @@ function iconifySetUrls(prefix: string): string[] {
 	);
 }
 
+/*
+ * 目录源：unpkg 优先——jsdelivr 对 @iconify/json 整包已超 150MB 限制返回 403，
+ * 保留 jsdelivr 作为回退镜像。
+ */
 const CATALOG_URLS = [
-	...CDN_HOSTS.map((host) => `${host}/@iconify/json@latest/collections.json`),
+	"https://unpkg.com/@iconify/json@latest/collections.json",
+	"https://cdn.jsdelivr.net/npm/@iconify/json@latest/collections.json",
 ];
 
 /**
@@ -56,7 +62,12 @@ export class IconifySource implements IIconSource {
 		fetchedAt: number;
 	}> {
 		const cached = force ? null : await this.store.readCatalog();
-		if (cached && cached.collections?.length) {
+		// 版本不符的旧缓存（如无 samples 字段）视为过期，重新拉取后落盘迁移
+		if (
+			cached &&
+			cached.version === CATALOG_CACHE_VERSION &&
+			cached.collections?.length
+		) {
 			return {
 				collections: cached.collections,
 				fromCache: true,

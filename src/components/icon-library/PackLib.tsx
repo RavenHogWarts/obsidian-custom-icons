@@ -31,6 +31,14 @@ import "./IconLib.css";
 /** 大包确认阈值：超过该图标数时在确认弹窗中附加提示 */
 const BIG_PACK_THRESHOLD = 3000;
 
+/** npm 预设 → 安装配置（卡片预览与安装动作共用同一 glob 语义） */
+const presetToConfig = (preset: INpmSvgPreset): IconSourceConfig => ({
+	type: "npm-svg",
+	package: preset.package,
+	version: "",
+	glob: preset.glob,
+});
+
 /**
  * 可折叠区块：点击标题栏展开/收起内容。
  * 标题栏由左侧箭头 + 图标 + 标题 + 可选尾部（计数/状态徽标）组成。
@@ -223,12 +231,7 @@ export const PackLib: React.FC = () => {
 	};
 
 	const handleInstallPreset = (preset: INpmSvgPreset) => {
-		const config: IconSourceConfig = {
-			type: "npm-svg",
-			package: preset.package,
-			version: "",
-			glob: preset.glob,
-		};
+		const config = presetToConfig(preset);
 		new ConfirmDialog(store.plugin, {
 			title: `${LL.common.add()} "${preset.name}"`,
 			confirmLL: LL.common.add(),
@@ -255,12 +258,7 @@ export const PackLib: React.FC = () => {
 					</div>
 					<PackPreview
 						load={() =>
-							service.previewNpmSvg({
-								type: "npm-svg",
-								package: preset.package,
-								version: "",
-								glob: preset.glob,
-							})
+							service.previewNpmSvg(presetToConfig(preset))
 						}
 					/>
 					<div className="ci-pack__confirm-hint">
@@ -493,12 +491,13 @@ export const PackLib: React.FC = () => {
 							{LL.view.CustomIconLib.pack.catalogLoading()}
 						</div>
 					) : (
-						<div className="ci-pack__grid">
-							{filteredCatalog.map((info) => {
-								const installed = Boolean(
-									settings.customIconLib.packs[info.prefix],
-								);
-								return (
+							<div className="ci-pack__grid">
+								{filteredCatalog.map((info) => {
+									const installed = Boolean(
+										settings.customIconLib.packs[info.prefix],
+									);
+									const samples = info.samples ?? [];
+									return (
 									<div
 										key={info.prefix}
 										className={`ci-pack__card${installing ? " is-disabled" : ""}${
@@ -538,6 +537,21 @@ export const PackLib: React.FC = () => {
 														)
 													: info.prefix}
 										</span>
+										{samples.length > 0 && (
+											<CardSamples
+												cacheKey={info.prefix}
+												placeholderCount={Math.min(
+													samples.length,
+													8,
+												)}
+												load={() =>
+													service.previewIconify(
+														info.prefix,
+														samples,
+													)
+												}
+											/>
+										)}
 									</div>
 								);
 							})}
@@ -564,16 +578,23 @@ export const PackLib: React.FC = () => {
 									}`}
 									onClick={() => handleInstallPreset(preset)}
 								>
-									<span className="ci-pack__card-name">
-										{preset.name}
-									</span>
-									<span className="ci-pack__card-meta">
-										{installed
-											? LL.view.CustomIconLib.pack.alreadyInstalled()
-											: (preset.license ??
-												preset.package)}
-									</span>
-								</div>
+								<span className="ci-pack__card-name">
+									{preset.name}
+								</span>
+								<span className="ci-pack__card-meta">
+									{installed
+										? LL.view.CustomIconLib.pack.alreadyInstalled()
+										: (preset.license ?? preset.package)}
+								</span>
+										<CardSamples
+											cacheKey={`npm:${preset.id}`}
+											load={() =>
+												service.previewNpmSvg(
+													presetToConfig(preset),
+												)
+											}
+										/>
+									</div>
 							);
 						})}
 					</div>
@@ -651,6 +672,135 @@ const PackDetail: React.FC<{
 				estimateRowHeight={88}
 				className="ci-vgrid--compact"
 			/>
+		</div>
+	);
+};
+
+/* ------------------------------------------------------------------ */
+
+/** 卡片内联样例的会话级缓存：cacheKey → 名称 → 已 sanitize 的 SVG（避免重复请求） */
+const cardSampleCache = new Map<string, Record<string, string>>();
+
+/** 单个样例字形：SVG 字符串解析后以节点方式注入（内容已过 sanitize） */
+const SampleGlyph: React.FC<{ svg: string }> = ({ svg }) => {
+	const ref = useRef<HTMLSpanElement>(null);
+
+	useEffect(() => {
+		const container = ref.current;
+		if (!container) {
+			return;
+		}
+		container.empty();
+		try {
+			const parsed = new DOMParser().parseFromString(
+				svg,
+				"image/svg+xml",
+			);
+			const el = parsed.documentElement;
+			if (
+				el &&
+				el.tagName.toLowerCase() === "svg" &&
+				container.ownerDocument
+			) {
+				container.appendChild(
+					container.ownerDocument.importNode(el, true),
+				);
+			}
+		} catch {
+			// 单个样例解析失败时静默跳过
+		}
+	}, [svg]);
+
+	return <span className="ci-pack__card-sample" ref={ref} />;
+};
+
+/**
+ * 卡片内联样例（Iconify 目录卡与 npm 预设卡共用）：
+ * 滚动进入视口时才懒加载（IntersectionObserver + 100px 预取边距），结果进内存缓存。
+ * 区块默认折叠 → 未展开时零网络请求；失败静默退化为纯文本卡片。
+ */
+const CardSamples: React.FC<{
+	/** 会话级缓存键（iconify 用 prefix，npm 预设加 npm: 前缀避免撞名） */
+	cacheKey: string;
+	/** 拉取样例（返回 名称 → 已 sanitize 的 SVG） */
+	load: () => Promise<Record<string, string>>;
+	/** 加载占位块数量（默认 8） */
+	placeholderCount?: number;
+}> = ({ cacheKey, load, placeholderCount = 8 }) => {
+	const [icons, setIcons] = useState<Record<string, string> | null>(
+		cardSampleCache.get(cacheKey) ?? null,
+	);
+	const ref = useRef<HTMLDivElement>(null);
+
+	// load 是调用点的内联箭头（每次渲染新引用），经 ref 中转避免效应反复触发
+	const loadRef = useRef(load);
+	useEffect(() => {
+		loadRef.current = load;
+	});
+
+	useEffect(() => {
+		const el = ref.current;
+		if (!el || icons) {
+			return;
+		}
+
+		let cancelled = false;
+		const io = new IntersectionObserver(
+			(entries) => {
+				if (!entries.some((entry) => entry.isIntersecting)) {
+					return;
+				}
+				io.disconnect();
+
+				// 同屏多卡可能已由其他实例拉取过，双重检查缓存
+				const cached = cardSampleCache.get(cacheKey);
+				if (cached) {
+					setIcons(cached);
+					return;
+				}
+
+				loadRef
+					.current()
+					.then((result) => {
+						if (cancelled) {
+							return;
+						}
+						cardSampleCache.set(cacheKey, result);
+						setIcons(result);
+					})
+					.catch(() => {
+						// 预览失败静默处理，卡片保持纯文本
+					});
+			},
+			{ rootMargin: "100px" },
+		);
+
+		io.observe(el);
+		return () => {
+			cancelled = true;
+			io.disconnect();
+		};
+	}, [cacheKey, icons]);
+
+	const shown: Array<[string, string]> = icons
+		? Object.entries(icons).slice(0, 8)
+		: Array.from({ length: placeholderCount }, (_, i): [string, string] => [
+				`${cacheKey}#${i}`,
+				"",
+			]);
+
+	return (
+		<div className="ci-pack__card-samples" ref={ref} aria-hidden="true">
+			{shown.map(([name, svg]) =>
+				icons ? (
+					<SampleGlyph key={name} svg={svg} />
+				) : (
+					<span
+						key={name}
+						className="ci-pack__card-sample ci-pack__card-sample--skeleton"
+					/>
+				),
+			)}
 		</div>
 	);
 };

@@ -48,6 +48,43 @@ const zh = {
 				customized: "已自定义",
 			},
 		},
+		fileExplorer: {
+			name: "文件浏览器",
+			enable: {
+				name: "启用功能",
+				desc: "为文件浏览器中的文件夹和文件自定义图标",
+			},
+			folderDefault: {
+				name: "文件夹默认图标",
+				desc: "为所有文件夹设置统一的默认图标（留空则不显示）",
+				resetTooltip: "重置",
+			},
+			fileDefault: {
+				name: "文件默认图标",
+				desc: "为未匹配到扩展名规则的文件设置兜底图标（留空则不显示）",
+				resetTooltip: "重置",
+			},
+			extensions: {
+				name: "按扩展名",
+				desc: "为某类扩展名的文件统一分配图标（如 pdf、canvas）",
+				placeholder: "输入扩展名（如 pdf）...",
+				addTooltip: "添加扩展名",
+				resetTooltip: "移除此扩展名",
+				noneFound: "尚未配置扩展名规则",
+			},
+			overrides: {
+				name: "单项覆盖",
+				desc: "在文件树中右键文件/文件夹「设置图标」可单独指定；此处列出已配置项",
+				folderSection: "文件夹",
+				fileSection: "文件",
+				resetTooltip: "移除此覆盖",
+				noneFound: "暂无单项覆盖",
+			},
+			menu: {
+				setIcon: "设置图标",
+				resetIcon: "重置图标",
+			},
+		},
 		experimental: {
 			name: "实验性",
 			keepPluginFirst: {

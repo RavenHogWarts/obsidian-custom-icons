@@ -48,6 +48,43 @@ const en = {
 				customized: "Customized",
 			},
 		},
+		fileExplorer: {
+			name: "File explorer",
+			enable: {
+				name: "Enable feature",
+				desc: "Customize icons for folders and files in the file explorer",
+			},
+			folderDefault: {
+				name: "Default folder icon",
+				desc: "Set a shared default icon for all folders (leave empty to hide)",
+				resetTooltip: "Reset",
+			},
+			fileDefault: {
+				name: "Default file icon",
+				desc: "Fallback icon for files that match no extension rule (leave empty to hide)",
+				resetTooltip: "Reset",
+			},
+			extensions: {
+				name: "By extension",
+				desc: "Assign a shared icon to files of an extension (e.g. pdf, canvas)",
+				placeholder: "Enter extension (e.g. pdf)...",
+				addTooltip: "Add extension",
+				resetTooltip: "Remove this extension",
+				noneFound: "No extension rules configured yet",
+			},
+			overrides: {
+				name: "Per-item overrides",
+				desc: "Right-click a file/folder in the tree and choose \"Set icon\" to override individually; configured items are listed here",
+				folderSection: "Folders",
+				fileSection: "Files",
+				resetTooltip: "Remove this override",
+				noneFound: "No per-item overrides yet",
+			},
+			menu: {
+				setIcon: "Set icon",
+				resetIcon: "Reset icon",
+			},
+		},
 		experimental: {
 			name: "Experimental",
 			keepPluginFirst: {

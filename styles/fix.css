@@ -2,3 +2,17 @@
 	.vertical-tab-nav-item-icon {
 	display: flex;
 }
+
+/* 文件浏览器：插入型文件夹/文件图标 */
+.custom-icon-file-explorer-icon {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	margin-right: var(--size-2-2);
+	flex: 0 0 auto;
+}
+
+.custom-icon-file-explorer-icon .svg-icon {
+	width: 16px;
+	height: 16px;
+}

@@ -296,15 +296,21 @@
 	width: 100%;
 	min-height: 0;
 
-	&:hover:not(:disabled) {
+	&:hover:not(:disabled):not(.is-disabled) {
 		border-color: var(--interactive-accent);
 		background-color: var(--background-secondary-alt);
 	}
 
-	&:disabled {
+	&:disabled,
+	&.is-disabled {
 		opacity: 0.5;
 		cursor: default;
 	}
+}
+
+/* div 卡片（role=button）的禁用态：拦截指针事件 */
+.ci-pack__card.is-disabled {
+	pointer-events: none;
 }
 
 /* 已安装的图标集：强调色边框 + 左上角标记，一眼区分 */

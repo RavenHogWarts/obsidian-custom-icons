@@ -1,6 +1,6 @@
 import { LL } from "@src/i18n/i18n";
 import CIPlugin from "@src/main";
-import { BaseModal } from "./BaseModal";
+import { BaseModal, BaseModalOptions } from "./BaseModal";
 import "./ConfirmDialog.css";
 
 interface ConfirmDialogProps {
@@ -48,12 +48,16 @@ const ConfirmDialogView: React.FC<ConfirmDialogViewProps> = ({
 };
 
 export class ConfirmDialog extends BaseModal<ConfirmDialogViewProps> {
-	constructor(plugin: CIPlugin, props: ConfirmDialogProps) {
+	constructor(
+		plugin: CIPlugin,
+		props: ConfirmDialogProps,
+		options?: BaseModalOptions,
+	) {
 		const viewProps = {
 			...props,
 			plugin,
 		};
 
-		super(plugin, ConfirmDialogView, viewProps, "");
+		super(plugin, ConfirmDialogView, viewProps, "", options);
 	}
 }

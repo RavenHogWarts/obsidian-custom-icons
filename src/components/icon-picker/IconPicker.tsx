@@ -58,6 +58,8 @@ export const IconPicker: React.FC<IconPickerProps> = ({
 				setSelectedType(type);
 				void onChange(icon, type);
 			},
+			// 触发元素：弹窗挂载到选择器按钮所在的窗口（跨窗口防错位）
+			buttonRef.current ?? undefined,
 		);
 		modal.open();
 	};
@@ -94,8 +96,9 @@ class IconSelector extends FuzzySuggestModal<string> {
 	private currentType: IconType;
 	private previewColor?: string;
 	/**
-	 * 触发选择器时所在的窗口文档（构造发生在用户点击的同步栈中）。
-	 * 防止跨窗口错位：设置界面打开时从 popout 触发，弹窗叠到主窗口设置上。
+	 * 弹窗应挂载到的窗口文档。
+	 * 优先取触发元素所在文档（跨窗口场景下 activeDocument 全局不可靠：
+	 * 设置界面打开时从 popout 触发，弹窗会错误地叠到主窗口的设置界面上）。
 	 */
 	private targetDoc: Document;
 
@@ -105,14 +108,19 @@ class IconSelector extends FuzzySuggestModal<string> {
 		initialType: IconType,
 		previewColor: string | undefined,
 		callback: (icon: string, type: IconType) => void,
+		sourceEl?: HTMLElement,
 	) {
 		super(app);
 		this.iconItems = iconItems;
 		this.currentType = initialType;
 		this.previewColor = previewColor;
 		this.callback = callback;
+		const active = activeDocument as Document | undefined;
 		this.targetDoc =
-			activeDocument ?? app.workspace.containerEl.ownerDocument;
+			sourceEl?.ownerDocument ??
+			(active?.body
+				? active
+				: app.workspace.containerEl.ownerDocument);
 		this.setInstructions([
 			{ command: "↑↓", purpose: "Navigate" },
 			{ command: "↵", purpose: "Select" },

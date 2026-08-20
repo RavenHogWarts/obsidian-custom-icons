@@ -15,7 +15,7 @@ interface VirtualIconGridProps<T> {
 	gap?: number;
 	/** 行高估算值（首帧使用，随后由 measureElement 实测校正） */
 	estimateRowHeight?: number;
-	/** 透传到滚动视口，复用既有网格外观（如 ci-lib__grid--lucide） */
+	/** 透传到滚动视口，复用既有网格外观（如 ci-vgrid--compact 紧凑只读风格） */
 	className?: string;
 }
 

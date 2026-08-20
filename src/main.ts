@@ -1,4 +1,4 @@
-import "@styles/styles";
+import "@styles/fix.css";
 import IconPackService from "@src/service/icon-packs/IconPackService";
 import IconPackStore from "@src/service/icon-packs/IconPackStore";
 import { Notice, Plugin } from "obsidian";

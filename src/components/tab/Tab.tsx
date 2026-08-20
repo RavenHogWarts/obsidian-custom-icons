@@ -29,26 +29,26 @@ export const Tab: FC<TabProps> = ({
 	return (
 		<Tabs.Root
 			defaultValue={defaultTab}
-			className={`CI__tab-group ${className}`}
+			className={`ci-tab ${className}`}
 			data-orientation={orientation}
 			onValueChange={onChange}
 		>
-			<Tabs.List className="CI__tab-list" data-orientation={orientation}>
+			<Tabs.List className="ci-tab__list" data-orientation={orientation}>
 				{orientation === "vertical" && (
-					<div className="CI__tab-resize-bar"></div>
+					<div className="ci-tab__resize-bar"></div>
 				)}
 				{items.map((item) => (
 					<Tabs.Trigger
 						key={item.id}
 						value={item.id}
-						className="CI__tab"
+						className="ci-tab__trigger"
 					>
-						<span className="CI__tab-title">{item.title}</span>
+						<span className="ci-tab__title">{item.title}</span>
 					</Tabs.Trigger>
 				))}
 			</Tabs.List>
 
-			<div className="CI__tab-panels">
+			<div className="ci-tab__panels">
 				{items.map((item) => (
 					<TabContentWrapper key={item.id} value={item.id}>
 						{item.content}
@@ -76,7 +76,7 @@ const TabContentWrapper: FC<{ value: string; children: ReactNode }> = ({
 	}, []);
 
 	return (
-		<Tabs.Content ref={panelRef} value={value} className="CI__tab-panel">
+		<Tabs.Content ref={panelRef} value={value} className="ci-tab__panel">
 			{containerEl && (
 				<SettingContainerContext.Provider value={containerEl}>
 					{children}

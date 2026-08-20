@@ -1,5 +1,5 @@
 /* Base Tab Group Layout */
-.CI__tab-group {
+.ci-tab {
 	width: 100%;
 	display: flex;
 	flex-direction: column;
@@ -8,11 +8,11 @@
 	overflow: hidden;
 }
 
-.CI__tab-group[data-orientation="vertical"] {
+.ci-tab[data-orientation="vertical"] {
 	flex-direction: row;
 }
 
-.CI__tab-list {
+.ci-tab__list {
 	display: flex;
 	background-color: transparent;
 	color: var(--text-normal);
@@ -23,11 +23,11 @@
 	min-height: 32px; /* Slightly taller for better touch targets */
 }
 
-.CI__tab-list::-webkit-scrollbar {
+.ci-tab__list::-webkit-scrollbar {
 	display: none; /* Chrome, Safari, Edge */
 }
 
-.CI__tab-list[data-orientation="vertical"] {
+.ci-tab__list[data-orientation="vertical"] {
 	flex-direction: column;
 	min-width: 150px;
 	max-width: 220px;
@@ -41,7 +41,7 @@
 }
 
 /* Tab Button Reset and Styling */
-button.CI__tab {
+button.ci-tab__trigger {
 	appearance: none;
 	background: none;
 	border: 0;
@@ -71,13 +71,13 @@ button.CI__tab {
 	outline: none;
 }
 
-button.CI__tab:focus-visible {
+button.ci-tab__trigger:focus-visible {
 	box-shadow: none;
 	outline: none;
 }
 
 /* Tab Title Text Styling */
-.CI__tab .CI__tab-title {
+.ci-tab__trigger .ci-tab__title {
 	line-height: 1.4;
 	overflow: hidden;
 	text-overflow: ellipsis;
@@ -87,14 +87,14 @@ button.CI__tab:focus-visible {
 }
 
 /* Active Tab Styling */
-.CI__tab[data-state="active"] {
+.ci-tab__trigger[data-state="active"] {
 	color: var(--text-normal);
 	background-color: var(--background-primary);
 	font-weight: var(--font-medium);
 	position: relative;
 }
 
-.CI__tab[data-state="active"]::after {
+.ci-tab__trigger[data-state="active"]::after {
 	content: "";
 	position: absolute;
 	bottom: 0;
@@ -105,18 +105,18 @@ button.CI__tab:focus-visible {
 }
 
 /* Tab Hover States */
-.CI__tab:hover {
+.ci-tab__trigger:hover {
 	color: var(--text-normal);
 	background-color: var(--background-modifier-hover);
 }
 
-.CI__tab:focus-visible {
+.ci-tab__trigger:focus-visible {
 	box-shadow: inset 0 0 0 2px var(--background-modifier-border-focus);
 	outline: none;
 }
 
 /* Active Tab in Vertical Orientation */
-.CI__tab-list[data-orientation="vertical"] .CI__tab {
+.ci-tab__list[data-orientation="vertical"] .ci-tab__trigger {
 	justify-content: flex-start;
 	padding: var(--size-4-1) var(--size-4-3);
 	height: auto;
@@ -124,17 +124,17 @@ button.CI__tab:focus-visible {
 	border-left: 3px solid transparent;
 }
 
-.CI__tab-list[data-orientation="vertical"] .CI__tab[data-state="active"] {
+.ci-tab__list[data-orientation="vertical"] .ci-tab__trigger[data-state="active"] {
 	border-left: 3px solid var(--interactive-accent);
 }
 
-.CI__tab-list[data-orientation="vertical"]
-	.CI__tab[data-state="active"]::after {
+.ci-tab__list[data-orientation="vertical"]
+	.ci-tab__trigger[data-state="active"]::after {
 	display: none;
 }
 
 /* Tab Content Panel Container */
-.CI__tab-panels {
+.ci-tab__panels {
 	flex: 1;
 	padding: var(--size-4-3);
 	border-radius: 0 0 var(--radius-m) var(--radius-m);
@@ -143,14 +143,14 @@ button.CI__tab:focus-visible {
 	width: 100%;
 }
 
-.CI__tab-group[data-orientation="vertical"] .CI__tab-panels {
+.ci-tab[data-orientation="vertical"] .ci-tab__panels {
 	margin-top: 0;
 	border-radius: 0 var(--radius-m) var(--radius-m) 0;
 	height: 100%;
 }
 
 /* Individual Tab Panel */
-.CI__tab-panel {
+.ci-tab__panel {
 	outline: none;
 	animation: fadeIn 200ms ease;
 }
@@ -165,7 +165,7 @@ button.CI__tab:focus-visible {
 }
 
 /* Resize Bar for Vertical Tabs */
-.CI__tab-list[data-orientation="vertical"] .CI__tab-resize-bar {
+.ci-tab__list[data-orientation="vertical"] .ci-tab__resize-bar {
 	position: absolute;
 	top: 0;
 	right: 0;
@@ -178,18 +178,18 @@ button.CI__tab:focus-visible {
 	z-index: 10;
 }
 
-.CI__tab-list[data-orientation="vertical"] .CI__tab-resize-bar:hover,
-.CI__tab-list[data-orientation="vertical"] .CI__tab-resize-bar:active {
+.ci-tab__list[data-orientation="vertical"] .ci-tab__resize-bar:hover,
+.ci-tab__list[data-orientation="vertical"] .ci-tab__resize-bar:active {
 	opacity: 0.7;
 }
 
 /* Mobile Responsiveness */
 @media (max-width: 768px) {
-	.CI__tab-group[data-orientation="vertical"] {
+	.ci-tab[data-orientation="vertical"] {
 		flex-direction: column;
 	}
 
-	.CI__tab-list[data-orientation="vertical"] {
+	.ci-tab__list[data-orientation="vertical"] {
 		flex-direction: row;
 		min-width: 100%;
 		max-width: 100%;
@@ -201,38 +201,38 @@ button.CI__tab:focus-visible {
 		overflow-y: hidden;
 	}
 
-	.CI__tab-list[data-orientation="vertical"] .CI__tab {
+	.ci-tab__list[data-orientation="vertical"] .ci-tab__trigger {
 		border-left: none;
 		border-bottom: 3px solid transparent;
 		padding: var(--size-4-2) var(--size-4-3);
 	}
 
-	.CI__tab-list[data-orientation="vertical"] .CI__tab[data-state="active"] {
+	.ci-tab__list[data-orientation="vertical"] .ci-tab__trigger[data-state="active"] {
 		border-left: none;
 		border-bottom: 3px solid var(--interactive-accent);
 	}
 
-	.CI__tab-list[data-orientation="vertical"] .CI__tab-resize-bar {
+	.ci-tab__list[data-orientation="vertical"] .ci-tab__resize-bar {
 		display: none;
 	}
 
-	.CI__tab-group[data-orientation="vertical"] .CI__tab-panels {
+	.ci-tab[data-orientation="vertical"] .ci-tab__panels {
 		border-radius: 0 0 var(--radius-m) var(--radius-m);
 	}
 
-	.CI__tab .CI__tab-title {
+	.ci-tab__trigger .ci-tab__title {
 		max-width: 140px;
 	}
 }
 
 /* Touch device enhancements */
 @media (pointer: coarse) {
-	.CI__tab {
+	.ci-tab__trigger {
 		padding: var(--size-4-2) var(--size-4-3);
 		min-height: 44px; /* Better touch target */
 	}
 
-	.CI__tab-list {
+	.ci-tab__list {
 		min-height: 44px;
 	}
 }

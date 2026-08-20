@@ -26,6 +26,7 @@ import { IconCard } from "../icon-card/IconCard";
 import { ConfirmDialog } from "../modal/ConfirmDialog";
 import { NpmSvgForm } from "./NpmSvgForm";
 import { VirtualIconGrid } from "./VirtualIconGrid";
+import "./IconLib.css";
 
 /** 大包确认阈值：超过该图标数时在确认弹窗中附加提示 */
 const BIG_PACK_THRESHOLD = 3000;
@@ -646,7 +647,7 @@ const PackDetail: React.FC<{
 				)}
 				minColumnWidth={92}
 				estimateRowHeight={88}
-				className="ci-lib__grid--lucide"
+				className="ci-vgrid--compact"
 			/>
 		</div>
 	);

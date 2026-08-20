@@ -22,20 +22,12 @@
 	}
 }
 
-.ci-lib__grid {
-	display: grid;
-	grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-	gap: var(--size-4-3);
-	overflow-y: auto;
-	padding: 4px;
-}
-
 /*
- * Lucide / 包详情只读网格：这是「浏览 + 复制名称」的图标墙，
+ * Lucide / 包详情只读网格（ci-vgrid--compact）：这是「浏览 + 复制名称」的图标墙，
  * 让字形成为主角、名称作为紧贴其下的安静副标题——去掉强制正方形与
  * 上下对齐留出的大片空白，收紧成一枚枚紧凑的图块。
  */
-.ci-lib__grid--lucide .ci-lib-icon__card {
+.ci-vgrid--compact .ci-lib-icon__card {
 	content-visibility: auto;
 	contain-intrinsic-size: auto 88px;
 	aspect-ratio: auto;
@@ -44,7 +36,7 @@
 	padding: var(--size-4-2);
 }
 
-.ci-lib__grid--lucide .ci-lib-icon__card-icon {
+.ci-vgrid--compact .ci-lib-icon__card-icon {
 	flex: none;
 	max-height: none;
 
@@ -56,12 +48,12 @@
 }
 
 /* 悬停时整块上浮（沿用基础卡片），字形点亮为强调色 */
-.ci-lib__grid--lucide .ci-lib-icon__card:hover .ci-lib-icon__card-icon svg {
+.ci-vgrid--compact .ci-lib-icon__card:hover .ci-lib-icon__card-icon svg {
 	color: var(--interactive-accent);
 }
 
 /* 名称作为副标题：更小、更淡，最多两行，保证每行卡片等高 */
-.ci-lib__grid--lucide .ci-lib-icon__card-name {
+.ci-vgrid--compact .ci-lib-icon__card-name {
 	margin-top: 0;
 	font-size: var(--font-ui-smaller);
 	line-height: 1.25;
@@ -74,7 +66,7 @@
 /* ------------------------------ 虚拟化网格 ------------------------------ */
 /*
  * VirtualIconGrid 结构：viewport(滚动) > sizer(撑总高) > row(绝对定位，内部 grid)。
- * 取代原 .ci-lib__grid 的 overflow 角色；仅挂载可视区 + overscan 的卡片。
+ * 仅挂载可视区 + overscan 的卡片；--compact 修饰符收紧为紧凑只读图块。
  */
 .ci-vgrid__viewport {
 	flex: 1;
@@ -119,12 +111,6 @@
 	resize: vertical;
 	width: 100%;
 	font-family: monospace;
-}
-
-.ci-lib__form__buttons {
-	display: flex;
-	justify-content: flex-end;
-	gap: "8px";
 }
 
 /* ------------------------------ 图标库（Pack）页 ------------------------------ */

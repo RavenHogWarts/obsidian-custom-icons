@@ -3,12 +3,13 @@ import useSettingsStore from "@src/hooks/useSettingsStore";
 import { LL } from "@src/i18n/i18n";
 import { CirclePlus, Code } from "lucide-react";
 import { Notice, setIcon } from "obsidian";
-import { useEffect, useMemo, useRef, useState } from "react";
-import { IconCard } from "../icon-card/IconCard";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { CustomAction, IconCard } from "../icon-card/IconCard";
 import { ConfirmDialog } from "../modal/ConfirmDialog";
 import { AddSvg } from "./AddSvg";
 import { EditSvg } from "./EditSvg";
 import { VirtualIconGrid } from "./VirtualIconGrid";
+import "./IconLib.css";
 
 export const SvgLib: React.FC = () => {
 	const store = useSettingsStore();
@@ -92,22 +93,25 @@ export const SvgLib: React.FC = () => {
 		}).open();
 	};
 
-	const handleDeleteIcon = (iconId: string) => {
-		new ConfirmDialog(store.plugin, {
-			title: `${LL.common.delete()} "${iconId}"?`,
-			confirmLL: LL.common.delete(),
-			onConfirm: async () => {
-				const currentSvgIcons = settings.customIconLib.svg;
-				const newSvgIcons = currentSvgIcons.filter(
-					(icon) => icon.id !== iconId,
-				);
-				await store.updateSettingByPath(
-					"customIconLib.svg",
-					newSvgIcons,
-				);
-			},
-		}).open();
-	};
+	const handleDeleteIcon = useCallback(
+		(iconId: string) => {
+			new ConfirmDialog(store.plugin, {
+				title: `${LL.common.delete()} "${iconId}"?`,
+				confirmLL: LL.common.delete(),
+				onConfirm: async () => {
+					const currentSvgIcons = settings.customIconLib.svg;
+					const newSvgIcons = currentSvgIcons.filter(
+						(icon) => icon.id !== iconId,
+					);
+					await store.updateSettingByPath(
+						"customIconLib.svg",
+						newSvgIcons,
+					);
+				},
+			}).open();
+		},
+		[store, settings.customIconLib.svg],
+	);
 
 	const handleEditIcon = async (
 		iconId: string,
@@ -132,55 +136,73 @@ export const SvgLib: React.FC = () => {
 		await store.updateSettingByPath("customIconLib.svg", newSvgIcons);
 	};
 
-	const handleOpenEditModal = async (iconId: string) => {
-		const icon = settings.customIconLib.svg.find(
-			(icon) => icon.id === iconId,
-		);
-		if (!icon) {
-			return;
-		}
+	const handleOpenEditModal = useCallback(
+		async (iconId: string) => {
+			const icon = settings.customIconLib.svg.find(
+				(icon) => icon.id === iconId,
+			);
+			if (!icon) {
+				return;
+			}
 
-		let submitFn: (() => Promise<void>) | null = null;
+			let submitFn: (() => Promise<void>) | null = null;
 
-		new ConfirmDialog(store.plugin, {
-			title: LL.common.edit() + " " + LL.view.CustomIconLib.svg.tabName(),
-			confirmLL: LL.common.save(),
-			children: (
-				<EditSvg
-					iconId={icon.id}
-					iconContent={icon.content}
-					onSubmit={(newIconId, newIconContent) =>
-						handleEditIcon(iconId, newIconId, newIconContent)
+			new ConfirmDialog(store.plugin, {
+				title: LL.common.edit() + " " + LL.view.CustomIconLib.svg.tabName(),
+				confirmLL: LL.common.save(),
+				children: (
+					<EditSvg
+						iconId={icon.id}
+						iconContent={icon.content}
+						onSubmit={(newIconId, newIconContent) =>
+							handleEditIcon(iconId, newIconId, newIconContent)
+						}
+						onReady={(submit) => {
+							submitFn = submit;
+						}}
+					/>
+				),
+				onConfirm: async () => {
+					if (submitFn) {
+						await submitFn();
 					}
-					onReady={(submit) => {
-						submitFn = submit;
-					}}
-				/>
-			),
-			onConfirm: async () => {
-				if (submitFn) {
-					await submitFn();
-				}
+				},
+			}).open();
+		},
+		[store, settings.customIconLib.svg],
+	);
+
+	const handleCopySvgCode = useCallback(
+		async (iconId: string) => {
+			const icon = settings.customIconLib.svg.find(
+				(icon) => icon.id === iconId,
+			);
+			if (!icon) {
+				return;
+			}
+
+			try {
+				await navigator.clipboard.writeText(icon.content);
+				new Notice(`Copied SVG code: ${iconId}`);
+			} catch (err) {
+				console.error("Failed to copy SVG code:", err);
+				new Notice("Failed to copy SVG code");
+			}
+		},
+		[settings.customIconLib.svg],
+	);
+
+	// 稳定的 props 引用：配合 IconCard 的 memo，避免网格重渲时全量重执行
+	const copyAction = useMemo<CustomAction[]>(
+		() => [
+			{
+				icon: <Code className="svg-icon" />,
+				title: LL.view.CustomIconLib.svg.copyAction(),
+				onClick: (id: string) => void handleCopySvgCode(id),
 			},
-		}).open();
-	};
-
-	const handleCopySvgCode = async (iconId: string) => {
-		const icon = settings.customIconLib.svg.find(
-			(icon) => icon.id === iconId,
-		);
-		if (!icon) {
-			return;
-		}
-
-		try {
-			await navigator.clipboard.writeText(icon.content);
-			new Notice(`Copied SVG code: ${iconId}`);
-		} catch (err) {
-			console.error("Failed to copy SVG code:", err);
-			new Notice("Failed to copy SVG code");
-		}
-	};
+		],
+		[handleCopySvgCode],
+	);
 
 	return (
 		<div className="ci-lib-container">
@@ -215,13 +237,7 @@ export const SvgLib: React.FC = () => {
 						id={icon.id}
 						onDelete={handleDeleteIcon}
 						onEdit={handleOpenEditModal}
-						customActions={[
-							{
-								icon: <Code className="svg-icon" />,
-								title: LL.view.CustomIconLib.svg.copyAction(),
-								onClick: handleCopySvgCode,
-							},
-						]}
+						customActions={copyAction}
 					/>
 				)}
 			/>

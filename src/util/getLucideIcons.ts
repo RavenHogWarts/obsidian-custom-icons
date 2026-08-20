@@ -20,7 +20,14 @@ export type LucideIconProps = {
  *
  * 我们需要去重，只保留唯一的图标
  */
+/** 图标名缓存：lucide-react 导出在运行期不变，一次计算全局复用 */
+let cachedIconNames: string[] | null = null;
+
 export function getLucideIconNames(): string[] {
+	if (cachedIconNames) {
+		return cachedIconNames;
+	}
+
 	const iconSet = new Set<string>();
 	const excludedKeys = new Set([
 		"default",
@@ -77,7 +84,7 @@ export function getLucideIconNames(): string[] {
 		}
 	}
 
-	return Array.from(iconSet).sort();
+	return (cachedIconNames = Array.from(iconSet).sort());
 }
 
 /**

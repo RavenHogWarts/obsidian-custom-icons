@@ -1,11 +1,11 @@
 /* Main Switcher Container */
-.CI__icon-picker-switcher {
+.ci-icon-picker__switcher {
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	padding: 4px;
+	padding: var(--size-4-1);
 	background-color: var(--background-modifier-form-field);
-	border-radius: 10px;
+	border-radius: var(--radius-m);
 	border: 1px solid var(--background-modifier-border);
 	width: fit-content;
 	min-width: 200px;
@@ -13,16 +13,16 @@
 }
 
 /* Individual Buttons */
-.CI__icon-picker-switcher button {
+.ci-icon-picker__switcher button {
 	flex: 1;
 	background: transparent;
 	border: none;
 	box-shadow: none;
 	color: var(--text-muted);
-	font-size: 13px;
+	font-size: var(--font-ui-small);
 	font-weight: 600;
-	padding: 8px 16px;
-	border-radius: 7px;
+	padding: var(--size-4-2) var(--size-4-3);
+	border-radius: var(--radius-s);
 	cursor: pointer;
 	transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 	height: auto;
@@ -32,59 +32,59 @@
 }
 
 /* Hover State */
-.CI__icon-picker-switcher button:hover {
+.ci-icon-picker__switcher button:hover {
 	color: var(--text-normal);
 	background-color: var(--background-modifier-hover);
 }
 
 /* Active State - Premium Look */
-.CI__icon-picker-switcher button.active {
+.ci-icon-picker__switcher button.active {
 	background-color: var(--interactive-accent);
 	color: var(--text-on-accent);
 	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }
 
 /* Active Hover - Maintain separation */
-.CI__icon-picker-switcher button.active:hover {
+.ci-icon-picker__switcher button.active:hover {
 	background-color: var(--interactive-accent-hover);
 }
 
 /* --- Original Icon Picker Trigger Styling --- */
-.CI__icon-picker {
+.ci-icon-picker {
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
 	width: 32px;
 	height: 32px;
 	cursor: pointer;
-	border-radius: 6px; /* Slightly more rounded */
+	border-radius: var(--radius-s);
 	background-color: var(--background-modifier-form-field);
 	border: 1px solid var(--background-modifier-border);
 	color: var(--text-muted);
 	transition: all 0.2s ease;
 }
 
-.CI__icon-picker:hover {
+.ci-icon-picker:hover {
 	background-color: var(--background-modifier-form-field-highlighted);
 	color: var(--text-normal);
 	border-color: var(--interactive-accent);
 	box-shadow: 0 0 0 1px var(--interactive-accent); /* Focus ring effect */
 }
 
-.CI__icon-picker:active {
+.ci-icon-picker:active {
 	transform: scale(0.96);
 }
 
 /* --- Suggestion Item Styling --- */
-.CI__icon-suggestion {
+.ci-icon-picker__suggestion {
 	display: flex;
 	align-items: center;
-	gap: 12px;
-	padding: 8px 12px; /* Add padding for better touch target */
+	gap: var(--size-4-3);
+	padding: var(--size-4-2) var(--size-4-3); /* Add padding for better touch target */
 	transition: background-color 0.2s ease;
-	border-radius: 4px;
+	border-radius: var(--radius-s);
 }
 
-.CI__icon-suggestion:hover {
+.ci-icon-picker__suggestion:hover {
 	background-color: var(--background-modifier-hover);
 }

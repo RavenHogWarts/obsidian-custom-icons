@@ -4,15 +4,29 @@
 }
 
 /* 文件浏览器：插入型文件夹/文件图标 */
+
+/* 含自定义图标的标题行强制 flex 居中，保证图标与文字垂直对齐
+   （部分主题下 .tree-item-self 非 flex，插入图标后会基线错位） */
+.tree-item-self.nav-folder-title:has(> .custom-icon-file-explorer-icon),
+.tree-item-self.nav-file-title:has(> .custom-icon-file-explorer-icon) {
+	display: flex;
+	align-items: center;
+}
+
 .custom-icon-file-explorer-icon {
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-	margin-right: var(--size-2-2);
 	flex: 0 0 auto;
+	width: 16px;
+	height: 16px;
+	margin-right: var(--size-4-1);
+	vertical-align: middle;
 }
 
-.custom-icon-file-explorer-icon .svg-icon {
+.custom-icon-file-explorer-icon .svg-icon,
+.custom-icon-file-explorer-icon svg {
+	display: block;
 	width: 16px;
 	height: 16px;
 }

@@ -3,6 +3,12 @@ import { DataAdapter } from "obsidian";
 import { IIconSet } from "./types";
 import { packIconId } from "./types";
 
+/**
+ * 目录缓存结构版本：字段演进时 +1（如引入 samples），旧缓存自动失效重拉。
+ * v2: 条目含 samples（下载前预览依赖），v1 及更早缓存无此字段需废弃。
+ */
+export const CATALOG_CACHE_VERSION = 2;
+
 /** Iconify 图标集目录条目（collections.json 精简后的缓存结构） */
 export interface ICollectionInfo {
 	prefix: string;
@@ -14,8 +20,10 @@ export interface ICollectionInfo {
 	samples?: string[];
 }
 
-/** 图标集目录的落盘缓存（离线不变式 O3） */
+/** Iconify 图标集目录的落盘缓存（离线不变式 O3） */
 export interface ICatalogCache {
+	/** 结构版本（旧版本缺失时视为过期，见 CATALOG_CACHE_VERSION） */
+	version?: number;
 	fetchedAt: number;
 	collections: ICollectionInfo[];
 }
@@ -147,7 +155,11 @@ export default class IconPackStore {
 	}
 
 	async writeCatalog(collections: ICollectionInfo[]): Promise<void> {
-		const cache: ICatalogCache = { fetchedAt: Date.now(), collections };
+		const cache: ICatalogCache = {
+			version: CATALOG_CACHE_VERSION,
+			fetchedAt: Date.now(),
+			collections,
+		};
 		await this.ensureDir();
 		await this.adapter.write(this.catalogPath, JSON.stringify(cache));
 		this.catalog = cache;

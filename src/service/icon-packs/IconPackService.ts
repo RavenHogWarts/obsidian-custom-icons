@@ -97,14 +97,17 @@ export default class IconPackService {
 		// 先落盘（store 缓存同步更新，供随后的 applyAll 使用）
 		await this.store.writePack(finalSet);
 
+		// 覆盖更新（重新下载）时保留原启用状态与安装时间：
+		// 重装不应意外重新启用已停用的包，也不应打乱已安装列表顺序。
+		const existing = this.plugin.settings.customIconLib.packs[packId];
 		const manifest: IIconPackManifest = {
 			id: packId,
 			name: finalSet.name,
 			version: finalSet.version,
 			license: finalSet.license,
 			iconCount: Object.keys(finalSet.icons).length,
-			enabled: true,
-			installedAt: Date.now(),
+			enabled: existing?.enabled ?? true,
+			installedAt: existing?.installedAt ?? Date.now(),
 			source: config,
 		};
 		await this.plugin.settingsStore.updateSettingByPath(

@@ -153,6 +153,11 @@ const zh = {
 				uninstallHint:
 					"将删除 {count:number} 个图标（本地文件与设置清单），已使用该图标的界面将回退为空白。",
 				uninstallFailed: "图标库卸载失败",
+				redownload: "重新下载",
+				redownloadTooltip: "从来源重新下载",
+				redownloadHint:
+					"从来源重新拉取该图标库并覆盖本地副本（可能替换为更新的版本），立即生效；下载失败时保留现有图标库。",
+				versionLabel: "版本",
 				refreshTooltip: "刷新目录",
 				installedSection: "已安装",
 				noPacksInstalled: "尚未安装任何图标库，从下方目录选择安装。",

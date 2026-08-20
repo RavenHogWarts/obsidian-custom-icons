@@ -14,6 +14,7 @@ import { IIconPackManifest, IconSourceConfig } from "@src/types/types";
 import {
 	ArrowLeft,
 	ChevronRight,
+	DownloadCloud,
 	Eye,
 	Globe,
 	Layers,
@@ -321,6 +322,42 @@ export const PackLib: React.FC = () => {
 		}, { sourceEl }).open();
 	};
 
+	const handleRedownload = (
+		manifest: IIconPackManifest,
+		sourceEl?: HTMLElement,
+	) => {
+		new ConfirmDialog(store.plugin, {
+			title: `${LL.view.CustomIconLib.pack.redownload()} "${manifest.name}"?`,
+			confirmLL: LL.view.CustomIconLib.pack.redownload(),
+			disableConfirm: installing,
+			children: (
+				<div className="ci-pack__confirm">
+					<div className="ci-pack__confirm-row">
+						<span>{LL.view.CustomIconLib.pack.iconCount()}</span>
+						<span>{manifest.iconCount}</span>
+					</div>
+					{manifest.version && (
+						<div className="ci-pack__confirm-row">
+							<span>
+								{LL.view.CustomIconLib.pack.versionLabel()}
+							</span>
+							<span>v{manifest.version}</span>
+						</div>
+					)}
+					<div className="ci-pack__confirm-hint">
+						{LL.view.CustomIconLib.pack.redownloadHint()}
+					</div>
+				</div>
+			),
+			onConfirm: () =>
+				doInstall(manifest.source, {
+					packId: manifest.id,
+					name: manifest.name,
+					license: manifest.license,
+				}),
+		}, { sourceEl }).open();
+	};
+
 	const handleToggleEnabled = async (
 		manifest: IIconPackManifest,
 		enabled: boolean,
@@ -439,6 +476,20 @@ export const PackLib: React.FC = () => {
 											title={LL.view.CustomIconLib.pack.browseTooltip()}
 										>
 											<Eye className="svg-icon" />
+										</button>
+										<button
+											className="clickable-icon"
+											onClick={(e) =>
+												handleRedownload(
+													manifest,
+													e.currentTarget,
+												)
+											}
+											disabled={installing}
+											aria-label={LL.view.CustomIconLib.pack.redownloadTooltip()}
+											title={LL.view.CustomIconLib.pack.redownloadTooltip()}
+										>
+											<DownloadCloud className="svg-icon" />
 										</button>
 										<button
 											className="clickable-icon"

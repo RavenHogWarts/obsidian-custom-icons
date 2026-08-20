@@ -21,6 +21,20 @@
 
 * 更新相关文档 ([a3212cf](https://github.com/Raven-Pensieve/obsidian-custom-icons/commit/a3212cf46abfa1099bc361a5c3e26241a76b41d0))
 
+## [2.4.0](https://github.com/Raven-Pensieve/obsidian-custom-icons/compare/2.3.0...2.4.0) (2026-08-20)
+
+
+### ✨ 新增功能 (Features)
+
+* 为图标库增加重新下载功能 ([d8f3f40](https://github.com/Raven-Pensieve/obsidian-custom-icons/commit/d8f3f406bdc08ef58fb951efdb362443fc701119))
+* 初步实现对于文件浏览器图标的替换管理 ([497edd0](https://github.com/Raven-Pensieve/obsidian-custom-icons/commit/497edd0bedd73a715e00286209ab122ac4fc0cfd))
+* 增加 子文件夹 / 子文件 图标自动继承父文件夹图标 功能 ([fec4f21](https://github.com/Raven-Pensieve/obsidian-custom-icons/commit/fec4f21c847d284065eec12afe3280c808411677))
+
+
+### 🐛 问题修复 (Bug Fixes)
+
+* 修正完整i18n文本 ([23ac9c9](https://github.com/Raven-Pensieve/obsidian-custom-icons/commit/23ac9c9813da821e81dbc1bd8707fa4f4dfbc7aa))
+
 ## [2.3.0](https://github.com/Raven-Pensieve/obsidian-custom-icons/compare/2.2.0...2.3.0) (2026-08-20)
 
 

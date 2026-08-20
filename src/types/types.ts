@@ -23,6 +23,8 @@ export interface IPluginSettings {
 		extensions: Record<string, IFileExplorerIconOverride>;
 		/** 单个文件覆盖，key = data-path（如 "YG/春节.md"） */
 		files: Record<string, IFileExplorerIconOverride>;
+		/** 继承开关：子文件夹 / 子文件 在无自身配置时继承最近祖先文件夹图标（默认关） */
+		inherit: { subfolder: boolean; file: boolean };
 	};
 	// 实验性功能
 	experimental: {
@@ -124,6 +126,7 @@ export const DEFAULT_SETTINGS: IPluginSettings = {
 		fileDefault: { id: "", icon: "", type: "lucide", color: "" },
 		extensions: {},
 		files: {},
+		inherit: { subfolder: false, file: false },
 	},
 	experimental: {
 		keepPluginFirst: false,

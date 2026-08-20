@@ -190,27 +190,45 @@ type RootTranslation = {
 				 */
 				resetTooltip: string
 			}
+			inherit: {
+				subfolder: {
+					/**
+					 * 子​文​件​夹​继​承​父​文​件​夹​图​标
+					 */
+					name: string
+					/**
+					 * 子​文​件​夹​在​没​有​自​身​配​置​时​，​自​动​套​用​最​近​祖​先​文​件​夹​的​图​标​（​含​颜​色​）
+					 */
+					desc: string
+				}
+				file: {
+					/**
+					 * 子​文​件​继​承​父​文​件​夹​图​标
+					 */
+					name: string
+					/**
+					 * 文​件​在​没​有​自​身​配​置​、​也​未​匹​配​扩​展​名​规​则​时​，​套​用​其​所​在​文​件​夹​链​的​最​近​图​标​（​含​颜​色​）
+					 */
+					desc: string
+				}
+			}
 			extensions: {
 				/**
 				 * 按​扩​展​名
 				 */
 				name: string
 				/**
-				 * 为​某​类​扩​展​名​的​文​件​统​一​分​配​图​标​（​如​ ​p​d​f​、​c​a​n​v​a​s​）
+				 * 为​某​类​扩​展​名​的​文​件​统​一​分​配​图​标​（​如​ ​p​d​f​、​c​a​n​v​a​s​）​；​支​持​复​合​后​缀​，​如​ ​e​x​c​a​l​i​d​r​a​w​.​m​d​ ​优​先​于​ ​m​d
 				 */
 				desc: string
 				/**
-				 * 输​入​扩​展​名​（​如​ ​p​d​f​）​.​.​.
+				 * 输​入​扩​展​名​，​支​持​批​量​（​如​ ​.​x​d​b​ ​.​j​s​）​.​.​.
 				 */
 				placeholder: string
 				/**
 				 * 添​加​扩​展​名
 				 */
 				addTooltip: string
-				/**
-				 * 移​除​此​扩​展​名
-				 */
-				resetTooltip: string
 				/**
 				 * 尚​未​配​置​扩​展​名​规​则
 				 */
@@ -233,10 +251,6 @@ type RootTranslation = {
 				 * 文​件
 				 */
 				fileSection: string
-				/**
-				 * 移​除​此​覆​盖
-				 */
-				resetTooltip: string
 				/**
 				 * 暂​无​单​项​覆​盖
 				 */
@@ -750,27 +764,45 @@ export type TranslationFunctions = {
 				 */
 				resetTooltip: () => LocalizedString
 			}
+			inherit: {
+				subfolder: {
+					/**
+					 * 子文件夹继承父文件夹图标
+					 */
+					name: () => LocalizedString
+					/**
+					 * 子文件夹在没有自身配置时，自动套用最近祖先文件夹的图标（含颜色）
+					 */
+					desc: () => LocalizedString
+				}
+				file: {
+					/**
+					 * 子文件继承父文件夹图标
+					 */
+					name: () => LocalizedString
+					/**
+					 * 文件在没有自身配置、也未匹配扩展名规则时，套用其所在文件夹链的最近图标（含颜色）
+					 */
+					desc: () => LocalizedString
+				}
+			}
 			extensions: {
 				/**
 				 * 按扩展名
 				 */
 				name: () => LocalizedString
 				/**
-				 * 为某类扩展名的文件统一分配图标（如 pdf、canvas）
+				 * 为某类扩展名的文件统一分配图标（如 pdf、canvas）；支持复合后缀，如 excalidraw.md 优先于 md
 				 */
 				desc: () => LocalizedString
 				/**
-				 * 输入扩展名（如 pdf）...
+				 * 输入扩展名，支持批量（如 .xdb .js）...
 				 */
 				placeholder: () => LocalizedString
 				/**
 				 * 添加扩展名
 				 */
 				addTooltip: () => LocalizedString
-				/**
-				 * 移除此扩展名
-				 */
-				resetTooltip: () => LocalizedString
 				/**
 				 * 尚未配置扩展名规则
 				 */
@@ -793,10 +825,6 @@ export type TranslationFunctions = {
 				 * 文件
 				 */
 				fileSection: () => LocalizedString
-				/**
-				 * 移除此覆盖
-				 */
-				resetTooltip: () => LocalizedString
 				/**
 				 * 暂无单项覆盖
 				 */

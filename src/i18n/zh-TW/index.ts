@@ -64,12 +64,21 @@ const zh_TW = {
 				desc: "TODO: 为未匹配到扩展名规则的文件设置兜底图标（留空则不显示）",
 				resetTooltip: "TODO: 重置",
 			},
+			inherit: {
+				subfolder: {
+					name: "TODO: 子文件夹继承父文件夹图标",
+					desc: "TODO: 子文件夹在没有自身配置时，自动套用最近祖先文件夹的图标（含颜色）",
+				},
+				file: {
+					name: "TODO: 子文件继承父文件夹图标",
+					desc: "TODO: 文件在没有自身配置、也未匹配扩展名规则时，套用其所在文件夹链的最近图标（含颜色）",
+				},
+			},
 			extensions: {
 				name: "TODO: 按扩展名",
 				desc: "TODO: 为某类扩展名的文件统一分配图标（如 pdf、canvas）",
 				placeholder: "TODO: 输入扩展名（如 pdf）...",
 				addTooltip: "TODO: 添加扩展名",
-				resetTooltip: "TODO: 移除此扩展名",
 				noneFound: "TODO: 尚未配置扩展名规则",
 			},
 			overrides: {
@@ -77,7 +86,6 @@ const zh_TW = {
 				desc: "TODO: 在文件树中右键文件/文件夹「设置图标」可单独指定；此处列出已配置项",
 				folderSection: "TODO: 文件夹",
 				fileSection: "TODO: 文件",
-				resetTooltip: "TODO: 移除此覆盖",
 				noneFound: "TODO: 暂无单项覆盖",
 			},
 			menu: {

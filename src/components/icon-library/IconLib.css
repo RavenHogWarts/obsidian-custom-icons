@@ -22,22 +22,48 @@
 	}
 }
 
+/* 全部/内置/差异 三态筛选（Lucide 页工具栏） */
+.ci-lib__filter {
+	display: flex;
+	flex: none;
+	gap: var(--size-4-1);
+}
+
+.ci-lib__filter-btn {
+	height: auto;
+	padding: var(--size-4-1) var(--size-4-2);
+	font-size: var(--font-ui-small);
+}
+
+.ci-lib__filter-btn.is-active {
+	background-color: var(--interactive-accent);
+	color: var(--text-on-accent);
+	box-shadow: none;
+}
+
 /*
- * Lucide / 包详情只读网格（ci-vgrid--compact）：这是「浏览 + 复制名称」的图标墙，
- * 让字形成为主角、名称作为紧贴其下的安静副标题——去掉强制正方形与
- * 上下对齐留出的大片空白，收紧成一枚枚紧凑的图块。
+ * Lucide / 包详情只读网格（ci-vgrid--compact）：这是「浏览 + 复制名称」的图标墙。
+ * 统一卡片结构：固定高度图标区 + 自然换行的名称区——名称完整显示不截断；
+ * 包裹层 flex + 卡片 flex:1 撑满行高，行内所有卡片严格等高，
+ * 图标处于同一水平线，名称区顶部对齐。
  */
+.ci-vgrid--compact .ci-vgrid__row > div {
+	display: flex;
+}
+
 .ci-vgrid--compact .ci-lib-icon__card {
+	flex: 1;
 	content-visibility: auto;
 	contain-intrinsic-size: auto 88px;
 	aspect-ratio: auto;
-	justify-content: center;
+	justify-content: flex-start;
 	gap: var(--size-4-1);
 	padding: var(--size-4-2);
 }
 
 .ci-vgrid--compact .ci-lib-icon__card-icon {
 	flex: none;
+	height: 2.25rem; /* 固定高度图标区：行内所有卡片的图标同处一水平线 */
 	max-height: none;
 
 	svg {
@@ -52,15 +78,13 @@
 	color: var(--interactive-accent);
 }
 
-/* 名称作为副标题：更小、更淡，最多两行，保证每行卡片等高 */
+/* 名称作为副标题：更小更淡，自然换行完整显示（kebab 名在连字符处断行） */
 .ci-vgrid--compact .ci-lib-icon__card-name {
+	flex: none;
 	margin-top: 0;
+	padding: 2px var(--size-4-1);
 	font-size: var(--font-ui-smaller);
 	line-height: 1.25;
-	display: -webkit-box;
-	-webkit-box-orient: vertical;
-	-webkit-line-clamp: 2;
-	overflow: hidden;
 }
 
 /* ------------------------------ 虚拟化网格 ------------------------------ */

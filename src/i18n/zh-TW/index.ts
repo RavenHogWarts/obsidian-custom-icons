@@ -132,8 +132,18 @@ const zh_TW = {
 			lucide: {
 				tabName: "Lucide",
 				count: "共 {count:number} 個圖示",
-				descHint:
-					"唯讀展示。以下為外掛內建 Lucide 中 Obsidian 原生未包含的圖示，點擊圖示可複製名稱。",
+				descHints: {
+					all: "外掛內建的全部 Lucide 圖示（已去重），點擊圖示可複製名稱。",
+					builtin:
+						"Obsidian 原生已內建的圖示，此處供查閱對照，點擊圖示可複製名稱。",
+					extra: "外掛內建 Lucide 中 Obsidian 原生未包含的圖示，點擊圖示可複製名稱。",
+				},
+				filter: {
+					group: "篩選圖示",
+					all: "全部",
+					builtin: "內建",
+					extra: "差異",
+				},
 			},
 		},
 	},

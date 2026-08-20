@@ -137,7 +137,18 @@ const en = {
 			lucide: {
 				tabName: "Lucide",
 				count: "{count:number} icon(s)",
-				descHint: "Read-only. These Lucide icons are bundled with the plugin but not built into Obsidian. Click an icon to copy its name.",
+				descHints: {
+					all: "All Lucide icons bundled with the plugin (deduplicated). Click an icon to copy its name.",
+					builtin:
+						"Icons already built into Obsidian natively, listed for reference. Click an icon to copy its name.",
+					extra: "Lucide icons bundled with the plugin but not built into Obsidian. Click an icon to copy its name.",
+				},
+				filter: {
+					group: "Filter icons",
+					all: "All",
+					builtin: "Built-in",
+					extra: "Extra",
+				},
 			},
 		},
 	},

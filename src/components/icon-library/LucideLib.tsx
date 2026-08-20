@@ -1,40 +1,50 @@
 import { LL } from "@src/i18n/i18n";
-import { getExtraLucideIconNames } from "@src/util/getLucideIcons";
+import { getLucideIconCatalog } from "@src/util/getLucideIcons";
 import { setIcon } from "obsidian";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { IconCard } from "../icon-card/IconCard";
 import { VirtualIconGrid } from "./VirtualIconGrid";
 import "./IconLib.css";
 
+/** Lucide 页筛选：全部 / Obsidian 内置 / 差异（原生未内置） */
+type LucideFilter = "all" | "builtin" | "extra";
+
+const LUCIDE_FILTERS: LucideFilter[] = ["all", "builtin", "extra"];
+
 /**
  * Lucide 只读图标页
- * 展示插件引入的 Lucide 中、Obsidian 原生未内置的图标
+ * 展示插件引入的 Lucide 图标（按组件去重），支持「全部 / 内置 / 差异」筛选，
  * 不支持编辑，点击图标或名称即可复制图标名称
  */
 export const LucideLib: React.FC = () => {
 	// Local State
 	const [searchQuery, setSearchQuery] = useState("");
 	const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
+	const [filter, setFilter] = useState<LucideFilter>("extra");
 	const sortButtonRef = useRef<HTMLButtonElement>(null);
 
-	// 差集计算开销较大（遍历 lucide 全部导出），仅计算一次
-	const allIcons = useMemo(() => getExtraLucideIconNames(), []);
+	// 目录计算开销较大（遍历 lucide 全部导出 + Obsidian 注册表比对），仅计算一次
+	const catalog = useMemo(() => getLucideIconCatalog(), []);
 
 	// Filter and Sort Icons
 	const filteredIcons = useMemo(() => {
-		const result = allIcons.filter(
-			(name) =>
-				!searchQuery || name.toLowerCase().includes(searchQuery.toLowerCase()),
+		const query = searchQuery.toLowerCase();
+
+		const result = catalog
+			.filter((entry) =>
+				filter === "all"
+					? true
+					: (filter === "builtin") === entry.builtin,
+			)
+			.filter((entry) => !query || entry.name.includes(query))
+			.map((entry) => entry.name);
+
+		result.sort((a, b) =>
+			sortOrder === "asc" ? a.localeCompare(b) : b.localeCompare(a),
 		);
 
-		result.sort((a, b) => {
-			return sortOrder === "asc"
-				? a.localeCompare(b)
-				: b.localeCompare(a);
-		});
-
 		return result;
-	}, [allIcons, searchQuery, sortOrder]);
+	}, [catalog, filter, searchQuery, sortOrder]);
 
 	// Update sort button icon when sortOrder changes
 	useEffect(() => {
@@ -64,6 +74,23 @@ export const LucideLib: React.FC = () => {
 					/>
 				</div>
 
+				<div
+					className="ci-lib__filter"
+					role="group"
+					aria-label={LL.view.CustomIconLib.lucide.filter.group()}
+				>
+					{LUCIDE_FILTERS.map((key) => (
+						<button
+							key={key}
+							className={`ci-lib__filter-btn${filter === key ? " is-active" : ""}`}
+							onClick={() => setFilter(key)}
+							aria-pressed={filter === key}
+						>
+							{LL.view.CustomIconLib.lucide.filter[key]()}
+						</button>
+					))}
+				</div>
+
 				<button
 					ref={sortButtonRef}
 					onClick={handleToggleSort}
@@ -79,7 +106,7 @@ export const LucideLib: React.FC = () => {
 					})}
 				</span>
 				<span className="ci-lib__hint-desc">
-					{LL.view.CustomIconLib.lucide.descHint()}
+					{LL.view.CustomIconLib.lucide.descHints[filter]()}
 				</span>
 			</div>
 

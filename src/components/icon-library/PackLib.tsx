@@ -463,6 +463,7 @@ export const PackLib: React.FC = () => {
 				<CollapsibleSection
 					icon={<Globe className="svg-icon" />}
 					title={LL.view.CustomIconLib.pack.catalogSection()}
+					defaultOpen={false}
 					trailing={
 						catalogMeta && (
 							<span
@@ -548,6 +549,7 @@ export const PackLib: React.FC = () => {
 				<CollapsibleSection
 					icon={<Globe className="svg-icon" />}
 					title={LL.view.CustomIconLib.pack.presetsSection()}
+					defaultOpen={false}
 				>
 					<div className="ci-pack__grid">
 						{filteredPresets.map((preset) => {

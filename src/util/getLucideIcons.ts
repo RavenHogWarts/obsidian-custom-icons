@@ -107,20 +107,34 @@ function normalizeIconName(name: string): string {
 	return name.replace(/-/g, "");
 }
 
+/** 目录条目：去重后的图标 + 是否为 Obsidian 原生内置 */
+export interface LucideCatalogEntry {
+	/** 去重主名（kebab-case，取组件 displayName） */
+	name: string;
+	/** Obsidian 原生是否内置（忽略连字符差异比对） */
+	builtin: boolean;
+}
+
+let cachedCatalog: LucideCatalogEntry[] | null = null;
+
 /**
- * 获取插件引入的 Lucide 中、Obsidian 原生未内置的图标名称
- * 与 Obsidian 内置图标注册表（getIconIds）做差集，
- * 用于自定义图标库的 Lucide 只读展示页
+ * Lucide 图标目录：按组件归组去重（新旧命名如 arrow-down-az / arrow-down-a-z
+ * 指向同一组件，只保留主名），并标注每个图标是否为 Obsidian 原生内置。
+ *
+ * 供「全部 / 内置 / 差异」三种筛选视图共用同一数据源。
  *
  * 比对时需处理两类差异：
  * 1. Obsidian 注册的内置 Lucide 图标 id 带 "lucide-" 前缀（如 "lucide-arrow-right"）；
- * 2. lucide-react 新旧命名并存（如 arrow-down-a-z 与 arrow-down-az 指向同一组件，
- *    别名组件的 displayName 即主名），先按组件归组去重，再做忽略连字符的名称比对
+ * 2. lucide-react 新旧命名并存（别名组件的 displayName 即主名），
+ *    组内任一名称与内置匹配即视为内置。
  */
-export function getExtraLucideIconNames(): string[] {
-	const allIconIds = getIconIds();
+export function getLucideIconCatalog(): LucideCatalogEntry[] {
+	if (cachedCatalog) {
+		return cachedCatalog;
+	}
+
 	const obsidianIconIds = new Set(
-		allIconIds
+		getIconIds()
 			.filter((id) => id.startsWith("lucide-"))
 			.map((id) => normalizeIconName(id.slice("lucide-".length))),
 	);
@@ -138,26 +152,30 @@ export function getExtraLucideIconNames(): string[] {
 		namesByComponent.set(displayName, names);
 	}
 
-	// 组内任一名称（含主名与别名）与 Obsidian 内置图标匹配，即视为 Obsidian 已有
-	const extraNames: string[] = [];
+	const entries: LucideCatalogEntry[] = [];
 	for (const [displayName, names] of namesByComponent) {
-		const existsInObsidian = Array.from(names).some((name) =>
+		const builtin = Array.from(names).some((name) =>
 			obsidianIconIds.has(normalizeIconName(name)),
 		);
-		if (!existsInObsidian) {
-			extraNames.push(componentNameToIconName(displayName));
-		}
+		entries.push({
+			name: componentNameToIconName(displayName),
+			builtin,
+		});
 	}
 
-	// 调试日志：核对 Obsidian 图标注册表与差集详情（开发者控制台查看）
-	// console.debug("[Custom Icons] Lucide extra icons debug:", {
-	// 	obsidianIconIds: allIconIds,
-	// 	obsidianLucideIconCount: obsidianIconIds.size,
-	// 	pluginIconGroupCount: namesByComponent.size,
-	// 	extraLucideIconCount: extraNames.length,
-	// });
+	return (cachedCatalog = entries.sort((a, b) =>
+		a.name.localeCompare(b.name),
+	));
+}
 
-	return extraNames.sort();
+/**
+ * 获取插件引入的 Lucide 中、Obsidian 原生未内置的图标名称（差异集）
+ * @see getLucideIconCatalog
+ */
+export function getExtraLucideIconNames(): string[] {
+	return getLucideIconCatalog()
+		.filter((entry) => !entry.builtin)
+		.map((entry) => entry.name);
 }
 
 /**

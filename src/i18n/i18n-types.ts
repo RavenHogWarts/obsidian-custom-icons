@@ -435,7 +435,29 @@ type RootTranslation = {
 				/**
 				 * 只​读​展​示​。​以​下​为​插​件​内​置​ ​L​u​c​i​d​e​ ​中​ ​O​b​s​i​d​i​a​n​ ​原​生​未​包​含​的​图​标​，​点​击​图​标​可​复​制​名​称​。
 				 */
-				descHint: string
+				descHints: {
+					all: string
+					builtin: string
+					extra: string
+				}
+				filter: {
+					/**
+					 * 筛​选​图​标
+					 */
+					group: string
+					/**
+					 * 全​部
+					 */
+					all: string
+					/**
+					 * 内​置
+					 */
+					builtin: string
+					/**
+					 * 差​异
+					 */
+					extra: string
+				}
 			}
 		}
 	}
@@ -850,7 +872,29 @@ export type TranslationFunctions = {
 				/**
 				 * 只读展示。以下为插件内置 Lucide 中 Obsidian 原生未包含的图标，点击图标可复制名称。
 				 */
-				descHint: () => LocalizedString
+				descHints: {
+					all: () => LocalizedString
+					builtin: () => LocalizedString
+					extra: () => LocalizedString
+				}
+				filter: {
+					/**
+					 * 筛选图标
+					 */
+					group: () => LocalizedString
+					/**
+					 * 全部
+					 */
+					all: () => LocalizedString
+					/**
+					 * 内置
+					 */
+					builtin: () => LocalizedString
+					/**
+					 * 差异
+					 */
+					extra: () => LocalizedString
+				}
 			}
 		}
 	}

@@ -11,9 +11,9 @@ interface VirtualIconGridProps<T> {
 	renderItem: (item: T) => React.ReactNode;
 	/** 单列最小宽度，对齐原 CSS minmax 下限（默认 100，Lucide 页建议 130） */
 	minColumnWidth?: number;
-	/** 列间距（像素，需与 --size-4-3 对齐，默认 12） */
+	/** 网格间距（像素，需与 --size-4-3 对齐，默认 12）：同时用于行内列间距与行间距 */
 	gap?: number;
-	/** 行高估算值（首帧使用，随后由 measureElement 实测校正） */
+	/** 行内容高度估算值（首帧使用，随后由 measureElement 实测校正；行间距由 gap 另行叠加） */
 	estimateRowHeight?: number;
 	/** 透传到滚动视口，复用既有网格外观（如 ci-vgrid--compact 紧凑只读风格） */
 	className?: string;
@@ -41,9 +41,10 @@ export function VirtualIconGrid<T>({
 	const rowVirtualizer = useVirtualizer({
 		count: rowCount,
 		getScrollElement: () => parentRef.current,
-		estimateSize: () => estimateRowHeight,
+		// 每行占位 = 行高 + 行间距：绝对定位行按占位累加偏移，行间才能留出 gap
+		estimateSize: () => estimateRowHeight + gap,
 		overscan: 4,
-		measureElement: (el) => el.getBoundingClientRect().height,
+		measureElement: (el) => el.getBoundingClientRect().height + gap,
 	});
 
 	return (

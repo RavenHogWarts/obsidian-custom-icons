@@ -93,6 +93,26 @@ const zh_TW = {
 				resetIcon: "重置圖示",
 			},
 		},
+		tabHeader: {
+			name: "分頁標籤",
+			enable: {
+				name: "啟用功能",
+				desc: "為工作區分頁標籤頭（側邊欄工具頁與編輯器分頁）按檢視類型自訂圖示。語意為「按類型」：同一類型的所有分頁共享圖示（如分配 markdown 會作用於全部文件分頁）。原生圖示不會被刪除，僅被隱藏，停用後自動恢復。",
+			},
+			mapping: {
+				name: "類型對應",
+				desc: "為檢視類型（data-type）分配圖示；也可在分頁右鍵圖示處就地設定。此處列出已設定項。",
+				selectType: "選擇檢視類型…",
+				addTooltip: "新增對應",
+				fetchTooltip: "從目前開啟的分頁擷取類型",
+				noneFound: "尚未設定類型對應",
+				resetTooltip: "刪除",
+			},
+			menu: {
+				setIcon: "設定圖示",
+				resetIcon: "重置圖示",
+			},
+		},
 		experimental: {
 			name: "實驗性",
 			keepPluginFirst: {

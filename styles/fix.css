@@ -30,3 +30,24 @@
 	width: 16px;
 	height: 16px;
 }
+
+/* 标签页：隐藏原生图标（保留 DOM，仅视觉隐藏），显示自定义图标。
+   选择器严格限定直接子级，不波及关闭按钮 / 状态容器内的 svg */
+.workspace-tab-header.custom-icon-tab-header
+	> .workspace-tab-header-inner
+	> .workspace-tab-header-inner-icon:not(.custom-icon) {
+	display: none;
+}
+
+.workspace-tab-header-inner-icon.custom-icon {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	flex: 0 0 auto;
+}
+.workspace-tab-header-inner-icon.custom-icon .svg-icon,
+.workspace-tab-header-inner-icon.custom-icon svg {
+	display: block;
+	width: 16px;
+	height: 16px;
+}

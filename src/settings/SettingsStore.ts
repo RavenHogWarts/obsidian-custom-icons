@@ -5,6 +5,7 @@ import {
 	IFileExplorerIconOverride,
 	IPluginSettings,
 	IRibbonIconOverride,
+	ITabHeaderIconOverride,
 } from "@src/types/types";
 import {
 	normalizeCommunityPluginOverride,
@@ -223,10 +224,46 @@ export default class SettingsStore {
 		return normalizedSettings;
 	}
 
+	#normalizeTabHeaderSettings(settings: IPluginSettings): IPluginSettings {
+		const normalizedSettings = JSON.parse(
+			JSON.stringify(settings),
+		) as IPluginSettings;
+		const normalizedData: Record<string, ITabHeaderIconOverride> = {};
+
+		Object.entries(normalizedSettings.tabHeader?.data ?? {}).forEach(
+			([rawType, override]) => {
+				// data-type 本就是小写连字符机器标识，仅 trim，不做大小写变换
+				const dataType = rawType.trim();
+				// 防原型污染 + 丢弃无意义条目（无图标则不覆盖）
+				if (
+					!dataType ||
+					dataType === "__proto__" ||
+					dataType === "constructor" ||
+					dataType === "prototype" ||
+					!override?.icon ||
+					!override.type
+				) {
+					return;
+				}
+				normalizedData[dataType] = {
+					id: dataType,
+					icon: override.icon,
+					type: override.type,
+					color: normalizeIconColor(override.color) ?? "",
+				};
+			},
+		);
+
+		normalizedSettings.tabHeader.data = normalizedData;
+		return normalizedSettings;
+	}
+
 	#normalizeSettings(settings: IPluginSettings): IPluginSettings {
-		return this.#normalizeFileExplorerSettings(
-			this.#normalizeRibbonSettings(
-				this.#normalizeCommunityPluginSettings(settings),
+		return this.#normalizeTabHeaderSettings(
+			this.#normalizeFileExplorerSettings(
+				this.#normalizeRibbonSettings(
+					this.#normalizeCommunityPluginSettings(settings),
+				),
 			),
 		);
 	}

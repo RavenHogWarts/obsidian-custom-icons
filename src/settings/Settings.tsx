@@ -5,6 +5,7 @@ import { CommunityPlugin } from "./tabs/CommunityPlugin";
 import { Experimental } from "./tabs/Experimental";
 import { FileExplorer } from "./tabs/FileExplorer";
 import { Ribbon } from "./tabs/Ribbon";
+import { TabHeader } from "./tabs/TabHeader";
 
 export const Settings: FC = () => {
 	const tabItems: TabItem[] = [
@@ -22,6 +23,11 @@ export const Settings: FC = () => {
 			id: "file-explorer",
 			title: LL.settings.fileExplorer.name(),
 			content: <FileExplorer />,
+		},
+		{
+			id: "tab-header",
+			title: LL.settings.tabHeader.name(),
+			content: <TabHeader />,
 		},
 		{
 			id: "experimental",

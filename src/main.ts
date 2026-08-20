@@ -8,6 +8,7 @@ import CustomIconLibHandler from "./service/CustomIconLibHandler";
 import FileExplorerIconHandler from "./service/FileExplorerIconHandler";
 import KeepPluginFirstHandler from "./service/KeepPluginFirstHandler";
 import RibbonIconHandler from "./service/RibbonIconHandler";
+import TabHeaderIconHandler from "./service/TabHeaderIconHandler";
 import { PluginSettingTab } from "./settings/PluginSettingTab";
 import SettingsStore from "./settings/SettingsStore";
 import { IPluginSettings } from "./types/types";
@@ -118,6 +119,7 @@ export default class CIPlugin extends Plugin {
 		this.iconManager.registerHandler(new CommunityPluginIconHandler());
 		this.iconManager.registerHandler(new RibbonIconHandler());
 		this.iconManager.registerHandler(new FileExplorerIconHandler(this));
+		this.iconManager.registerHandler(new TabHeaderIconHandler(this));
 		// 实验性功能（非图标处理器，仅复用生命周期编排）
 		this.iconManager.registerHandler(
 			new KeepPluginFirstHandler(this.manifest.id),

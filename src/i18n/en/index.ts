@@ -94,6 +94,26 @@ const en = {
 				resetIcon: "Reset icon",
 			},
 		},
+		tabHeader: {
+			name: "Tab headers",
+			enable: {
+				name: "Enable feature",
+				desc: "Customize icons for workspace tab headers (sidebar tool tabs and editor tabs) by view type. The semantics are per-type: all tabs of the same type share one icon (e.g. assigning markdown affects every document tab). Native icons are hidden, not removed, and are restored automatically when disabled.",
+			},
+			mapping: {
+				name: "Type mapping",
+				desc: "Assign icons to view types (data-type); you can also set one in place by right-clicking a tab's icon. Configured entries are listed here.",
+				selectType: "Select a view type…",
+				addTooltip: "Add mapping",
+				fetchTooltip: "Fetch types from currently open tabs",
+				noneFound: "No type mappings configured yet",
+				resetTooltip: "Delete",
+			},
+			menu: {
+				setIcon: "Set icon",
+				resetIcon: "Reset icon",
+			},
+		},
 		experimental: {
 			name: "Experimental",
 			keepPluginFirst: {

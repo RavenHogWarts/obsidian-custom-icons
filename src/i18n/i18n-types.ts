@@ -267,6 +267,62 @@ type RootTranslation = {
 				resetIcon: string
 			}
 		}
+		tabHeader: {
+			/**
+			 * 标​签​页
+			 */
+			name: string
+			enable: {
+				/**
+				 * 启​用​功​能
+				 */
+				name: string
+				/**
+				 * 为​工​作​区​标​签​页​头​（​侧​栏​工​具​页​与​编​辑​器​标​签​）​按​视​图​类​型​自​定​义​图​标​。​语​义​为​「​按​类​型​」​：​同​一​类​型​的​所​有​标​签​共​享​图​标​（​如​分​配​ ​m​a​r​k​d​o​w​n​ ​会​作​用​于​全​部​文​档​标​签​）​。​原​生​图​标​不​会​被​删​除​，​仅​被​隐​藏​，​禁​用​后​自​动​恢​复​。
+				 */
+				desc: string
+			}
+			mapping: {
+				/**
+				 * 类​型​映​射
+				 */
+				name: string
+				/**
+				 * 为​视​图​类​型​（​d​a​t​a​-​t​y​p​e​）​分​配​图​标​；​也​可​在​标​签​页​右​键​图​标​处​就​地​设​置​。​此​处​列​出​已​配​置​项​。
+				 */
+				desc: string
+				/**
+				 * 选​择​视​图​类​型​…
+				 */
+				selectType: string
+				/**
+				 * 添​加​映​射
+				 */
+				addTooltip: string
+				/**
+				 * 从​当​前​打​开​的​标​签​抓​取​类​型
+				 */
+				fetchTooltip: string
+				/**
+				 * 尚​未​配​置​类​型​映​射
+				 */
+				noneFound: string
+				/**
+				 * 删​除
+				 */
+				resetTooltip: string
+			}
+			menu: {
+				/**
+				 * 设​置​图​标
+				 */
+				setIcon: string
+				/**
+				 * 重​置​图​标
+				 */
+				resetIcon: string
+			}
+		}
 		experimental: {
 			/**
 			 * 实​验​性
@@ -845,6 +901,62 @@ export type TranslationFunctions = {
 				 * 暂无单项覆盖
 				 */
 				noneFound: () => LocalizedString
+			}
+			menu: {
+				/**
+				 * 设置图标
+				 */
+				setIcon: () => LocalizedString
+				/**
+				 * 重置图标
+				 */
+				resetIcon: () => LocalizedString
+			}
+		}
+		tabHeader: {
+			/**
+			 * 标签页
+			 */
+			name: () => LocalizedString
+			enable: {
+				/**
+				 * 启用功能
+				 */
+				name: () => LocalizedString
+				/**
+				 * 为工作区标签页头（侧栏工具页与编辑器标签）按视图类型自定义图标。语义为「按类型」：同一类型的所有标签共享图标（如分配 markdown 会作用于全部文档标签）。原生图标不会被删除，仅被隐藏，禁用后自动恢复。
+				 */
+				desc: () => LocalizedString
+			}
+			mapping: {
+				/**
+				 * 类型映射
+				 */
+				name: () => LocalizedString
+				/**
+				 * 为视图类型（data-type）分配图标；也可在标签页右键图标处就地设置。此处列出已配置项。
+				 */
+				desc: () => LocalizedString
+				/**
+				 * 选择视图类型…
+				 */
+				selectType: () => LocalizedString
+				/**
+				 * 添加映射
+				 */
+				addTooltip: () => LocalizedString
+				/**
+				 * 从当前打开的标签抓取类型
+				 */
+				fetchTooltip: () => LocalizedString
+				/**
+				 * 尚未配置类型映射
+				 */
+				noneFound: () => LocalizedString
+				/**
+				 * 删除
+				 */
+				resetTooltip: () => LocalizedString
 			}
 			menu: {
 				/**

@@ -93,6 +93,26 @@ const zh = {
 				resetIcon: "重置图标",
 			},
 		},
+		tabHeader: {
+			name: "标签页",
+			enable: {
+				name: "启用功能",
+				desc: "为工作区标签页头（侧栏工具页与编辑器标签）按视图类型自定义图标。语义为「按类型」：同一类型的所有标签共享图标（如分配 markdown 会作用于全部文档标签）。原生图标不会被删除，仅被隐藏，禁用后自动恢复。",
+			},
+			mapping: {
+				name: "类型映射",
+				desc: "为视图类型（data-type）分配图标；也可在标签页右键图标处就地设置。此处列出已配置项。",
+				selectType: "选择视图类型…",
+				addTooltip: "添加映射",
+				fetchTooltip: "从当前打开的标签抓取类型",
+				noneFound: "尚未配置类型映射",
+				resetTooltip: "删除",
+			},
+			menu: {
+				setIcon: "设置图标",
+				resetIcon: "重置图标",
+			},
+		},
 		experimental: {
 			name: "实验性",
 			keepPluginFirst: {

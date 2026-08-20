@@ -3,7 +3,7 @@ import { IconType } from "@src/types/types";
 import setIcon from "@src/util/setIcon";
 import { Pencil, Trash2 } from "lucide-react";
 import { Notice } from "obsidian";
-import { useEffect, useRef } from "react";
+import { memo, useEffect, useRef } from "react";
 import "./IconCard.css";
 
 export interface CustomAction {
@@ -21,13 +21,14 @@ interface IconCardProps {
 	customActions?: CustomAction[];
 }
 
-export const IconCard: React.FC<IconCardProps> = ({
+// memo：虚拟网格滚动/搜索时跳过 props 未变卡片的重渲（含 setIcon DOM 副作用）
+export const IconCard = memo(function IconCard({
 	id,
 	type = "svg",
 	onDelete,
 	onEdit,
 	customActions = [],
-}) => {
+}: IconCardProps) {
 	const iconRef = useRef<HTMLDivElement>(null);
 
 	// 只读卡片：不传任何操作回调时无操作按钮
@@ -129,4 +130,4 @@ export const IconCard: React.FC<IconCardProps> = ({
 			</button>
 		</div>
 	);
-};
+});

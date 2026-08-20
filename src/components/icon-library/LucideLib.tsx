@@ -4,6 +4,7 @@ import { setIcon } from "obsidian";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { IconCard } from "../icon-card/IconCard";
 import { VirtualIconGrid } from "./VirtualIconGrid";
+import "./IconLib.css";
 
 /**
  * Lucide 只读图标页
@@ -89,7 +90,7 @@ export const LucideLib: React.FC = () => {
 				renderItem={(name) => <IconCard id={name} type="lucide" />}
 				minColumnWidth={92}
 				estimateRowHeight={88}
-				className="ci-lib__grid--lucide"
+				className="ci-vgrid--compact"
 			/>
 		</div>
 	);

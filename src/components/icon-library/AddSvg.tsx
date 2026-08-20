@@ -84,7 +84,7 @@ export const AddSvg: React.FC<AddSvgProps> = ({ onSubmit, onReady }) => {
 	const uploadTab = (
 		<div className="ci-lib__form">
 			<input
-				className="ci-lib__form__input ci-lib-svg-upload-input"
+				className="ci-lib__form__input"
 				type="file"
 				accept=".svg"
 				multiple

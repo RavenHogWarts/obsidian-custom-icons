@@ -1,6 +1,7 @@
 import { LL } from "@src/i18n/i18n";
 import CIPlugin from "@src/main";
 import { BaseModal } from "./BaseModal";
+import "./ConfirmDialog.css";
 
 interface ConfirmDialogProps {
 	title: string;

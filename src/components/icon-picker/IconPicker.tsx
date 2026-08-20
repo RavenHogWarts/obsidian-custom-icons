@@ -81,7 +81,7 @@ export const IconPicker: React.FC<IconPickerProps> = ({
 
 	return (
 		<div
-			className="CI__icon-picker"
+			className="ci-icon-picker"
 			ref={buttonRef}
 			onClick={handleClick}
 		></div>
@@ -131,7 +131,7 @@ class IconSelector extends FuzzySuggestModal<string> {
 
 	private addTypeSwitcher() {
 		const container = this.modalEl.createDiv({
-			cls: "CI__icon-picker-switcher",
+			cls: "ci-icon-picker__switcher",
 		});
 
 		// Insert before the input container (this.inputEl.parentElement)
@@ -184,7 +184,7 @@ class IconSelector extends FuzzySuggestModal<string> {
 	}
 
 	renderSuggestion(item: FuzzyMatch<string>, el: HTMLElement) {
-		el.addClass("CI__icon-suggestion");
+		el.addClass("ci-icon-picker__suggestion");
 
 		// 将图标作为子元素追加
 		setIcon(el, this.currentType, item.item, {

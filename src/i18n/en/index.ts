@@ -98,15 +98,24 @@ const en = {
 			name: "Tab headers",
 			enable: {
 				name: "Enable feature",
-				desc: "Customize icons for workspace tab headers (sidebar tool tabs and editor tabs) by view type. The semantics are per-type: all tabs of the same type share one icon (e.g. assigning markdown affects every document tab). Native icons are hidden, not removed, and are restored automatically when disabled.",
+				desc: "Customize icons for workspace tab headers (sidebar tool tabs and editor tabs) with two-level resolution: per-tab overrides take priority, the type mapping acts as fallback for tabs without one, and native icons are kept otherwise. Native icons are hidden, not removed, and are restored automatically when disabled.",
 			},
 			mapping: {
 				name: "Type mapping",
-				desc: "Assign icons to view types (data-type); you can also set one in place by right-clicking a tab's icon. Configured entries are listed here.",
+				desc: "Assign fallback icons to view types (data-type), applied to all tabs of the type without a per-tab override; you can also set one in place by right-clicking a tab's icon. Configured entries are listed here.",
 				selectType: "Select a view type…",
 				addTooltip: "Add mapping",
 				fetchTooltip: "Fetch types from currently open tabs",
 				noneFound: "No type mappings configured yet",
+				resetTooltip: "Delete",
+			},
+			tabs: {
+				name: "Per-tab overrides",
+				desc: "Assign icons to individual tabs (type + tab title), taking priority over the type mapping. Click refresh to fetch candidates from open tabs; you can also set one in place by right-clicking a tab's icon. File tabs are identified by file name (same-named files in different folders share it); view tab titles follow the interface language.",
+				selectTab: "Select a tab…",
+				addTooltip: "Add override",
+				fetchTooltip: "Fetch from currently open tabs",
+				noneFound: "No per-tab overrides configured yet",
 				resetTooltip: "Delete",
 			},
 			menu: {

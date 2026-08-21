@@ -102,7 +102,7 @@ const en = {
 			},
 			mapping: {
 				name: "Type mapping",
-				desc: "Assign fallback icons to view types (data-type), applied to all tabs of the type without a per-tab override; you can also set one in place by right-clicking a tab's icon. Configured entries are listed here.",
+				desc: "Assign fallback icons to view types (data-type), applied to all tabs of the type without a per-tab override; you can also set one in place by right-clicking a tab's icon. Due to an Obsidian limitation, right-clicking an inactive tab only shows the native menu items — left-click the tab to activate it first, and the 'Set icon' entry will then appear in its right-click menu. Configured entries are listed here.",
 				selectType: "Select a view type…",
 				addTooltip: "Add mapping",
 				fetchTooltip: "Fetch types from currently open tabs",
@@ -111,7 +111,7 @@ const en = {
 			},
 			tabs: {
 				name: "Per-tab overrides",
-				desc: "Assign icons to individual tabs (type + tab title), taking priority over the type mapping. Click refresh to fetch candidates from open tabs; you can also set one in place by right-clicking a tab's icon. File tabs are identified by file name (same-named files in different folders share it); view tab titles follow the interface language.",
+				desc: "Assign icons to individual tabs (type + tab title), taking priority over the type mapping. Click refresh to fetch candidates from open tabs; you can also set one in place by right-clicking a tab's icon (inactive tabs only show the native menu items; the 'Set icon' entry appears once the tab is activated). File tabs are identified by file name (same-named files in different folders share it); view tab titles follow the interface language.",
 				selectTab: "Select a tab…",
 				addTooltip: "Add override",
 				fetchTooltip: "Fetch from currently open tabs",

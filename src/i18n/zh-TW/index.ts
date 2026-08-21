@@ -77,7 +77,7 @@ const zh_TW = {
 			extensions: {
 				name: "按副檔名",
 				desc: "為某類副檔名的檔案統一分配圖示（如 pdf、canvas）；支援複合後綴，如 excalidraw.md 優先於 md",
-				placeholder: "輸入副檔名，支援批次（如 .xdb .js）...",
+				placeholder: "支援批次（如 .xdb .js）...",
 				addTooltip: "添加副檔名",
 				noneFound: "尚未設定副檔名規則",
 			},
@@ -101,16 +101,16 @@ const zh_TW = {
 			},
 			mapping: {
 				name: "類型對應",
-				desc: "為檢視類型（data-type）分配兜底圖示，作用於未單獨設定的所有同類型分頁。此處列出已設定項。",
+				desc: "為檢視類型（data-type）分配兜底圖示，作用於未單獨設定的所有同類型分頁。",
 				selectType: "選擇檢視類型…",
 				addTooltip: "新增對應",
-				fetchTooltip: "從目前開啟的分頁擷取類型",
+				fetchTooltip: "從目前開啟的側邊欄工具分頁擷取類型",
 				noneFound: "尚未設定類型對應",
 				resetTooltip: "刪除",
 			},
 			tabs: {
 				name: "單分頁覆蓋",
-				desc: "為單個分頁（類型 + 分頁名稱）單獨分配圖示，優先於類型對應。點擊重新整理從目前開啟的分頁擷取候選；右鍵分頁圖示也可就地設定（未作用中的分頁右鍵只有原生選單項，先單擊作用中才會出現「設定圖示」選項）。文件分頁以檔案名稱識別（不同目錄的同名檔案共享），檢視分頁隨介面語言。",
+				desc: "為單個分頁（類型 + 分頁名稱）單獨分配圖示，優先於類型對應。右鍵分頁圖示也可設定（未作用中的分頁右鍵只有原生選單項，先單擊作用中才會出現「設定圖示」選項）。",
 				selectTab: "選擇分頁…",
 				addTooltip: "新增覆蓋",
 				fetchTooltip: "從目前開啟的分頁擷取",

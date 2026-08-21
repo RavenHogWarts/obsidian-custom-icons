@@ -77,8 +77,7 @@ const en = {
 			extensions: {
 				name: "By extension",
 				desc: "Assign a shared icon to files of an extension (e.g. pdf, canvas); compound suffixes are supported, e.g. excalidraw.md takes precedence over md",
-				placeholder:
-					"Enter extensions, batch supported (e.g. .xdb .js)...",
+				placeholder: "Batch supported (e.g. .xdb .js)...",
 				addTooltip: "Add extension",
 				noneFound: "No extension rules configured yet",
 			},
@@ -102,16 +101,16 @@ const en = {
 			},
 			mapping: {
 				name: "Type mapping",
-				desc: "Assign fallback icons to view types (data-type), applied to all tabs of the type without a per-tab override. Configured entries are listed here.",
+				desc: "Assign fallback icons to view types (data-type), applied to all tabs of the type without a per-tab override.",
 				selectType: "Select a view type…",
 				addTooltip: "Add mapping",
-				fetchTooltip: "Fetch types from currently open tabs",
+				fetchTooltip: "Fetch types from currently open sidebar tool tabs",
 				noneFound: "No type mappings configured yet",
 				resetTooltip: "Delete",
 			},
 			tabs: {
 				name: "Per-tab overrides",
-				desc: "Assign icons to individual tabs (type + tab title), taking priority over the type mapping. Click refresh to fetch candidates from open tabs; you can also set one in place by right-clicking a tab's icon (inactive tabs only show the native menu items; the 'Set icon' entry appears once the tab is activated). File tabs are identified by file name (same-named files in different folders share it); view tab titles follow the interface language.",
+				desc: "Assign icons to individual tabs (type + tab title), taking priority over the type mapping. You can also set one by right-clicking a tab's icon (inactive tabs only show the native menu items; the 'Set icon' entry appears once the tab is activated).",
 				selectTab: "Select a tab…",
 				addTooltip: "Add override",
 				fetchTooltip: "Fetch from currently open tabs",

@@ -77,7 +77,7 @@ const zh = {
 			extensions: {
 				name: "按扩展名",
 				desc: "为某类扩展名的文件统一分配图标（如 pdf、canvas）；支持复合后缀，如 excalidraw.md 优先于 md",
-				placeholder: "输入扩展名，支持批量（如 .xdb .js）...",
+				placeholder: "支持批量（如 .xdb .js）...",
 				addTooltip: "添加扩展名",
 				noneFound: "尚未配置扩展名规则",
 			},
@@ -101,19 +101,19 @@ const zh = {
 			},
 			mapping: {
 				name: "类型映射",
-				desc: "为视图类型（data-type）分配兜底图标，作用于未单独配置的所有同类型标签。此处列出已配置项。",
+				desc: "为视图类型（data-type）分配兜底图标，作用于未单独配置的所有同类型标签。",
 				selectType: "选择视图类型…",
 				addTooltip: "添加映射",
-				fetchTooltip: "从当前打开的标签抓取类型",
+				fetchTooltip: "从当前打开的侧栏工具标签页抓取类型",
 				noneFound: "尚未配置类型映射",
 				resetTooltip: "删除",
 			},
 			tabs: {
 				name: "单标签覆盖",
-				desc: "为单个标签（类型 + 标签名）单独分配图标，优先于类型映射。点击刷新从当前打开的标签抓取候选；右键标签页图标也可就地设置（未激活标签的右键菜单只有原生项，先激活标签才会出现「设置图标」选项）。文件标签以文件名标识（不同目录的同名文件共享），视图标签随界面语言。",
+				desc: "为单个标签（类型 + 标签名）单独分配图标，优先于类型映射。右键标签页图标也可设置（未激活标签的右键菜单只有原生项，先激活标签才会出现「设置图标」选项）。",
 				selectTab: "选择标签…",
 				addTooltip: "添加覆盖",
-				fetchTooltip: "从当前打开的标签抓取",
+				fetchTooltip: "从当前打开的标签页抓取",
 				noneFound: "尚未配置单标签覆盖",
 				resetTooltip: "删除",
 			},
@@ -173,7 +173,8 @@ const zh = {
 				offlineHint: "安装完成后图标存储在本地，离线可用。",
 				npmModal: {
 					title: "自定义 npm 图标包",
-					packIdPlaceholder: "包 ID（小写字母/数字/连字符，如 my-icons）",
+					packIdPlaceholder:
+						"包 ID（小写字母/数字/连字符，如 my-icons）",
 					packagePlaceholder: "npm 包名（如 @tabler/icons）",
 					globPlaceholder: "SVG 路径 glob（如 icons/outline/*.svg）",
 					versionPlaceholder: "版本（可选，默认最新）",

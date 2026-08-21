@@ -21,6 +21,27 @@
 
 * 更新相关文档 ([a3212cf](https://github.com/Raven-Pensieve/obsidian-custom-icons/commit/a3212cf46abfa1099bc361a5c3e26241a76b41d0))
 
+## [2.5.0](https://github.com/Raven-Pensieve/obsidian-custom-icons/compare/2.4.0...2.5.0) (2026-08-21)
+
+
+### ✨ 新增功能 (Features)
+
+* 修改 TabHeaderIconHandler 解析优先级 ([1f96ab6](https://github.com/Raven-Pensieve/obsidian-custom-icons/commit/1f96ab6c2a8549cd09dbd568371a0c0e7831b31f))
+* 新增 标签页 图标替换 ([b72751a](https://github.com/Raven-Pensieve/obsidian-custom-icons/commit/b72751a8da7bbd18bb8e86aece8990ae5b0ca243))
+
+
+### 🐛 问题修复 (Bug Fixes)
+
+* FileExplorerIconHandler 只在 file-explorer-context-menu 来源时加菜单项 ([2075ae3](https://github.com/Raven-Pensieve/obsidian-custom-icons/commit/2075ae3ca184c68522e32f352efb3573336d5066))
+* 更新 tabHeader 逻辑 ([6d08552](https://github.com/Raven-Pensieve/obsidian-custom-icons/commit/6d0855216c7b82e21297830f3417944569a35b1a))
+
+
+### ♻️ 重构 (Refactor)
+
+* 优化翻译文本 ([aed31df](https://github.com/Raven-Pensieve/obsidian-custom-icons/commit/aed31df49694ac0e9b9fae69aa0a27dec4efe148))
+* 更新 i18n 文本说明 ([26468ad](https://github.com/Raven-Pensieve/obsidian-custom-icons/commit/26468ad373b9f6be4a4e90478b414bbc18cde95b))
+* 替换侧边栏图标库图标为 book-image ([e8bd225](https://github.com/Raven-Pensieve/obsidian-custom-icons/commit/e8bd2257cb4e4343e01223a1f7f7a0ce651bcd94))
+
 ## [2.4.0](https://github.com/Raven-Pensieve/obsidian-custom-icons/compare/2.3.0...2.4.0) (2026-08-20)
 
 

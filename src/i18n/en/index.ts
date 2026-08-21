@@ -102,7 +102,7 @@ const en = {
 			},
 			mapping: {
 				name: "Type mapping",
-				desc: "Assign fallback icons to view types (data-type), applied to all tabs of the type without a per-tab override; you can also set one in place by right-clicking a tab's icon. Due to an Obsidian limitation, right-clicking an inactive tab only shows the native menu items — left-click the tab to activate it first, and the 'Set icon' entry will then appear in its right-click menu. Configured entries are listed here.",
+				desc: "Assign fallback icons to view types (data-type), applied to all tabs of the type without a per-tab override. Configured entries are listed here.",
 				selectType: "Select a view type…",
 				addTooltip: "Add mapping",
 				fetchTooltip: "Fetch types from currently open tabs",

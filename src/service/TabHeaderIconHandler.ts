@@ -42,6 +42,9 @@ interface ITabHeaderConfig {
  *   workspace 事件天然覆盖全部窗口（含 popout），无需逐 document 绑定。
  *   该事件无 source 参数，两条触发面（标签页头右键 / 视图头 ⋮ 菜单）以 menu.sections
  *   是否含 "title" 段区分，入口仅收敛到前者（见 registerContextMenu）。
+ *   已知限制：该事件仅对「当前激活」的标签触发——右键未激活标签时仍会出现
+ *   原生菜单（关闭/固定等），但其中不含本插件菜单项；需先左键激活目标标签，
+ *   右键菜单中才会出现「设置图标」。无法从插件侧解决，已在设置页描述中注明。
  */
 export default class TabHeaderIconHandler extends AbstractIconHandler<ITabHeaderConfig> {
 	readonly id = "tabHeader";

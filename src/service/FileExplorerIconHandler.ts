@@ -14,6 +14,22 @@ import setIcon, { cleanupIcon } from "@src/util/setIcon";
 import { EventRef, Menu, TAbstractFile, TFolder, WorkspaceLeaf } from "obsidian";
 
 /**
+ * 文件浏览器视图内部形态（Obsidian 未公开 API，按需最小声明）。
+ *
+ * `fileItems` 以 vault 相对路径为键，持有每个文件/夹树项的元素引用；即便树项因
+ * 折叠 / 出屏被 Obsidian detach 缓存，引用依旧有效——故清理时可借它够到那些
+ * 脱离文档树的游离子树（否则 querySelectorAll 只能扫到当前挂载的节点，残留漏删）。
+ * 标题元素在不同 Obsidian 版本叫 `titleEl`（新）或 `selfEl`（旧），取二者兜底。
+ */
+interface FileExplorerItemLike {
+	titleEl?: HTMLElement;
+	selfEl?: HTMLElement;
+}
+interface FileExplorerViewLike {
+	fileItems?: Record<string, FileExplorerItemLike>;
+}
+
+/**
  * 文件浏览器图标处理器（插入型）。
  *
  * 为左侧文件浏览器（data-type="file-explorer"）的文件夹/文件插入自定义图标。
@@ -38,6 +54,8 @@ export default class FileExplorerIconHandler extends AbstractIconHandler<IFileEx
 	private readonly iconSize = 16;
 
 	private observers: MutationObserver[] = [];
+	/** 合并 DOM 变更 → 下一帧一次全量重扫的 rAF 句柄（null = 未排程） */
+	private rescanHandle: number | null = null;
 	private menuEventRef: EventRef | null = null;
 	private renameEventRef: EventRef | null = null;
 	private deleteEventRef: EventRef | null = null;
@@ -64,8 +82,7 @@ export default class FileExplorerIconHandler extends AbstractIconHandler<IFileEx
 	}
 
 	cleanup(): void {
-		this.observers.forEach((o) => o.disconnect());
-		this.observers = [];
+		this.disconnectObservers();
 
 		if (this.menuEventRef) {
 			this.app.workspace.offref(this.menuEventRef);
@@ -166,9 +183,27 @@ export default class FileExplorerIconHandler extends AbstractIconHandler<IFileEx
 	}
 
 	private removeAllIcons(): void {
-		this.getExplorerContainers().forEach((container) => {
-			container
-				.querySelectorAll<HTMLElement>(`.${this.iconClass}`)
+		this.app.workspace.getLeavesOfType("file-explorer").forEach((leaf) => {
+			// ① 游离缓存子树：折叠 / 出屏被 Obsidian detach 缓存的树项不是 containerEl
+			// 的后代，DOM 查询扫不到；借视图内部 fileItems 的元素引用逐项清理，才能
+			// 够到它们——否则关闭功能后这些图标残留，下次展开随缓存节点一起挂回。
+			const view = leaf.view as unknown as FileExplorerViewLike;
+			const items = view.fileItems;
+			if (items) {
+				Object.values(items).forEach((item) => {
+					const host = item.titleEl ?? item.selfEl;
+					host?.querySelectorAll<HTMLElement>(
+						`.${this.iconClass}`,
+					).forEach((el) => {
+						cleanupIcon(el);
+						el.remove();
+					});
+				});
+			}
+			// ② 文档树兜底：清理不在 fileItems 里的游离图标（根节点 / 异常态 /
+			// fileItems 不可用的旧版本）。已被 ① 移除的节点此处自然扫不到。
+			leaf.view.containerEl
+				?.querySelectorAll<HTMLElement>(`.${this.iconClass}`)
 				.forEach((el) => {
 					cleanupIcon(el);
 					el.remove();
@@ -181,13 +216,18 @@ export default class FileExplorerIconHandler extends AbstractIconHandler<IFileEx
 	// ---------------------------------------------------------------------
 
 	private setupObservers(): void {
-		this.observers.forEach((o) => o.disconnect());
-		this.observers = [];
+		this.disconnectObservers();
 		this.getExplorerContainers().forEach((container) => {
 			const observer = new MutationObserver((mutations) => {
 				if (!this.isEnabled()) return;
 
-				mutations.forEach((mutation) => {
+				for (const mutation of mutations) {
+					// data-path 在节点插入 DOM 后才被赋值的时序（首次展开常见）：
+					// childList 那一回合标题还没有 [data-path]、扫不到，靠属性变更兜住。
+					if (mutation.type === "attributes") {
+						this.scheduleRescan();
+						continue;
+					}
 					mutation.addedNodes.forEach((node) => {
 						if (!node.instanceOf(HTMLElement)) return;
 						// 跳过我们自己插入的图标节点，避免 subtree 自触发死循环
@@ -197,28 +237,47 @@ export default class FileExplorerIconHandler extends AbstractIconHandler<IFileEx
 						) {
 							return;
 						}
-						this.applyToElementTree(node);
+						// 新增树节点：合并成下一帧一次幂等全量重扫
+						// （scheduleRescan 幂等，一批里多次调用只排程一次）
+						this.scheduleRescan();
 					});
-				});
+				}
 			});
-			observer.observe(container, { childList: true, subtree: true });
+			observer.observe(container, {
+				childList: true,
+				subtree: true,
+				attributes: true,
+				attributeFilter: ["data-path"],
+			});
 			this.observers.push(observer);
 		});
 	}
 
-	private applyToElementTree(rootEl: HTMLElement): void {
-		if (rootEl.matches(this.folderTitleSelector)) {
-			this.applyToTitle(rootEl, true);
-		} else if (rootEl.matches(this.fileTitleSelector)) {
-			this.applyToTitle(rootEl, false);
-		}
+	/**
+	 * 合并（coalesce）同一批 DOM 变更：等展开渲染（含 Obsidian 自身首帧 / 动画）
+	 * 落定后，于下一帧按最终 DOM 统一全量重扫一次。
+	 *
+	 * 收口懒渲染的关键：不再赌「新增节点当场就是带 [data-path] 的完整标题」这一时序，
+	 * 而是让稳定的 applyToAllExplorers（直接 querySelectorAll 当前所有已渲染标题）兜底。
+	 * 其幂等（isSameIcon + setIcon 的 iconStateMap 去重）保证未变化行不写 DOM，
+	 * 插入的图标节点又被 observer 回调跳过——故最多 1~2 帧收敛、不自触发死循环。
+	 */
+	private scheduleRescan(): void {
+		if (this.rescanHandle !== null) return;
+		this.rescanHandle = window.requestAnimationFrame(() => {
+			this.rescanHandle = null;
+			if (!this.isEnabled()) return;
+			this.applyToAllExplorers();
+		});
+	}
 
-		rootEl
-			.querySelectorAll<HTMLElement>(this.folderTitleSelector)
-			.forEach((el) => this.applyToTitle(el, true));
-		rootEl
-			.querySelectorAll<HTMLElement>(this.fileTitleSelector)
-			.forEach((el) => this.applyToTitle(el, false));
+	private disconnectObservers(): void {
+		this.observers.forEach((o) => o.disconnect());
+		this.observers = [];
+		if (this.rescanHandle !== null) {
+			window.cancelAnimationFrame(this.rescanHandle);
+			this.rescanHandle = null;
+		}
 	}
 
 	// ---------------------------------------------------------------------

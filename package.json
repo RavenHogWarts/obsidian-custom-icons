@@ -1,6 +1,6 @@
 {
 	"name": "custom-sidebar-icons",
-	"version": "2.5.1",
+	"version": "2.6.0",
 	"description": "Enhance your workspace with customizable icons for documents and folders.",
 	"main": "main.js",
 	"scripts": {

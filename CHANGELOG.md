@@ -21,6 +21,18 @@
 
 * 更新相关文档 ([a3212cf](https://github.com/Raven-Pensieve/obsidian-custom-icons/commit/a3212cf46abfa1099bc361a5c3e26241a76b41d0))
 
+## [2.5.1](https://github.com/Raven-Pensieve/obsidian-custom-icons/compare/2.5.0...2.5.1) (2026-08-24)
+
+
+### 🐛 问题修复 (Bug Fixes)
+
+* file-explorer 首次展开不渲染，关闭功能仍残留图标 ([6dea6b4](https://github.com/Raven-Pensieve/obsidian-custom-icons/commit/6dea6b4a993d56326fd2273a32a7be09cdcbdcd7))
+
+
+### 📝 文档 (Documentation)
+
+* 更新 README 文档 ([a07718b](https://github.com/Raven-Pensieve/obsidian-custom-icons/commit/a07718b03350910385c94dc1911c388c5b413f77))
+
 ## [2.5.0](https://github.com/Raven-Pensieve/obsidian-custom-icons/compare/2.4.0...2.5.0) (2026-08-21)
 
 

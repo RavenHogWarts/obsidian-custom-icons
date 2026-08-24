@@ -21,6 +21,14 @@
 
 * 更新相关文档 ([a3212cf](https://github.com/Raven-Pensieve/obsidian-custom-icons/commit/a3212cf46abfa1099bc361a5c3e26241a76b41d0))
 
+## [2.6.0](https://github.com/Raven-Pensieve/obsidian-custom-icons/compare/2.5.1...2.6.0) (2026-08-24)
+
+
+### ✨ 新增功能 (Features)
+
+* 初步实现 bookmarks icon 处理 ([9ccb66f](https://github.com/Raven-Pensieve/obsidian-custom-icons/commit/9ccb66fb70841acf7f9a071372daa4f5f7c5f3c7))
+* 实现 bookmarks 右键菜单 ([abbd73b](https://github.com/Raven-Pensieve/obsidian-custom-icons/commit/abbd73bc8f5988c9bfd8fcbf459745769ca04b91))
+
 ## [2.5.1](https://github.com/Raven-Pensieve/obsidian-custom-icons/compare/2.5.0...2.5.1) (2026-08-24)
 
 

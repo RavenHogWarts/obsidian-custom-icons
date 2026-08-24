@@ -34,6 +34,14 @@ export interface IPluginSettings {
 		/** 单标签覆盖（优先层），key = `${data-type}::${aria-label}`（如 "markdown::春节.md"） */
 		tabs: Record<string, ITabHeaderIconOverride>;
 	};
+	// 书签面板（data-type="bookmarks"），两级解析：单项覆盖 > 按书签类型
+	bookmarks: {
+		enable: boolean;
+		/** 单项覆盖（优先层），key = String(ctime)（书签稳定 id，重命名/移动不失效） */
+		items: Record<string, IBookmarkIconOverride>;
+		/** 类型默认层（兜底），key = BookmarkKind（file/folder/group/search/graph/url） */
+		types: Record<string, IBookmarkIconOverride>;
+	};
 	// 实验性功能
 	experimental: {
 		keepPluginFirst: boolean;
@@ -67,6 +75,23 @@ export interface ITabHeaderIconOverride {
 	 * 冗余存储便于归一化：类型层 = data-type；单标签层 = `${data-type}::${aria-label}`
 	 * （data-type 为机器标识不含 `:`，解析取首个 `::`，标签名自身含 `::` 也不歧义）
 	 */
+	id: string;
+	icon?: string;
+	type?: IconType;
+	color?: string;
+}
+
+/** 书签类型（对应 Obsidian BookmarkItem.type） */
+export type BookmarkKind =
+	| "file"
+	| "folder"
+	| "group"
+	| "search"
+	| "graph"
+	| "url";
+
+export interface IBookmarkIconOverride {
+	/** 冗余存储便于归一化：单项层 = String(ctime)；类型层 = BookmarkKind */
 	id: string;
 	icon?: string;
 	type?: IconType;
@@ -150,6 +175,11 @@ export const DEFAULT_SETTINGS: IPluginSettings = {
 		enable: false,
 		data: {},
 		tabs: {},
+	},
+	bookmarks: {
+		enable: false,
+		items: {},
+		types: {},
 	},
 	experimental: {
 		keepPluginFirst: false,

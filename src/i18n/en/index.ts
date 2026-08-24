@@ -1,4 +1,4 @@
-import type { BaseTranslation } from "../i18n-types";
+import type { BaseTranslation } from '../i18n-types'
 
 const en = {
 	settings: {
@@ -83,7 +83,7 @@ const en = {
 			},
 			overrides: {
 				name: "Per-item overrides",
-				desc: 'Right-click a file/folder in the tree and choose "Set icon" to override individually; configured items are listed here',
+				desc: "Right-click a file/folder in the tree and choose \"Set icon\" to override individually; configured items are listed here",
 				folderSection: "Folders",
 				fileSection: "Files",
 				noneFound: "No per-item overrides yet",
@@ -122,6 +122,34 @@ const en = {
 				resetIcon: "Reset icon",
 			},
 		},
+		bookmarks: {
+			name: "TODO: 书签",
+			enable: {
+				name: "TODO: 启用功能",
+				desc: "TODO: 为书签面板中的书签项与书签组自定义图标，两级解析：单项覆盖优先（右键分配）、类型默认兜底（按书签类型统一）、未配置则保留原生。叶子项的原生图标不会被删除，仅被隐藏，禁用后自动恢复。",
+			},
+			types: {
+				name: "TODO: 按类型",
+				desc: "TODO: 为每种书签类型设置默认图标，作用于该类型的全部书签；文件 / 文件夹 / 网址类型还可在书签上右键单独覆盖。",
+				file: "TODO: 文件",
+				folder: "TODO: 文件夹",
+				group: "TODO: 书签组",
+				search: "TODO: 搜索",
+				graph: "TODO: 关系图",
+				url: "TODO: 网址",
+				resetTooltip: "TODO: 重置",
+			},
+			overrides: {
+				name: "TODO: 单项覆盖",
+				desc: "TODO: 在书签面板中右键书签「设置图标」可单独指定（文件 / 文件夹 / 网址类型）；此处列出已配置项。",
+				noneFound: "TODO: 暂无单项覆盖",
+				invalid: "TODO: 已失效（书签不存在）",
+			},
+			menu: {
+				setIcon: "TODO: 设置图标",
+				resetIcon: "TODO: 重置图标",
+			},
+		},
 		experimental: {
 			name: "Experimental",
 			keepPluginFirst: {
@@ -153,8 +181,7 @@ const en = {
 					idPlaceholder: "Icon ID (e.g.: my-icon)",
 					contentPlaceholder: "SVG content (<svg>...</svg>)",
 					selectFiles: "Select svg files",
-					selectFilesDesc:
-						"You can select multiple svg files to batch add icons. File names will be used as icon IDs.",
+					selectFilesDesc: "You can select multiple svg files to batch add icons. File names will be used as icon IDs.",
 					selectedFiles: "{count:number} file(s) selected",
 				},
 			},
@@ -162,39 +189,31 @@ const en = {
 				tabName: "Icon packs",
 				installing: "Downloading icon pack…",
 				progress: "Downloading icons {done:number}/{total:number}…",
-				installed:
-					"Installed {count:number} icons, effective immediately",
+				installed: "Installed {count:number} icons, effective immediately",
 				installFailed: "Failed to install icon pack",
 				iconCount: "Icons",
 				licenseLabel: "License",
 				idLabel: "Icon ID prefix",
 				sourcePackage: "Source package",
-				bigPackWarning:
-					"This set contains {count:number} icons and may take a while to install and sync. Continue?",
-				offlineHint:
-					"After installation, icons are stored locally and work offline.",
+				bigPackWarning: "This set contains {count:number} icons and may take a while to install and sync. Continue?",
+				offlineHint: "After installation, icons are stored locally and work offline.",
 				npmModal: {
 					title: "Custom npm icon pack",
-					packIdPlaceholder:
-						"Pack ID (lowercase/digits/hyphens, e.g. my-icons)",
+					packIdPlaceholder: "Pack ID (lowercase/digits/hyphens, e.g. my-icons)",
 					packagePlaceholder: "npm package (e.g. @tabler/icons)",
 					globPlaceholder: "SVG path glob (e.g. icons/outline/*.svg)",
-					versionPlaceholder:
-						"Version (optional, defaults to latest)",
+					versionPlaceholder: "Version (optional, defaults to latest)",
 					hint: "Fetches loose SVG files from an npm CDN; supports *, ** and comma-separated alternatives.",
 				},
-				uninstallHint:
-					"This removes {count:number} icons (local file and manifest). UI using them will fall back to blank.",
+				uninstallHint: "This removes {count:number} icons (local file and manifest). UI using them will fall back to blank.",
 				uninstallFailed: "Failed to uninstall icon pack",
 				redownload: "Re-download",
 				redownloadTooltip: "Re-download from source",
-				redownloadHint:
-					"Re-fetches this pack from its source and overwrites the local copy (a newer version may replace the current one). Takes effect immediately; if the download fails, the existing pack is kept.",
+				redownloadHint: "Re-fetches this pack from its source and overwrites the local copy (a newer version may replace the current one). Takes effect immediately; if the download fails, the existing pack is kept.",
 				versionLabel: "Version",
 				refreshTooltip: "Refresh catalog",
 				installedSection: "Installed",
-				noPacksInstalled:
-					"No icon packs installed yet. Pick one from the catalog below.",
+				noPacksInstalled: "No icon packs installed yet. Pick one from the catalog below.",
 				iconCountLabel: "{count:number} icons",
 				browseTooltip: "Browse icons",
 				enabledTooltip: "Enable/disable this icon pack",
@@ -202,14 +221,12 @@ const en = {
 				cachedAt: "Catalog cached at {time}",
 				catalogCached: "offline cache",
 				catalogOnline: "online",
-				catalogLoadFailed:
-					"Failed to load catalog (offline and no cache)",
+				catalogLoadFailed: "Failed to load catalog (offline and no cache)",
 				catalogLoading: "Loading icon set catalog…",
 				presetsSection: "Popular npm icon packs (one-click)",
 				alreadyInstalled: "Installed",
 				backTooltip: "Back",
-				detailHint:
-					"Read-only. Click an icon to copy its full ID (CI- prefix).",
+				detailHint: "Read-only. Click an icon to copy its full ID (CI- prefix).",
 				previewTitle: "Preview",
 				previewLoading: "Loading preview…",
 				previewEmpty: "No preview samples available",
@@ -221,8 +238,7 @@ const en = {
 				count: "{count:number} icon(s)",
 				descHints: {
 					all: "All Lucide icons bundled with the plugin (deduplicated). Click an icon to copy its name.",
-					builtin:
-						"Icons already built into Obsidian natively, listed for reference. Click an icon to copy its name.",
+					builtin: "Icons already built into Obsidian natively, listed for reference. Click an icon to copy its name.",
 					extra: "Lucide icons bundled with the plugin but not built into Obsidian. Click an icon to copy its name.",
 				},
 				filter: {

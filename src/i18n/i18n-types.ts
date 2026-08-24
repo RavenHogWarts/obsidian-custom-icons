@@ -222,7 +222,7 @@ type RootTranslation = {
 				 */
 				desc: string
 				/**
-				 * 输​入​扩​展​名​，​支​持​批​量​（​如​ ​.​x​d​b​ ​.​j​s​）​.​.​.
+				 * 支​持​批​量​（​如​ ​.​x​d​b​ ​.​j​s​）​.​.​.
 				 */
 				placeholder: string
 				/**
@@ -288,7 +288,7 @@ type RootTranslation = {
 				 */
 				name: string
 				/**
-				 * 为​视​图​类​型​（​d​a​t​a​-​t​y​p​e​）​分​配​兜​底​图​标​，​作​用​于​未​单​独​配​置​的​所​有​同​类​型​标​签​；​也​可​在​标​签​页​右​键​图​标​处​就​地​设​置​。​此​处​列​出​已​配​置​项​。
+				 * 为​视​图​类​型​（​d​a​t​a​-​t​y​p​e​）​分​配​兜​底​图​标​，​作​用​于​未​单​独​配​置​的​所​有​同​类​型​标​签​。
 				 */
 				desc: string
 				/**
@@ -300,7 +300,7 @@ type RootTranslation = {
 				 */
 				addTooltip: string
 				/**
-				 * 从​当​前​打​开​的​标​签​抓​取​类​型
+				 * 从​当​前​打​开​的​侧​栏​工​具​标​签​页​抓​取​类​型
 				 */
 				fetchTooltip: string
 				/**
@@ -318,7 +318,7 @@ type RootTranslation = {
 				 */
 				name: string
 				/**
-				 * 为​单​个​标​签​（​类​型​ ​+​ ​标​签​名​）​单​独​分​配​图​标​，​优​先​于​类​型​映​射​。​点​击​刷​新​从​当​前​打​开​的​标​签​抓​取​候​选​；​右​键​标​签​页​图​标​也​可​就​地​设​置​。​文​件​标​签​以​文​件​名​标​识​（​不​同​目​录​的​同​名​文​件​共​享​）​，​视​图​标​签​随​界​面​语​言​。
+				 * 为​单​个​标​签​（​类​型​ ​+​ ​标​签​名​）​单​独​分​配​图​标​，​优​先​于​类​型​映​射​。​右​键​标​签​页​图​标​也​可​设​置​（​未​激​活​标​签​的​右​键​菜​单​只​有​原​生​项​，​先​激​活​标​签​才​会​出​现​「​设​置​图​标​」​选​项​）​。
 				 */
 				desc: string
 				/**
@@ -330,7 +330,7 @@ type RootTranslation = {
 				 */
 				addTooltip: string
 				/**
-				 * 从​当​前​打​开​的​标​签​抓​取
+				 * 从​当​前​打​开​的​标​签​页​抓​取
 				 */
 				fetchTooltip: string
 				/**
@@ -341,6 +341,88 @@ type RootTranslation = {
 				 * 删​除
 				 */
 				resetTooltip: string
+			}
+			menu: {
+				/**
+				 * 设​置​图​标
+				 */
+				setIcon: string
+				/**
+				 * 重​置​图​标
+				 */
+				resetIcon: string
+			}
+		}
+		bookmarks: {
+			/**
+			 * 书​签
+			 */
+			name: string
+			enable: {
+				/**
+				 * 启​用​功​能
+				 */
+				name: string
+				/**
+				 * 为​书​签​面​板​中​的​书​签​项​与​书​签​组​自​定​义​图​标​，​两​级​解​析​：​单​项​覆​盖​优​先​（​右​键​分​配​）​、​类​型​默​认​兜​底​（​按​书​签​类​型​统​一​）​、​未​配​置​则​保​留​原​生​。​叶​子​项​的​原​生​图​标​不​会​被​删​除​，​仅​被​隐​藏​，​禁​用​后​自​动​恢​复​。
+				 */
+				desc: string
+			}
+			types: {
+				/**
+				 * 按​类​型
+				 */
+				name: string
+				/**
+				 * 为​每​种​书​签​类​型​设​置​默​认​图​标​，​作​用​于​该​类​型​的​全​部​书​签​；​文​件​ ​/​ ​文​件​夹​ ​/​ ​网​址​类​型​还​可​在​书​签​上​右​键​单​独​覆​盖​。
+				 */
+				desc: string
+				/**
+				 * 文​件
+				 */
+				file: string
+				/**
+				 * 文​件​夹
+				 */
+				folder: string
+				/**
+				 * 书​签​组
+				 */
+				group: string
+				/**
+				 * 搜​索
+				 */
+				search: string
+				/**
+				 * 关​系​图
+				 */
+				graph: string
+				/**
+				 * 网​址
+				 */
+				url: string
+				/**
+				 * 重​置
+				 */
+				resetTooltip: string
+			}
+			overrides: {
+				/**
+				 * 单​项​覆​盖
+				 */
+				name: string
+				/**
+				 * 在​书​签​面​板​中​右​键​书​签​「​设​置​图​标​」​可​单​独​指​定​（​文​件​ ​/​ ​文​件​夹​ ​/​ ​网​址​类​型​）​；​此​处​列​出​已​配​置​项​。
+				 */
+				desc: string
+				/**
+				 * 暂​无​单​项​覆​盖
+				 */
+				noneFound: string
+				/**
+				 * 已​失​效​（​书​签​不​存​在​）
+				 */
+				invalid: string
 			}
 			menu: {
 				/**
@@ -898,7 +980,7 @@ export type TranslationFunctions = {
 				 */
 				desc: () => LocalizedString
 				/**
-				 * 输入扩展名，支持批量（如 .xdb .js）...
+				 * 支持批量（如 .xdb .js）...
 				 */
 				placeholder: () => LocalizedString
 				/**
@@ -964,7 +1046,7 @@ export type TranslationFunctions = {
 				 */
 				name: () => LocalizedString
 				/**
-				 * 为视图类型（data-type）分配兜底图标，作用于未单独配置的所有同类型标签；也可在标签页右键图标处就地设置。此处列出已配置项。
+				 * 为视图类型（data-type）分配兜底图标，作用于未单独配置的所有同类型标签。
 				 */
 				desc: () => LocalizedString
 				/**
@@ -976,7 +1058,7 @@ export type TranslationFunctions = {
 				 */
 				addTooltip: () => LocalizedString
 				/**
-				 * 从当前打开的标签抓取类型
+				 * 从当前打开的侧栏工具标签页抓取类型
 				 */
 				fetchTooltip: () => LocalizedString
 				/**
@@ -994,7 +1076,7 @@ export type TranslationFunctions = {
 				 */
 				name: () => LocalizedString
 				/**
-				 * 为单个标签（类型 + 标签名）单独分配图标，优先于类型映射。点击刷新从当前打开的标签抓取候选；右键标签页图标也可就地设置。文件标签以文件名标识（不同目录的同名文件共享），视图标签随界面语言。
+				 * 为单个标签（类型 + 标签名）单独分配图标，优先于类型映射。右键标签页图标也可设置（未激活标签的右键菜单只有原生项，先激活标签才会出现「设置图标」选项）。
 				 */
 				desc: () => LocalizedString
 				/**
@@ -1006,7 +1088,7 @@ export type TranslationFunctions = {
 				 */
 				addTooltip: () => LocalizedString
 				/**
-				 * 从当前打开的标签抓取
+				 * 从当前打开的标签页抓取
 				 */
 				fetchTooltip: () => LocalizedString
 				/**
@@ -1017,6 +1099,88 @@ export type TranslationFunctions = {
 				 * 删除
 				 */
 				resetTooltip: () => LocalizedString
+			}
+			menu: {
+				/**
+				 * 设置图标
+				 */
+				setIcon: () => LocalizedString
+				/**
+				 * 重置图标
+				 */
+				resetIcon: () => LocalizedString
+			}
+		}
+		bookmarks: {
+			/**
+			 * 书签
+			 */
+			name: () => LocalizedString
+			enable: {
+				/**
+				 * 启用功能
+				 */
+				name: () => LocalizedString
+				/**
+				 * 为书签面板中的书签项与书签组自定义图标，两级解析：单项覆盖优先（右键分配）、类型默认兜底（按书签类型统一）、未配置则保留原生。叶子项的原生图标不会被删除，仅被隐藏，禁用后自动恢复。
+				 */
+				desc: () => LocalizedString
+			}
+			types: {
+				/**
+				 * 按类型
+				 */
+				name: () => LocalizedString
+				/**
+				 * 为每种书签类型设置默认图标，作用于该类型的全部书签；文件 / 文件夹 / 网址类型还可在书签上右键单独覆盖。
+				 */
+				desc: () => LocalizedString
+				/**
+				 * 文件
+				 */
+				file: () => LocalizedString
+				/**
+				 * 文件夹
+				 */
+				folder: () => LocalizedString
+				/**
+				 * 书签组
+				 */
+				group: () => LocalizedString
+				/**
+				 * 搜索
+				 */
+				search: () => LocalizedString
+				/**
+				 * 关系图
+				 */
+				graph: () => LocalizedString
+				/**
+				 * 网址
+				 */
+				url: () => LocalizedString
+				/**
+				 * 重置
+				 */
+				resetTooltip: () => LocalizedString
+			}
+			overrides: {
+				/**
+				 * 单项覆盖
+				 */
+				name: () => LocalizedString
+				/**
+				 * 在书签面板中右键书签「设置图标」可单独指定（文件 / 文件夹 / 网址类型）；此处列出已配置项。
+				 */
+				desc: () => LocalizedString
+				/**
+				 * 暂无单项覆盖
+				 */
+				noneFound: () => LocalizedString
+				/**
+				 * 已失效（书签不存在）
+				 */
+				invalid: () => LocalizedString
 			}
 			menu: {
 				/**

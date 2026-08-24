@@ -51,3 +51,35 @@
 	width: 16px;
 	height: 16px;
 }
+
+/* 书签：组行插入型（折叠三角后），叶子行隐藏原生 + 插入（混合型） */
+
+/* 含自定义图标的行强制 flex 居中（部分主题 .tree-item-self 非 flex，插入后基线错位） */
+.tree-item-self.bookmark:has(> .custom-icon-bookmarks-icon) {
+	display: flex;
+	align-items: center;
+}
+
+.custom-icon-bookmarks-icon {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	flex: 0 0 auto;
+	width: 16px;
+	height: 16px;
+	margin-right: var(--size-4-1);
+	vertical-align: middle;
+}
+
+.custom-icon-bookmarks-icon .svg-icon,
+.custom-icon-bookmarks-icon svg {
+	display: block;
+	width: 16px;
+	height: 16px;
+}
+
+/* 叶子行：隐藏原生图标（保留 DOM，仅视觉隐藏）；组的折叠三角(.collapse-icon)不受影响 */
+.tree-item-self.bookmark.custom-icon-bookmark-host
+	> .tree-item-icon:not(.collapse-icon):not(.custom-icon-bookmarks-icon) {
+	display: none;
+}

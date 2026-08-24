@@ -1,6 +1,7 @@
 import CIPlugin from "@src/main";
 import {
 	DEFAULT_SETTINGS,
+	IBookmarkIconOverride,
 	ICommunityPluginIconOverride,
 	IFileExplorerIconOverride,
 	IPluginSettings,
@@ -11,6 +12,7 @@ import {
 	normalizeCommunityPluginOverride,
 	normalizeIconColor,
 } from "@src/util/communityPluginIcon";
+import { isBookmarkKind } from "@src/util/bookmarkIcon";
 import { normalizeExtensionKey } from "@src/util/fileExplorerIcon";
 import { parseTabKey } from "@src/util/tabHeaderIcon";
 
@@ -287,13 +289,61 @@ export default class SettingsStore {
 	}
 
 	#normalizeSettings(settings: IPluginSettings): IPluginSettings {
-		return this.#normalizeTabHeaderSettings(
-			this.#normalizeFileExplorerSettings(
-				this.#normalizeRibbonSettings(
-					this.#normalizeCommunityPluginSettings(settings),
+		return this.#normalizeBookmarksSettings(
+			this.#normalizeTabHeaderSettings(
+				this.#normalizeFileExplorerSettings(
+					this.#normalizeRibbonSettings(
+						this.#normalizeCommunityPluginSettings(settings),
+					),
 				),
 			),
 		);
+	}
+
+	#normalizeBookmarksSettings(settings: IPluginSettings): IPluginSettings {
+		const normalizedSettings = JSON.parse(
+			JSON.stringify(settings),
+		) as IPluginSettings;
+
+		const normalizeMap = (
+			source: Record<string, IBookmarkIconOverride>,
+			keyIsValid: (key: string) => boolean,
+		): Record<string, IBookmarkIconOverride> => {
+			const result: Record<string, IBookmarkIconOverride> = {};
+			Object.entries(source ?? {}).forEach(([rawKey, override]) => {
+				const key = rawKey.trim();
+				// 防原型污染 + 键合法性 + 丢弃无意义条目（无图标则不覆盖）
+				if (
+					!key ||
+					key === "__proto__" ||
+					key === "constructor" ||
+					key === "prototype" ||
+					!keyIsValid(key) ||
+					!override?.icon ||
+					!override.type
+				) {
+					return;
+				}
+				result[key] = {
+					id: key,
+					icon: override.icon,
+					type: override.type,
+					color: normalizeIconColor(override.color) ?? "",
+				};
+			});
+			return result;
+		};
+
+		// 单项键 = String(ctime)（数字串，仅需非空且过原型污染）；类型键须为合法 BookmarkKind
+		normalizedSettings.bookmarks.items = normalizeMap(
+			normalizedSettings.bookmarks?.items,
+			() => true,
+		);
+		normalizedSettings.bookmarks.types = normalizeMap(
+			normalizedSettings.bookmarks?.types,
+			isBookmarkKind,
+		);
+		return normalizedSettings;
 	}
 
 	async loadSettings() {

@@ -122,6 +122,34 @@ const zh = {
 				resetIcon: "重置图标",
 			},
 		},
+		bookmarks: {
+			name: "书签",
+			enable: {
+				name: "启用功能",
+				desc: "为书签面板中的书签项与书签组自定义图标，两级解析：单项覆盖优先（右键分配）、类型默认兜底（按书签类型统一）、未配置则保留原生。叶子项的原生图标不会被删除，仅被隐藏，禁用后自动恢复。",
+			},
+			types: {
+				name: "按类型",
+				desc: "为每种书签类型设置默认图标，作用于该类型的全部书签；文件 / 文件夹 / 网址类型还可在书签上右键单独覆盖。",
+				file: "文件",
+				folder: "文件夹",
+				group: "书签组",
+				search: "搜索",
+				graph: "关系图",
+				url: "网址",
+				resetTooltip: "重置",
+			},
+			overrides: {
+				name: "单项覆盖",
+				desc: "在书签面板中右键书签「设置图标」可单独指定（文件 / 文件夹 / 网址类型）；此处列出已配置项。",
+				noneFound: "暂无单项覆盖",
+				invalid: "已失效（书签不存在）",
+			},
+			menu: {
+				setIcon: "设置图标",
+				resetIcon: "重置图标",
+			},
+		},
 		experimental: {
 			name: "实验性",
 			keepPluginFirst: {

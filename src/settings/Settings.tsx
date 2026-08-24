@@ -1,6 +1,7 @@
 import { Tab, TabItem } from "@src/components/tab/Tab";
 import { LL } from "@src/i18n/i18n";
 import { FC } from "react";
+import { Bookmarks } from "./tabs/Bookmarks";
 import { CommunityPlugin } from "./tabs/CommunityPlugin";
 import { Experimental } from "./tabs/Experimental";
 import { FileExplorer } from "./tabs/FileExplorer";
@@ -28,6 +29,11 @@ export const Settings: FC = () => {
 			id: "tab-header",
 			title: LL.settings.tabHeader.name(),
 			content: <TabHeader />,
+		},
+		{
+			id: "bookmarks",
+			title: LL.settings.bookmarks.name(),
+			content: <Bookmarks />,
 		},
 		{
 			id: "experimental",

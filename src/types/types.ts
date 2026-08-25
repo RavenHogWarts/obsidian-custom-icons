@@ -123,6 +123,13 @@ export interface ICustomIconLib {
 	recent: string[];
 	/** 收藏（用户手动，保持添加顺序），元素同为 `${type}:${id}` */
 	favorites: string[];
+	/** 图标库视图偏好 */
+	ui: ICustomIconLibUI;
+}
+
+export interface ICustomIconLibUI {
+	/** 网格密度：紧凑 / 标准 / 大（见 util/iconGridDensity.ts） */
+	density: "compact" | "normal" | "large";
 }
 
 /** 「最近使用」保留条数上限 */
@@ -202,5 +209,6 @@ export const DEFAULT_SETTINGS: IPluginSettings = {
 		packs: {},
 		recent: [],
 		favorites: [],
+		ui: { density: "normal" },
 	},
 };

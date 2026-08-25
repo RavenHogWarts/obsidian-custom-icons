@@ -1,7 +1,12 @@
+import { useIconFavorites } from "@src/hooks/useIconFavorites";
+import { useIconGridDensity } from "@src/hooks/useIconGridDensity";
+import { useLibShortcuts } from "@src/hooks/useLibShortcuts";
 import usePluginSettings from "@src/hooks/usePluginSettings";
 import useSettingsStore from "@src/hooks/useSettingsStore";
 import { LL } from "@src/i18n/i18n";
 import { ICustomSVGIcon } from "@src/types/types";
+import { cardGridMetrics } from "@src/util/iconGridDensity";
+import { IconRef } from "@src/util/iconRef";
 import { uniqueIconId } from "@src/util/svgUtils";
 import { CirclePlus, Code, Shapes } from "lucide-react";
 import { Notice, setIcon } from "obsidian";
@@ -14,7 +19,9 @@ import {
 	DuplicateStrategy,
 	PendingIcon,
 } from "./AddSvg";
+import { DensityToggle } from "./DensityToggle";
 import { EditSvg } from "./EditSvg";
+import { FavoriteStrip } from "./FavoriteStrip";
 import { LibEmptyState } from "./LibEmptyState";
 import { LibHandoff, LibNavigate } from "./libNav";
 import { VirtualIconGrid } from "./VirtualIconGrid";
@@ -30,14 +37,28 @@ interface SvgLibProps {
 export const SvgLib: React.FC<SvgLibProps> = ({ handoff, onNavigate }) => {
 	const store = useSettingsStore();
 	const settings = usePluginSettings(store);
+	const [density, setDensity] = useIconGridDensity();
+	const favorites = useIconFavorites();
 
 	// Local State
 	const [searchQuery, setSearchQuery] = useState(handoff?.query ?? "");
 	const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
 	const sortButtonRef = useRef<HTMLButtonElement>(null);
+	const searchRef = useRef<HTMLInputElement>(null);
+	const clearSearch = useCallback(() => setSearchQuery(""), []);
+	const handleShortcuts = useLibShortcuts(searchRef, clearSearch);
 
 	const svgIcons = settings.customIconLib.svg;
 	const existingIds = useMemo(() => svgIcons.map((i) => i.id), [svgIcons]);
+	const metrics = cardGridMetrics(density);
+
+	// 本页的收藏 = 类型为 svg 且确实是用户导入的图标（排除图标包的 CI-* 项）
+	const ownFavorites = useMemo(() => {
+		const own = new Set(existingIds);
+		return favorites.refs.filter(
+			(ref) => ref.type === "svg" && own.has(ref.id),
+		);
+	}, [favorites.refs, existingIds]);
 
 	// Filter and Sort Icons
 	const filteredIcons = useMemo(() => {
@@ -296,18 +317,35 @@ export const SvgLib: React.FC<SvgLibProps> = ({ handoff, onNavigate }) => {
 		/>
 	);
 
+	const handleToggleFavorite = useCallback(
+		(id: string) => void favorites.toggle({ type: "svg", id }),
+		[favorites.toggle],
+	);
+	const handleToggleFavoriteRef = useCallback(
+		(ref: IconRef) => void favorites.toggle(ref),
+		[favorites.toggle],
+	);
+
 	return (
-		<div className="ci-lib-container">
+		<div
+			className="ci-lib-container"
+			tabIndex={-1}
+			onKeyDown={handleShortcuts}
+		>
 			{/* Navigation Bar */}
 			<div className="ci-lib__toolbar">
 				<div className="ci-lib__search">
 					<input
+						ref={searchRef}
 						type="search"
 						placeholder={LL.view.CustomIconLib.searchPlaceholder()}
+						title={LL.view.CustomIconLib.searchHint()}
 						value={searchQuery}
 						onChange={(e) => setSearchQuery(e.target.value)}
 					/>
 				</div>
+
+				<DensityToggle value={density} onChange={setDensity} />
 
 				<button
 					ref={sortButtonRef}
@@ -320,6 +358,18 @@ export const SvgLib: React.FC<SvgLibProps> = ({ handoff, onNavigate }) => {
 				</button>
 			</div>
 
+			{/* 收藏置顶（搜索时收起，避免与结果混淆） */}
+			{!searchQuery && (
+				<FavoriteStrip
+					refs={ownFavorites}
+					onToggleFavorite={handleToggleFavoriteRef}
+					onEdit={handleOpenEditModal}
+					onDelete={handleDeleteIcon}
+					customActions={copyAction}
+					minColumnWidth={metrics.minColumnWidth}
+				/>
+			)}
+
 			{/* Icon Grid */}
 			<VirtualIconGrid
 				items={filteredIcons}
@@ -330,8 +380,15 @@ export const SvgLib: React.FC<SvgLibProps> = ({ handoff, onNavigate }) => {
 						onDelete={handleDeleteIcon}
 						onEdit={handleOpenEditModal}
 						customActions={copyAction}
+						favorite={favorites.isFavorite({
+							type: "svg",
+							id: icon.id,
+						})}
+						onToggleFavorite={handleToggleFavorite}
 					/>
 				)}
+				minColumnWidth={metrics.minColumnWidth}
+				estimateRowHeight={metrics.estimateRowHeight}
 				emptyState={emptyState}
 			/>
 		</div>

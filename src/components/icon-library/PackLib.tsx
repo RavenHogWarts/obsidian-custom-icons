@@ -1,6 +1,11 @@
 import usePluginSettings from "@src/hooks/usePluginSettings";
 import useSettingsStore from "@src/hooks/useSettingsStore";
+import { useIconFavorites } from "@src/hooks/useIconFavorites";
+import { useIconGridDensity } from "@src/hooks/useIconGridDensity";
+import { useLibShortcuts } from "@src/hooks/useLibShortcuts";
 import { LL } from "@src/i18n/i18n";
+import { compactGridMetrics } from "@src/util/iconGridDensity";
+import { IconRef } from "@src/util/iconRef";
 import { InstallOptions } from "@src/service/icon-packs/IconPackService";
 import IconPackStore, {
 	ICollectionInfo,
@@ -22,10 +27,13 @@ import {
 	Trash2,
 } from "lucide-react";
 import { Notice } from "obsidian";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { IconCard } from "../icon-card/IconCard";
 import { ConfirmDialog } from "../modal/ConfirmDialog";
+import { DensityToggle } from "./DensityToggle";
+import { FavoriteStrip } from "./FavoriteStrip";
 import { LibEmptyState, LibGridSkeleton } from "./LibEmptyState";
+import { LibHandoff } from "./libNav";
 import { NpmSvgForm } from "./NpmSvgForm";
 import { SvgGlyph } from "./SvgGlyph";
 import { VirtualIconGrid } from "./VirtualIconGrid";
@@ -73,14 +81,25 @@ const CollapsibleSection: React.FC<{
 	);
 };
 
-export const PackLib: React.FC = () => {
+interface PackLibProps {
+	/** 从「全部」页交接过来的查询词与目标图标包（有 packId 时直接进包详情） */
+	handoff?: LibHandoff;
+}
+
+export const PackLib: React.FC<PackLibProps> = ({ handoff }) => {
 	const store = useSettingsStore();
 	const settings = usePluginSettings(store);
 	const service = store.plugin.iconPackService;
 
 	// Local State
 	const [searchQuery, setSearchQuery] = useState("");
-	const [browsing, setBrowsing] = useState<IIconPackManifest | null>(null);
+	// 交接指定了图标包时直接落到该包的详情页（否则停在目录，用户还要自己找一遍）
+	const [browsing, setBrowsing] = useState<IIconPackManifest | null>(
+		() =>
+			(handoff?.packId
+				? settings.customIconLib.packs[handoff.packId]
+				: null) ?? null,
+	);
 	const [installing, setInstalling] = useState(false);
 	const [catalog, setCatalog] = useState<ICollectionInfo[] | null>(null);
 	const [catalogMeta, setCatalogMeta] = useState<{
@@ -374,6 +393,9 @@ export const PackLib: React.FC = () => {
 			<PackDetail
 				manifest={browsing}
 				iconPackStore={store.plugin.iconPackStore}
+				initialQuery={
+					handoff?.packId === browsing.id ? handoff.query : ""
+				}
 				onBack={() => setBrowsing(null)}
 			/>
 		);
@@ -680,10 +702,36 @@ export const PackLib: React.FC = () => {
 const PackDetail: React.FC<{
 	manifest: IIconPackManifest;
 	iconPackStore: IconPackStore;
+	/** 从「全部」页交接过来的查询词 */
+	initialQuery?: string;
 	onBack: () => void;
-}> = ({ manifest, iconPackStore, onBack }) => {
+}> = ({ manifest, iconPackStore, initialQuery, onBack }) => {
 	const [names, setNames] = useState<string[] | null>(null);
-	const [searchQuery, setSearchQuery] = useState("");
+	const [searchQuery, setSearchQuery] = useState(initialQuery ?? "");
+	const searchRef = useRef<HTMLInputElement>(null);
+	const clearSearch = useCallback(() => setSearchQuery(""), []);
+	const handleShortcuts = useLibShortcuts(searchRef, clearSearch);
+
+	const [density, setDensity] = useIconGridDensity();
+	const favorites = useIconFavorites();
+	const metrics = compactGridMetrics(density);
+
+	// 本页的收藏 = 属于该图标包的项（注册 id 以 CI-{packId}- 开头）
+	const packFavorites = useMemo(() => {
+		const prefix = `${packIconId(manifest.id, "")}`;
+		return favorites.refs.filter(
+			(ref) => ref.type === "svg" && ref.id.startsWith(prefix),
+		);
+	}, [favorites.refs, manifest.id]);
+
+	const handleToggleFavorite = useCallback(
+		(id: string) => void favorites.toggle({ type: "svg", id }),
+		[favorites.toggle],
+	);
+	const handleToggleFavoriteRef = useCallback(
+		(ref: IconRef) => void favorites.toggle(ref),
+		[favorites.toggle],
+	);
 
 	useEffect(() => {
 		void (async () => {
@@ -724,7 +772,11 @@ const PackDetail: React.FC<{
 		);
 
 	return (
-		<div className="ci-lib-container">
+		<div
+			className="ci-lib-container"
+			tabIndex={-1}
+			onKeyDown={handleShortcuts}
+		>
 			<div className="ci-lib__toolbar">
 				<button
 					className="clickable-icon"
@@ -736,12 +788,15 @@ const PackDetail: React.FC<{
 				</button>
 				<div className="ci-lib__search">
 					<input
+						ref={searchRef}
 						type="search"
 						placeholder={LL.view.CustomIconLib.searchPlaceholder()}
+						title={LL.view.CustomIconLib.searchHint()}
 						value={searchQuery}
 						onChange={(e) => setSearchQuery(e.target.value)}
 					/>
 				</div>
+				<DensityToggle value={density} onChange={setDensity} />
 			</div>
 
 			<div className="ci-lib__hint">
@@ -758,14 +813,34 @@ const PackDetail: React.FC<{
 				</span>
 			</div>
 
+			{/* 收藏置顶（搜索时收起，避免与结果混淆） */}
+			{!searchQuery && (
+				<FavoriteStrip
+					refs={packFavorites}
+					onToggleFavorite={handleToggleFavoriteRef}
+					minColumnWidth={metrics.minColumnWidth}
+				/>
+			)}
+
 			<VirtualIconGrid
 				items={names === null ? [] : filteredNames}
 				getKey={(name) => name}
-				renderItem={(name) => (
-					<IconCard id={packIconId(manifest.id, name)} type="svg" />
-				)}
-				minColumnWidth={92}
-				estimateRowHeight={88}
+				renderItem={(name) => {
+					const id = packIconId(manifest.id, name);
+					return (
+						<IconCard
+							id={id}
+							type="svg"
+							favorite={favorites.isFavorite({
+								type: "svg",
+								id,
+							})}
+							onToggleFavorite={handleToggleFavorite}
+						/>
+					);
+				}}
+				minColumnWidth={metrics.minColumnWidth}
+				estimateRowHeight={metrics.estimateRowHeight}
 				className="ci-vgrid--compact"
 				emptyState={detailEmptyState}
 			/>

@@ -1,8 +1,15 @@
+import { useIconFavorites } from "@src/hooks/useIconFavorites";
+import { useIconGridDensity } from "@src/hooks/useIconGridDensity";
+import { useLibShortcuts } from "@src/hooks/useLibShortcuts";
 import { LL } from "@src/i18n/i18n";
 import { getLucideIconCatalog } from "@src/util/getLucideIcons";
+import { compactGridMetrics } from "@src/util/iconGridDensity";
+import { IconRef } from "@src/util/iconRef";
 import { setIcon } from "obsidian";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { IconCard } from "../icon-card/IconCard";
+import { DensityToggle } from "./DensityToggle";
+import { FavoriteStrip } from "./FavoriteStrip";
 import { LibEmptyState } from "./LibEmptyState";
 import { LibHandoff, LibNavigate } from "./libNav";
 import { VirtualIconGrid } from "./VirtualIconGrid";
@@ -37,6 +44,26 @@ export const LucideLib: React.FC<LucideLibProps> = ({
 		handoff ? "all" : "extra",
 	);
 	const sortButtonRef = useRef<HTMLButtonElement>(null);
+	const searchRef = useRef<HTMLInputElement>(null);
+	const clearSearch = useCallback(() => setSearchQuery(""), []);
+	const handleShortcuts = useLibShortcuts(searchRef, clearSearch);
+
+	const [density, setDensity] = useIconGridDensity();
+	const favorites = useIconFavorites();
+	const metrics = compactGridMetrics(density);
+
+	const lucideFavorites = useMemo(
+		() => favorites.refs.filter((ref) => ref.type === "lucide"),
+		[favorites.refs],
+	);
+	const handleToggleFavorite = useCallback(
+		(id: string) => void favorites.toggle({ type: "lucide", id }),
+		[favorites.toggle],
+	);
+	const handleToggleFavoriteRef = useCallback(
+		(ref: IconRef) => void favorites.toggle(ref),
+		[favorites.toggle],
+	);
 
 	// 目录计算开销较大（遍历 lucide 全部导出 + Obsidian 注册表比对），仅计算一次
 	const catalog = useMemo(() => getLucideIconCatalog(), []);
@@ -121,13 +148,19 @@ export const LucideLib: React.FC<LucideLibProps> = ({
 	);
 
 	return (
-		<div className="ci-lib-container">
+		<div
+			className="ci-lib-container"
+			tabIndex={-1}
+			onKeyDown={handleShortcuts}
+		>
 			{/* Navigation Bar */}
 			<div className="ci-lib__toolbar">
 				<div className="ci-lib__search">
 					<input
+						ref={searchRef}
 						type="search"
 						placeholder={LL.view.CustomIconLib.searchPlaceholder()}
+						title={LL.view.CustomIconLib.searchHint()}
 						value={searchQuery}
 						onChange={(e) => setSearchQuery(e.target.value)}
 					/>
@@ -150,6 +183,8 @@ export const LucideLib: React.FC<LucideLibProps> = ({
 					))}
 				</div>
 
+				<DensityToggle value={density} onChange={setDensity} />
+
 				<button
 					ref={sortButtonRef}
 					onClick={handleToggleSort}
@@ -169,13 +204,32 @@ export const LucideLib: React.FC<LucideLibProps> = ({
 				</span>
 			</div>
 
+			{/* 收藏置顶（搜索时收起，避免与结果混淆） */}
+			{!searchQuery && (
+				<FavoriteStrip
+					refs={lucideFavorites}
+					onToggleFavorite={handleToggleFavoriteRef}
+					minColumnWidth={metrics.minColumnWidth}
+				/>
+			)}
+
 			{/* Icon Grid */}
 			<VirtualIconGrid
 				items={filteredIcons}
 				getKey={(name) => name}
-				renderItem={(name) => <IconCard id={name} type="lucide" />}
-				minColumnWidth={92}
-				estimateRowHeight={88}
+				renderItem={(name) => (
+					<IconCard
+						id={name}
+						type="lucide"
+						favorite={favorites.isFavorite({
+							type: "lucide",
+							id: name,
+						})}
+						onToggleFavorite={handleToggleFavorite}
+					/>
+				)}
+				minColumnWidth={metrics.minColumnWidth}
+				estimateRowHeight={metrics.estimateRowHeight}
 				className="ci-vgrid--compact"
 				emptyState={emptyState}
 			/>

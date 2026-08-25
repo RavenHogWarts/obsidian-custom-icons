@@ -2,7 +2,15 @@ import { VirtualIconGrid } from "@src/components/icon-library/VirtualIconGrid";
 import { LL } from "@src/i18n/i18n";
 import CIPlugin from "@src/main";
 import { IconType, RECENT_LIMIT } from "@src/types/types";
-import { getLucideIconNames } from "@src/util/getLucideIcons";
+import {
+	IconRef,
+	decodeIconRefs,
+	encodeIconRef,
+	pushRecent,
+	toggleFavorite,
+} from "@src/util/iconRef";
+import { rankIcons } from "@src/util/iconSearch";
+import { buildIconSources } from "@src/util/iconSources";
 import setIcon from "@src/util/setIcon";
 import { Ban, Star } from "lucide-react";
 import { Platform } from "obsidian";
@@ -16,14 +24,6 @@ import {
 	useState,
 } from "react";
 import { BaseModal, BaseModalOptions } from "../modal/BaseModal";
-import {
-	IconRef,
-	decodeIconRefs,
-	encodeIconRef,
-	pushRecent,
-	toggleFavorite,
-} from "./iconRef";
-import { rankIcons } from "./iconSearch";
 import "./IconPicker.css";
 
 /** 有查询时单段渲染上限：足够翻找，又不让一次渲染无上限膨胀 */
@@ -60,50 +60,15 @@ const toSegment = (
 });
 
 /**
- * 构建不随弹窗交互变化的分组：Lucide、用户 SVG、每个已启用图标包各一段。
- *
- * 关键：**按包分段**而不是把所有包摊平成一个大数组。旧实现让每个 IconPicker
- * 实例在 useMemo 里构建上万条候选（设置页 N 行 = N 份），再交给
- * FuzzySuggestModal 逐键全量打分；现在每次打开弹窗只构建一次，且检索按段进行。
+ * 不随弹窗交互变化的分组：Lucide、用户 SVG、每个已启用图标包各一段。
+ * 来源构建与「全部」页共用 `buildIconSources`，此处只补上空态文案。
  */
 function buildStaticSegments(plugin: CIPlugin): Segment[] {
-	const picker = LL.view.CustomIconLib.picker;
-	const lib = plugin.settings.customIconLib;
-	const segments: Segment[] = [
-		toSegment(
-			"lucide",
-			picker.segment.lucide(),
-			getLucideIconNames().map((id) => ({
-				type: "lucide" as const,
-				id,
-			})),
-			picker.emptySegment(),
-		),
-		toSegment(
-			"svg",
-			picker.segment.svg(),
-			lib.svg.map((icon) => ({ type: "svg" as const, id: icon.id })),
-			picker.emptySegment(),
-		),
-	];
-
-	for (const manifest of Object.values(lib.packs)) {
-		if (!manifest.enabled) {
-			continue;
-		}
-		segments.push(
-			toSegment(
-				`pack:${manifest.id}`,
-				manifest.name,
-				plugin.iconPackStore
-					.getPackIconIds(manifest.id)
-					.map((id) => ({ type: "svg" as const, id })),
-				picker.emptySegment(),
-			),
-		);
-	}
-
-	return segments;
+	const emptyText = LL.view.CustomIconLib.picker.emptySegment();
+	return buildIconSources(plugin).map((source) => ({
+		...source,
+		emptyText,
+	}));
 }
 
 interface IconTileProps {

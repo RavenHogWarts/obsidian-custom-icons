@@ -496,6 +496,83 @@ type RootTranslation = {
 			 * 搜​索​图​标​.​.​.
 			 */
 			searchPlaceholder: string
+			/**
+			 * 按​ ​/​ ​聚​焦​搜​索​，​E​s​c​ ​清​空
+			 */
+			searchHint: string
+			density: {
+				/**
+				 * 网​格​密​度
+				 */
+				label: string
+				/**
+				 * 紧​凑
+				 */
+				compact: string
+				/**
+				 * 标​准
+				 */
+				normal: string
+				/**
+				 * 大
+				 */
+				large: string
+			}
+			favorites: {
+				/**
+				 * 收​藏
+				 */
+				section: string
+				/**
+				 * 点​图​标​右​上​角​的​ ​★​ ​或​右​键​管​理​收​藏
+				 */
+				hint: string
+			}
+			card: {
+				/**
+				 * 点​击​复​制​图​标​名​称
+				 */
+				copyNameTooltip: string
+				/**
+				 * 复​制​名​称
+				 */
+				copyName: string
+				/**
+				 * 复​制​完​整​ ​I​D
+				 */
+				copyFullId: string
+				/**
+				 * 复​制​图​标​名​称​失​败
+				 */
+				copyNameFailed: string
+				/**
+				 * 复​制​ ​S​V​G​ ​代​码​失​败
+				 */
+				copySvgCodeFailed: string
+				/**
+				 * 已​复​制
+				 */
+				copied: string
+			}
+			all: {
+				/**
+				 * 全​部
+				 */
+				tabName: string
+				/**
+				 * 输​入​关​键​词​，​跨​ ​L​u​c​i​d​e​、​我​的​ ​S​V​G​ ​与​已​安​装​图​标​包​一​起​搜​索​。
+				 */
+				prompt: string
+				/**
+				 * 跨​来​源​搜​索​结​果​按​来​源​分​组​；​点​击​图​标​可​复​制​名​称​。
+				 */
+				hint: string
+				/**
+				 * 查​看​全​部​ ​{​c​o​u​n​t​}​ ​个​ ​→
+				 * @param {number} count
+				 */
+				showAll: RequiredParams<'count'>
+			}
 			empty: {
 				/**
 				 * 没​有​匹​配​「​{​q​u​e​r​y​}​」​的​图​标
@@ -1500,6 +1577,82 @@ export type TranslationFunctions = {
 			 * 搜索图标...
 			 */
 			searchPlaceholder: () => LocalizedString
+			/**
+			 * 按 / 聚焦搜索，Esc 清空
+			 */
+			searchHint: () => LocalizedString
+			density: {
+				/**
+				 * 网格密度
+				 */
+				label: () => LocalizedString
+				/**
+				 * 紧凑
+				 */
+				compact: () => LocalizedString
+				/**
+				 * 标准
+				 */
+				normal: () => LocalizedString
+				/**
+				 * 大
+				 */
+				large: () => LocalizedString
+			}
+			favorites: {
+				/**
+				 * 收藏
+				 */
+				section: () => LocalizedString
+				/**
+				 * 点图标右上角的 ★ 或右键管理收藏
+				 */
+				hint: () => LocalizedString
+			}
+			card: {
+				/**
+				 * 点击复制图标名称
+				 */
+				copyNameTooltip: () => LocalizedString
+				/**
+				 * 复制名称
+				 */
+				copyName: () => LocalizedString
+				/**
+				 * 复制完整 ID
+				 */
+				copyFullId: () => LocalizedString
+				/**
+				 * 复制图标名称失败
+				 */
+				copyNameFailed: () => LocalizedString
+				/**
+				 * 复制 SVG 代码失败
+				 */
+				copySvgCodeFailed: () => LocalizedString
+				/**
+				 * 已复制
+				 */
+				copied: () => LocalizedString
+			}
+			all: {
+				/**
+				 * 全部
+				 */
+				tabName: () => LocalizedString
+				/**
+				 * 输入关键词，跨 Lucide、我的 SVG 与已安装图标包一起搜索。
+				 */
+				prompt: () => LocalizedString
+				/**
+				 * 跨来源搜索结果按来源分组；点击图标可复制名称。
+				 */
+				hint: () => LocalizedString
+				/**
+				 * 查看全部 {count} 个 →
+				 */
+				showAll: (arg: { count: number }) => LocalizedString
+			}
 			empty: {
 				/**
 				 * 没有匹配「{query}」的图标

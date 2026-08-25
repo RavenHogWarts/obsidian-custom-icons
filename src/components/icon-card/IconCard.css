@@ -83,7 +83,23 @@
 	border-radius: var(--radius-s);
 }
 
-.ci-lib-icon__card:hover .ci-lib-icon__card-actions {
+/*
+ * 浮层可达性：hover 之外补 focus-within（键盘）与 coarse pointer（触屏），
+ * 否则键盘与触屏用户完全够不到这些按钮。已收藏的星标常显，
+ * 让「哪些是收藏」不必逐个 hover 才看得出来。
+ */
+.ci-lib-icon__card:hover .ci-lib-icon__card-actions,
+.ci-lib-icon__card:focus-within .ci-lib-icon__card-actions {
+	opacity: 1;
+}
+
+@media (pointer: coarse) {
+	.ci-lib-icon__card-actions {
+		opacity: 1;
+	}
+}
+
+.ci-lib-icon__card-actions:has(.ci-lib-icon__card-star.is-on) {
 	opacity: 1;
 }
 
@@ -123,4 +139,57 @@
 .ci-lib-icon__card-custom:hover {
 	background-color: var(--interactive-accent);
 	border-color: var(--interactive-accent);
+}
+
+/* 收藏星标：已收藏为实心黄星 */
+.ci-lib-icon__card-star.is-on {
+	color: var(--color-yellow);
+
+	svg {
+		fill: currentColor;
+	}
+}
+
+.ci-lib-icon__card-star:hover {
+	background-color: var(--background-modifier-hover);
+	color: var(--color-yellow);
+}
+
+/* 键盘可达：图标区现在是可聚焦的 role="button" */
+.ci-lib-icon__card-icon:focus-visible {
+	outline: none;
+	box-shadow: 0 0 0 2px var(--background-modifier-border-focus);
+	border-radius: var(--radius-s);
+}
+
+/* 「已复制」微反馈：卡片压一层强调色，中间打勾，1s 后自动消失 */
+.ci-lib-icon__card.is-copied {
+	border-color: var(--interactive-accent);
+}
+
+.ci-lib-icon__card-copied {
+	position: absolute;
+	inset: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border-radius: var(--radius-m);
+	background-color: var(--background-modifier-hover);
+	color: var(--interactive-accent);
+	pointer-events: none;
+	animation: ci-card-copied-in 0.12s ease;
+
+	svg {
+		width: 1.5rem;
+		height: 1.5rem;
+	}
+}
+
+@keyframes ci-card-copied-in {
+	from {
+		opacity: 0;
+	}
+	to {
+		opacity: 1;
+	}
 }

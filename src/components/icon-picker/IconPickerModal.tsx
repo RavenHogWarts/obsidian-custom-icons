@@ -10,8 +10,10 @@ import {
 	pushRecent,
 	toggleFavorite,
 } from "@src/util/iconRef";
+import { buildIconExistence } from "@src/util/iconExists";
 import { rankIcons } from "@src/util/iconSearch";
 import { buildIconSources } from "@src/util/iconSources";
+import { hasLucideIcon } from "@src/util/getLucideIcons";
 import setIcon from "@src/util/setIcon";
 import { Ban, Star } from "lucide-react";
 import { Platform } from "obsidian";
@@ -192,14 +194,32 @@ const IconPickerView: React.FC<IconPickerViewProps> = ({
 	// Lucide / 我的 SVG / 各图标包：每次打开构建一次
 	const staticSegments = useMemo(() => buildStaticSegments(plugin), [plugin]);
 
+	/**
+	 * 收藏 / 最近里的键可能已经指不到任何图标（图标被删、被改名，或所属包被
+	 * 卸载 / 停用 / 更新），铺出来就是一格空白，还能被方向键选中并写回设置。
+	 * 这两段都先过一遍存在性判定。
+	 */
+	const exists = useMemo(
+		() =>
+			buildIconExistence({
+				lib,
+				getPack: (packId) => plugin.iconPackStore.getCachedPack(packId),
+				hasLucide: hasLucideIcon,
+			}),
+		[lib, plugin],
+	);
+
 	// 收藏段随星标切换实时变化；最近段在弹窗生命周期内固定（选中即关闭）
-	const recentRefs = useMemo(() => decodeIconRefs(lib.recent), [lib.recent]);
+	const recentRefs = useMemo(
+		() => decodeIconRefs(lib.recent).filter(exists),
+		[lib.recent, exists],
+	);
 	const segments = useMemo(
 		() => [
 			toSegment(
 				"favorites",
 				picker.segment.favorites(),
-				decodeIconRefs(favorites),
+				decodeIconRefs(favorites).filter(exists),
 				picker.emptyFavorites(),
 			),
 			toSegment(
@@ -210,7 +230,7 @@ const IconPickerView: React.FC<IconPickerViewProps> = ({
 			),
 			...staticSegments,
 		],
-		[favorites, recentRefs, staticSegments, picker],
+		[favorites, recentRefs, staticSegments, picker, exists],
 	);
 
 	/**

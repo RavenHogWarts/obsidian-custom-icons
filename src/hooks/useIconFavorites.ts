@@ -1,11 +1,13 @@
 import usePluginSettings from "@src/hooks/usePluginSettings";
 import useSettingsStore from "@src/hooks/useSettingsStore";
+import { buildIconExistence } from "@src/util/iconExists";
 import {
 	IconRef,
 	decodeIconRefs,
 	encodeIconRef,
 	toggleFavorite,
 } from "@src/util/iconRef";
+import { hasLucideIcon } from "@src/util/getLucideIcons";
 import { useCallback, useMemo } from "react";
 
 /**
@@ -16,14 +18,36 @@ import { useCallback, useMemo } from "react";
  *
  * 写入即落盘（与插件里其它设置项一致），不做延迟提交——避免在库视图里
  * 造出第二套写入路径。
+ *
+ * `refs` 已滤掉当前渲染不出来的项：图标被删、被改名，或所属包被卸载 / 停用 / 更新后，
+ * 键仍留在设置里，直接铺出来就是一格空白。滤的是**读取**而非存储，因此停用的包
+ * 重新启用后收藏会自己回来（删除路径另有清理，见 `removeIconKeys`）。
  */
 export function useIconFavorites() {
 	const store = useSettingsStore();
 	const settings = usePluginSettings(store);
-	const keys = settings.customIconLib.favorites;
+	const lib = settings.customIconLib;
+	const keys = lib.favorites;
 
-	const refs = useMemo(() => decodeIconRefs(keys), [keys]);
-	const keySet = useMemo(() => new Set(keys), [keys]);
+	const exists = useMemo(
+		() =>
+			buildIconExistence({
+				lib,
+				getPack: (packId) =>
+					store.plugin.iconPackStore.getCachedPack(packId),
+				hasLucide: hasLucideIcon,
+			}),
+		[lib, store.plugin],
+	);
+
+	const refs = useMemo(
+		() => decodeIconRefs(keys).filter(exists),
+		[keys, exists],
+	);
+	const keySet = useMemo(
+		() => new Set(refs.map(encodeIconRef)),
+		[refs],
+	);
 
 	const isFavorite = useCallback(
 		(ref: IconRef) => keySet.has(encodeIconRef(ref)),

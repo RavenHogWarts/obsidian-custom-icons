@@ -3,6 +3,8 @@ import { getLucideIconCatalog } from "@src/util/getLucideIcons";
 import { setIcon } from "obsidian";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { IconCard } from "../icon-card/IconCard";
+import { LibEmptyState } from "./LibEmptyState";
+import { LibHandoff, LibNavigate } from "./libNav";
 import { VirtualIconGrid } from "./VirtualIconGrid";
 import "./IconLib.css";
 
@@ -11,16 +13,29 @@ type LucideFilter = "all" | "builtin" | "extra";
 
 const LUCIDE_FILTERS: LucideFilter[] = ["all", "builtin", "extra"];
 
+interface LucideLibProps {
+	/** 从其它页交接过来的查询词（挂载时作为初始值） */
+	handoff?: LibHandoff;
+	/** 请求切到另一页并带上查询词 */
+	onNavigate?: LibNavigate;
+}
+
 /**
  * Lucide 只读图标页
  * 展示插件引入的 Lucide 图标（按组件去重），支持「全部 / 内置 / 差异」筛选，
  * 不支持编辑，点击图标或名称即可复制图标名称
  */
-export const LucideLib: React.FC = () => {
+export const LucideLib: React.FC<LucideLibProps> = ({
+	handoff,
+	onNavigate,
+}) => {
 	// Local State
-	const [searchQuery, setSearchQuery] = useState("");
+	const [searchQuery, setSearchQuery] = useState(handoff?.query ?? "");
 	const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
-	const [filter, setFilter] = useState<LucideFilter>("extra");
+	// 交接进来的查询要跨全部图标搜，否则默认的「差异」筛选会藏掉内置命中项
+	const [filter, setFilter] = useState<LucideFilter>(
+		handoff ? "all" : "extra",
+	);
 	const sortButtonRef = useRef<HTMLButtonElement>(null);
 
 	// 目录计算开销较大（遍历 lucide 全部导出 + Obsidian 注册表比对），仅计算一次
@@ -60,6 +75,50 @@ export const LucideLib: React.FC = () => {
 	const handleToggleSort = () => {
 		setSortOrder((prev) => (prev === "asc" ? "desc" : "asc"));
 	};
+
+	// 空态：搜索无结果给"清空 / 换页去搜"，筛选无结果给"放宽筛选"
+	const emptyState = searchQuery ? (
+		<LibEmptyState
+			title={LL.view.CustomIconLib.empty.noResults({
+				query: searchQuery,
+			})}
+			actions={[
+				{
+					label: LL.view.CustomIconLib.empty.clearSearch(),
+					onClick: () => setSearchQuery(""),
+				},
+				...(filter === "all"
+					? []
+					: [
+							{
+								label: LL.view.CustomIconLib.lucide.showAll(),
+								onClick: () => setFilter("all"),
+							},
+						]),
+				...(onNavigate
+					? [
+							{
+								label: LL.view.CustomIconLib.empty.searchInSvg({
+									query: searchQuery,
+								}),
+								onClick: () => onNavigate("svg", searchQuery),
+							},
+						]
+					: []),
+			]}
+		/>
+	) : (
+		<LibEmptyState
+			title={LL.view.CustomIconLib.lucide.emptyFilter()}
+			actions={[
+				{
+					label: LL.view.CustomIconLib.lucide.showAll(),
+					onClick: () => setFilter("all"),
+					cta: true,
+				},
+			]}
+		/>
+	);
 
 	return (
 		<div className="ci-lib-container">
@@ -118,6 +177,7 @@ export const LucideLib: React.FC = () => {
 				minColumnWidth={92}
 				estimateRowHeight={88}
 				className="ci-vgrid--compact"
+				emptyState={emptyState}
 			/>
 		</div>
 	);

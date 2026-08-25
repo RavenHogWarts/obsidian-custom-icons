@@ -374,7 +374,7 @@ type RootTranslation = {
 				 */
 				name: string
 				/**
-				 * 为​每​种​书​签​类​型​设​置​默​认​图​标​，​作​用​于​该​类​型​的​全​部​书​签​；​文​件​ ​/​ ​文​件​夹​ ​/​ ​网​址​类​型​还​可​在​书​签​上​右​键​单​独​覆​盖​。
+				 * 为​每​种​书​签​类​型​设​置​默​认​图​标​，​作​用​于​该​类​型​的​全​部​书​签​；​任​意​书​签​还​可​右​键​单​独​覆​盖​。
 				 */
 				desc: string
 				/**
@@ -412,7 +412,7 @@ type RootTranslation = {
 				 */
 				name: string
 				/**
-				 * 在​书​签​面​板​中​右​键​书​签​「​设​置​图​标​」​可​单​独​指​定​（​文​件​ ​/​ ​文​件​夹​ ​/​ ​网​址​类​型​）​；​此​处​列​出​已​配​置​项​。
+				 * 在​书​签​面​板​中​右​键​任​意​书​签​「​设​置​图​标​」​可​单​独​指​定​（​六​种​类​型​均​支​持​）​；​此​处​列​出​已​配​置​项​。
 				 */
 				desc: string
 				/**
@@ -496,6 +496,27 @@ type RootTranslation = {
 			 * 搜​索​图​标​.​.​.
 			 */
 			searchPlaceholder: string
+			empty: {
+				/**
+				 * 没​有​匹​配​「​{​q​u​e​r​y​}​」​的​图​标
+				 * @param {string} query
+				 */
+				noResults: RequiredParams<'query'>
+				/**
+				 * 清​空​搜​索
+				 */
+				clearSearch: string
+				/**
+				 * 在​ ​L​u​c​i​d​e​ ​中​搜​索​「​{​q​u​e​r​y​}​」
+				 * @param {string} query
+				 */
+				searchInLucide: RequiredParams<'query'>
+				/**
+				 * 在​我​的​ ​S​V​G​ ​中​搜​索​「​{​q​u​e​r​y​}​」
+				 * @param {string} query
+				 */
+				searchInSvg: RequiredParams<'query'>
+			}
 			svg: {
 				/**
 				 * S​V​G​（​实​验​性​）
@@ -505,6 +526,18 @@ type RootTranslation = {
 				 * 复​制​ ​S​V​G​ ​代​码
 				 */
 				copyAction: string
+				/**
+				 * 还​没​有​自​定​义​图​标
+				 */
+				emptyTitle: string
+				/**
+				 * 粘​贴​ ​S​V​G​ ​源​码​或​上​传​ ​.​s​v​g​ ​文​件​即​可​添​加​，​添​加​后​可​在​插​件​各​处​使​用​。
+				 */
+				emptyDesc: string
+				/**
+				 * 添​加​图​标
+				 */
+				emptyAction: string
 				modal: {
 					/**
 					 * 粘​贴​源​码
@@ -535,6 +568,90 @@ type RootTranslation = {
 					 * @param {number} count
 					 */
 					selectedFiles: RequiredParams<'count'>
+					/**
+					 * 正​在​读​取​文​件​…
+					 */
+					reading: string
+					/**
+					 * 预​览
+					 */
+					previewTitle: string
+					/**
+					 * 请​填​写​图​标​ ​I​D
+					 */
+					idRequired: string
+					/**
+					 * 请​填​写​ ​S​V​G​ ​内​容
+					 */
+					contentRequired: string
+					/**
+					 * 请​至​少​选​择​一​个​ ​S​V​G​ ​文​件
+					 */
+					filesRequired: string
+					/**
+					 * 不​是​合​法​的​ ​S​V​G​（​根​元​素​必​须​是​ ​<​s​v​g​>​）
+					 */
+					invalidSvg: string
+					/**
+					 * 已​存​在​同​名​图​标​「​{​i​d​}​」
+					 * @param {string} id
+					 */
+					duplicateId: RequiredParams<'id'>
+					/**
+					 * 原​图​标​已​不​存​在​（​可​能​已​在​其​它​窗​口​被​删​除​）
+					 */
+					targetMissing: string
+					/**
+					 * 重​名​处​理
+					 */
+					conflictLabel: string
+					/**
+					 * 跳​过
+					 */
+					conflictSkip: string
+					/**
+					 * 重​命​名
+					 */
+					conflictRename: string
+					/**
+					 * 覆​盖
+					 */
+					conflictOverwrite: string
+					/**
+					 * 全​部​图​标​都​与​已​有​图​标​重​名​，​没​有​可​添​加​的​内​容
+					 */
+					allDuplicate: string
+					/**
+					 * 没​有​可​解​析​为​合​法​ ​S​V​G​ ​的​文​件
+					 */
+					allInvalid: string
+					/**
+					 * 已​添​加​ ​{​c​o​u​n​t​}​ ​个
+					 * @param {number} count
+					 */
+					resultAdded: RequiredParams<'count'>
+					/**
+					 * 已​覆​盖​ ​{​c​o​u​n​t​}​ ​个
+					 * @param {number} count
+					 */
+					resultOverwritten: RequiredParams<'count'>
+					/**
+					 * 已​跳​过​ ​{​c​o​u​n​t​}​ ​个​重​名
+					 * @param {number} count
+					 */
+					resultSkipped: RequiredParams<'count'>
+					/**
+					 * 可​添​加
+					 */
+					fileOk: string
+					/**
+					 * 重​名
+					 */
+					fileDuplicate: string
+					/**
+					 * 无​法​解​析
+					 */
+					fileInvalid: string
 				}
 			}
 			pack: {
@@ -611,6 +728,22 @@ type RootTranslation = {
 					 * 从​ ​n​p​m​ ​C​D​N​ ​抓​取​包​内​散​装​ ​S​V​G​ ​文​件​；​支​持​ ​*​、​*​*​ ​与​逗​号​分​组​多​选​一​语​法​。
 					 */
 					hint: string
+					/**
+					 * 包​ ​I​D​ ​需​以​小​写​字​母​开​头​，​仅​含​小​写​字​母​、​数​字​与​连​字​符
+					 */
+					packIdInvalid: string
+					/**
+					 * 该​包​ ​I​D​ ​为​保​留​字​，​请​换​一​个
+					 */
+					packIdReserved: string
+					/**
+					 * 请​填​写​ ​n​p​m​ ​包​名
+					 */
+					packageRequired: string
+					/**
+					 * 请​填​写​ ​S​V​G​ ​路​径​ ​g​l​o​b
+					 */
+					globRequired: string
 				}
 				/**
 				 * 将​删​除​ ​{​c​o​u​n​t​}​ ​个​图​标​（​本​地​文​件​与​设​置​清​单​）​，​已​使​用​该​图​标​的​界​面​将​回​退​为​空​白​。
@@ -704,6 +837,10 @@ type RootTranslation = {
 				 */
 				detailHint: string
 				/**
+				 * 正​在​读​取​图​标​库​…
+				 */
+				detailLoading: string
+				/**
 				 * 预​览
 				 */
 				previewTitle: string
@@ -736,6 +873,14 @@ type RootTranslation = {
 				 * @param {number} count
 				 */
 				count: RequiredParams<'count'>
+				/**
+				 * 当​前​筛​选​下​没​有​图​标
+				 */
+				emptyFilter: string
+				/**
+				 * 显​示​全​部
+				 */
+				showAll: string
 				descHints: {
 					/**
 					 * 插​件​内​置​的​全​部​ ​L​u​c​i​d​e​ ​图​标​（​已​去​重​）​，​点​击​图​标​可​复​制​名​称​。
@@ -1132,7 +1277,7 @@ export type TranslationFunctions = {
 				 */
 				name: () => LocalizedString
 				/**
-				 * 为每种书签类型设置默认图标，作用于该类型的全部书签；文件 / 文件夹 / 网址类型还可在书签上右键单独覆盖。
+				 * 为每种书签类型设置默认图标，作用于该类型的全部书签；任意书签还可右键单独覆盖。
 				 */
 				desc: () => LocalizedString
 				/**
@@ -1170,7 +1315,7 @@ export type TranslationFunctions = {
 				 */
 				name: () => LocalizedString
 				/**
-				 * 在书签面板中右键书签「设置图标」可单独指定（文件 / 文件夹 / 网址类型）；此处列出已配置项。
+				 * 在书签面板中右键任意书签「设置图标」可单独指定（六种类型均支持）；此处列出已配置项。
 				 */
 				desc: () => LocalizedString
 				/**
@@ -1254,6 +1399,24 @@ export type TranslationFunctions = {
 			 * 搜索图标...
 			 */
 			searchPlaceholder: () => LocalizedString
+			empty: {
+				/**
+				 * 没有匹配「{query}」的图标
+				 */
+				noResults: (arg: { query: string }) => LocalizedString
+				/**
+				 * 清空搜索
+				 */
+				clearSearch: () => LocalizedString
+				/**
+				 * 在 Lucide 中搜索「{query}」
+				 */
+				searchInLucide: (arg: { query: string }) => LocalizedString
+				/**
+				 * 在我的 SVG 中搜索「{query}」
+				 */
+				searchInSvg: (arg: { query: string }) => LocalizedString
+			}
 			svg: {
 				/**
 				 * SVG（实验性）
@@ -1263,6 +1426,18 @@ export type TranslationFunctions = {
 				 * 复制 SVG 代码
 				 */
 				copyAction: () => LocalizedString
+				/**
+				 * 还没有自定义图标
+				 */
+				emptyTitle: () => LocalizedString
+				/**
+				 * 粘贴 SVG 源码或上传 .svg 文件即可添加，添加后可在插件各处使用。
+				 */
+				emptyDesc: () => LocalizedString
+				/**
+				 * 添加图标
+				 */
+				emptyAction: () => LocalizedString
 				modal: {
 					/**
 					 * 粘贴源码
@@ -1292,6 +1467,86 @@ export type TranslationFunctions = {
 					 * 已选择 {count} 个文件
 					 */
 					selectedFiles: (arg: { count: number }) => LocalizedString
+					/**
+					 * 正在读取文件…
+					 */
+					reading: () => LocalizedString
+					/**
+					 * 预览
+					 */
+					previewTitle: () => LocalizedString
+					/**
+					 * 请填写图标 ID
+					 */
+					idRequired: () => LocalizedString
+					/**
+					 * 请填写 SVG 内容
+					 */
+					contentRequired: () => LocalizedString
+					/**
+					 * 请至少选择一个 SVG 文件
+					 */
+					filesRequired: () => LocalizedString
+					/**
+					 * 不是合法的 SVG（根元素必须是 <svg>）
+					 */
+					invalidSvg: () => LocalizedString
+					/**
+					 * 已存在同名图标「{id}」
+					 */
+					duplicateId: (arg: { id: string }) => LocalizedString
+					/**
+					 * 原图标已不存在（可能已在其它窗口被删除）
+					 */
+					targetMissing: () => LocalizedString
+					/**
+					 * 重名处理
+					 */
+					conflictLabel: () => LocalizedString
+					/**
+					 * 跳过
+					 */
+					conflictSkip: () => LocalizedString
+					/**
+					 * 重命名
+					 */
+					conflictRename: () => LocalizedString
+					/**
+					 * 覆盖
+					 */
+					conflictOverwrite: () => LocalizedString
+					/**
+					 * 全部图标都与已有图标重名，没有可添加的内容
+					 */
+					allDuplicate: () => LocalizedString
+					/**
+					 * 没有可解析为合法 SVG 的文件
+					 */
+					allInvalid: () => LocalizedString
+					/**
+					 * 已添加 {count} 个
+					 */
+					resultAdded: (arg: { count: number }) => LocalizedString
+					/**
+					 * 已覆盖 {count} 个
+					 */
+					resultOverwritten: (arg: { count: number }) => LocalizedString
+					/**
+					 * 已跳过 {count} 个重名
+					 */
+					resultSkipped: (arg: { count: number }) => LocalizedString
+					/**
+					 * 可添加
+					 */
+					fileOk: () => LocalizedString
+					/**
+					 * 重名
+					 */
+					fileDuplicate: () => LocalizedString
+					/**
+					 * 无法解析
+					 */
+					fileInvalid: () => LocalizedString
 				}
 			}
 			pack: {
@@ -1364,6 +1619,22 @@ export type TranslationFunctions = {
 					 * 从 npm CDN 抓取包内散装 SVG 文件；支持 *、** 与逗号分组多选一语法。
 					 */
 					hint: () => LocalizedString
+					/**
+					 * 包 ID 需以小写字母开头，仅含小写字母、数字与连字符
+					 */
+					packIdInvalid: () => LocalizedString
+					/**
+					 * 该包 ID 为保留字，请换一个
+					 */
+					packIdReserved: () => LocalizedString
+					/**
+					 * 请填写 npm 包名
+					 */
+					packageRequired: () => LocalizedString
+					/**
+					 * 请填写 SVG 路径 glob
+					 */
+					globRequired: () => LocalizedString
 				}
 				/**
 				 * 将删除 {count} 个图标（本地文件与设置清单），已使用该图标的界面将回退为空白。
@@ -1454,6 +1725,10 @@ export type TranslationFunctions = {
 				 */
 				detailHint: () => LocalizedString
 				/**
+				 * 正在读取图标库…
+				 */
+				detailLoading: () => LocalizedString
+				/**
 				 * 预览
 				 */
 				previewTitle: () => LocalizedString
@@ -1483,6 +1758,14 @@ export type TranslationFunctions = {
 				 * 共 {count} 个图标
 				 */
 				count: (arg: { count: number }) => LocalizedString
+				/**
+				 * 当前筛选下没有图标
+				 */
+				emptyFilter: () => LocalizedString
+				/**
+				 * 显示全部
+				 */
+				showAll: () => LocalizedString
 				descHints: {
 					/**
 					 * 插件内置的全部 Lucide 图标（已去重），点击图标可复制名称。

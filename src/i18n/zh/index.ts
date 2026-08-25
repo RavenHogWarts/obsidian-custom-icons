@@ -172,9 +172,19 @@ const zh = {
 			reapplyCommand: "重新应用所有图标",
 			reapplyNotice: "已重新应用所有自定义图标",
 			searchPlaceholder: "搜索图标...",
+			empty: {
+				noResults: "没有匹配「{query:string}」的图标",
+				clearSearch: "清空搜索",
+				searchInLucide: "在 Lucide 中搜索「{query:string}」",
+				searchInSvg: "在我的 SVG 中搜索「{query:string}」",
+			},
 			svg: {
 				tabName: "SVG（实验性）",
 				copyAction: "复制 SVG 代码",
+				emptyTitle: "还没有自定义图标",
+				emptyDesc:
+					"粘贴 SVG 源码或上传 .svg 文件即可添加，添加后可在插件各处使用。",
+				emptyAction: "添加图标",
 				modal: {
 					pasteMode: "粘贴源码",
 					uploadMode: "上传文件",
@@ -184,6 +194,26 @@ const zh = {
 					selectFilesDesc:
 						"可以选择多个 SVG 文件进行批量添加，将使用文件名作为图标 ID。",
 					selectedFiles: "已选择 {count:number} 个文件",
+					reading: "正在读取文件…",
+					previewTitle: "预览",
+					idRequired: "请填写图标 ID",
+					contentRequired: "请填写 SVG 内容",
+					filesRequired: "请至少选择一个 SVG 文件",
+					invalidSvg: "不是合法的 SVG（根元素必须是 <svg>）",
+					duplicateId: "已存在同名图标「{id:string}」",
+					targetMissing: "原图标已不存在（可能已在其它窗口被删除）",
+					conflictLabel: "重名处理",
+					conflictSkip: "跳过",
+					conflictRename: "重命名",
+					conflictOverwrite: "覆盖",
+					allDuplicate: "全部图标都与已有图标重名，没有可添加的内容",
+					allInvalid: "没有可解析为合法 SVG 的文件",
+					resultAdded: "已添加 {count:number} 个",
+					resultOverwritten: "已覆盖 {count:number} 个",
+					resultSkipped: "已跳过 {count:number} 个重名",
+					fileOk: "可添加",
+					fileDuplicate: "重名",
+					fileInvalid: "无法解析",
 				},
 			},
 			pack: {
@@ -207,6 +237,11 @@ const zh = {
 					globPlaceholder: "SVG 路径 glob（如 icons/outline/*.svg）",
 					versionPlaceholder: "版本（可选，默认最新）",
 					hint: "从 npm CDN 抓取包内散装 SVG 文件；支持 *、** 与逗号分组多选一语法。",
+					packIdInvalid:
+						"包 ID 需以小写字母开头，仅含小写字母、数字与连字符",
+					packIdReserved: "该包 ID 为保留字，请换一个",
+					packageRequired: "请填写 npm 包名",
+					globRequired: "请填写 SVG 路径 glob",
 				},
 				uninstallHint:
 					"将删除 {count:number} 个图标（本地文件与设置清单），已使用该图标的界面将回退为空白。",
@@ -232,6 +267,7 @@ const zh = {
 				alreadyInstalled: "已安装",
 				backTooltip: "返回",
 				detailHint: "只读展示。点击图标可复制完整 ID（CI- 前缀）。",
+				detailLoading: "正在读取图标库…",
 				previewTitle: "预览",
 				previewLoading: "正在加载预览…",
 				previewEmpty: "暂无预览样例",
@@ -241,6 +277,8 @@ const zh = {
 			lucide: {
 				tabName: "Lucide",
 				count: "共 {count:number} 个图标",
+				emptyFilter: "当前筛选下没有图标",
+				showAll: "显示全部",
 				descHints: {
 					all: "插件内置的全部 Lucide 图标（已去重），点击图标可复制名称。",
 					builtin:

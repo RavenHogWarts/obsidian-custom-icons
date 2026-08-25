@@ -12,6 +12,11 @@ export interface TabItem {
 export interface TabProps {
 	items: TabItem[];
 	defaultValue?: string;
+	/**
+	 * 受控当前页。传入时由外部管理页签切换（程序化切页不会触发 onChange，
+	 * 后者只在用户点击 trigger 时回调）。
+	 */
+	value?: string;
 	orientation?: "horizontal" | "vertical";
 	onChange?: (value: string) => void;
 	className?: string;
@@ -20,6 +25,7 @@ export interface TabProps {
 export const Tab: FC<TabProps> = ({
 	items,
 	defaultValue,
+	value,
 	orientation = "horizontal",
 	onChange,
 	className = "",
@@ -28,7 +34,10 @@ export const Tab: FC<TabProps> = ({
 
 	return (
 		<Tabs.Root
-			defaultValue={defaultTab}
+			// 受控与非受控互斥：同时传 value 和 defaultValue 会被 Radix 警告
+			{...(value === undefined
+				? { defaultValue: defaultTab }
+				: { value })}
 			className={`ci-tab ${className}`}
 			data-orientation={orientation}
 			onValueChange={onChange}

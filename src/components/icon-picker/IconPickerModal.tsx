@@ -12,6 +12,7 @@ import {
 } from "@src/util/iconRef";
 import { buildIconExistence } from "@src/util/iconExists";
 import { rankIcons } from "@src/util/iconSearch";
+import { decidePickerKey, nextSegmentIndex } from "./pickerKeys";
 import { buildIconSources } from "@src/util/iconSources";
 import { hasLucideIcon } from "@src/util/getLucideIcons";
 import setIcon from "@src/util/setIcon";
@@ -401,64 +402,67 @@ const IconPickerView: React.FC<IconPickerViewProps> = ({
 		void toggleFavRef.current(entry);
 	}, []);
 
-	const moveSegment = (delta: number) => {
-		const next =
-			(activeSegmentIndex + delta + segments.length) % segments.length;
-		setActiveSegmentId(segments[next].id);
-	};
-
 	const moveActive = (delta: number) => {
 		setActiveIndex(() =>
 			Math.min(Math.max(clampedIndex + delta, 0), visible.length - 1),
 		);
 	};
 
+	/**
+	 * 键位派发。决策全在 `decidePickerKey` / `nextSegmentIndex`（纯函数，有单测），
+	 * 这里只负责读出 DOM 状态、执行动作、决定是否 `preventDefault`。
+	 */
 	const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-		const mod = e.ctrlKey || e.metaKey;
-
-		if (e.key === "Tab") {
-			e.preventDefault();
-			moveSegment(e.shiftKey ? -1 : 1);
-			return;
-		}
-		if (mod && e.key === "Backspace") {
-			e.preventDefault();
-			emitChange("", type);
-			return;
-		}
-		if (e.key === "Enter") {
-			e.preventDefault();
-			if (mod) {
-				void toggleFavRef.current(activeEntry);
-			} else {
-				void chooseRef.current(activeEntry);
-			}
-			return;
-		}
-
-		// 上下键单行输入框用不到，直接接管；左右键要先让给光标移动，
-		// 只有光标已经贴到相应一端时才用于网格走位
 		const el = e.currentTarget;
-		const caretAtStart =
-			el.selectionStart === 0 && el.selectionEnd === 0;
-		const caretAtEnd =
-			el.selectionStart === el.value.length &&
-			el.selectionEnd === el.value.length;
+		const action = decidePickerKey({
+			key: e.key,
+			shiftKey: e.shiftKey,
+			mod: e.ctrlKey || e.metaKey,
+			// React 的合成事件不透出 isComposing，从原生事件读
+			composing: e.nativeEvent.isComposing,
+			caretAtStart: el.selectionStart === 0 && el.selectionEnd === 0,
+			caretAtEnd:
+				el.selectionStart === el.value.length &&
+				el.selectionEnd === el.value.length,
+			columns,
+		});
 
-		let delta = 0;
-		if (e.key === "ArrowDown") {
-			delta = columns;
-		} else if (e.key === "ArrowUp") {
-			delta = -columns;
-		} else if (e.key === "ArrowRight" && caretAtEnd) {
-			delta = 1;
-		} else if (e.key === "ArrowLeft" && caretAtStart) {
-			delta = -1;
-		}
-
-		if (delta !== 0) {
-			e.preventDefault();
-			moveActive(delta);
+		switch (action.kind) {
+			case "segment": {
+				// Tab 一律接管（含无处可去时）：分段行回绕，焦点始终留在搜索框。
+				// 底栏功能因此不靠 Tab 到达，各有键位（Mod+Backspace / Esc）
+				e.preventDefault();
+				// 有查询词时跳过 0 命中的分组：装了几个包时，挨个 Tab 过去
+				// 全是空分组很折磨。无查询时空分组要留着——空态文案本身是引导
+				const next = nextSegmentIndex(
+					totals,
+					activeSegmentIndex,
+					action.delta,
+					deferredQuery.trim() !== "",
+				);
+				if (next !== null) {
+					setActiveSegmentId(segments[next].id);
+				}
+				return;
+			}
+			case "move":
+				e.preventDefault();
+				moveActive(action.delta);
+				return;
+			case "select":
+				e.preventDefault();
+				void chooseRef.current(activeEntry);
+				return;
+			case "favorite":
+				e.preventDefault();
+				void toggleFavRef.current(activeEntry);
+				return;
+			case "clear":
+				e.preventDefault();
+				emitChange("", type);
+				return;
+			case "none":
+				return;
 		}
 	};
 
@@ -512,6 +516,19 @@ const IconPickerView: React.FC<IconPickerViewProps> = ({
 								? picker.matchCount({ count: totals[index] })
 								: seg.label
 						}
+						// 焦点常驻搜索框（combobox 模式）：分段不进 Tab 序，
+						// 换段走 Tab / Shift+Tab，与网格 tile 的星标同一约定
+						tabIndex={-1}
+						/*
+						 * 点分段不夺走焦点。
+						 *
+						 * 否则焦点落到这个按钮上，而 Tab / 方向键只挂在搜索框的
+						 * keydown 上：此后按 Tab 只是原生焦点遍历（焦点环挪了，
+						 * is-active 留在原处），方向键也不再走位——必须先点回
+						 * 输入框才能恢复。preventDefault 掉 mousedown 的默认聚焦
+						 * 行为，点击照常触发 onClick，焦点不动。
+						 */
+						onMouseDown={(e) => e.preventDefault()}
 						onClick={() => setActiveSegmentId(seg.id)}
 					>
 						<span className="ci-picker__segment-label">

@@ -12,7 +12,7 @@ export function cleanSvg(svgContent: string): string {
 }
 
 /**
- * 在已占用集合中为 base 找一个未占用的 id：`base-2`、`base-3`…
+ * 在已占用集合中为 base 找一个未占用的 id：`base-1`、`base-2`…
  *
  * 用于导入图标时的「重命名」冲突策略。调用方负责把返回值加入 taken，
  * 以便同一批次内的多次调用不会撞名。
@@ -21,7 +21,7 @@ export function uniqueIconId(base: string, taken: Set<string>): string {
 	if (!taken.has(base)) {
 		return base;
 	}
-	let suffix = 2;
+	let suffix = 1;
 	while (taken.has(`${base}-${suffix}`)) {
 		suffix++;
 	}

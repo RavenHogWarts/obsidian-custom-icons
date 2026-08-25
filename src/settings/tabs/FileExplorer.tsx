@@ -60,7 +60,6 @@ export const FileExplorer: FC = () => {
 						}}
 					/>
 					<IconPicker
-						app={settingsStore.app}
 						value={override.icon ?? ""}
 						type={override.type ?? "lucide"}
 						color={override.color}
@@ -118,7 +117,6 @@ export const FileExplorer: FC = () => {
 							}}
 						/>
 						<IconPicker
-							app={settingsStore.app}
 							value={icon.icon}
 							type={icon.type}
 							color={icon.color}
@@ -248,7 +246,6 @@ export const FileExplorer: FC = () => {
 								onChange={(value) => setNewExt(value)}
 							/>
 							<IconPicker
-								app={settingsStore.app}
 								value={newExtIcon}
 								type={newExtType}
 								onChange={(value, type) => {

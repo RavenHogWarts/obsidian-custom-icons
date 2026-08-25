@@ -1,8 +1,7 @@
-import { IconSelector } from "@src/components/icon-picker/IconSelector";
+import { IconPickerModal } from "@src/components/icon-picker/IconPickerModal";
 import { LL } from "@src/i18n/i18n";
 import type CIPlugin from "@src/main";
-import { IIcon, IconType, ITabHeaderIconOverride } from "@src/types/types";
-import { getLucideIconNames } from "@src/util/getLucideIcons";
+import { IIcon, ITabHeaderIconOverride } from "@src/types/types";
 import { AbstractIconHandler } from "@src/util/IconHandler";
 import setIcon, { cleanupIcon } from "@src/util/setIcon";
 import { buildTabKey, resolveTabIcon } from "@src/util/tabHeaderIcon";
@@ -348,32 +347,25 @@ export default class TabHeaderIconHandler extends AbstractIconHandler<ITabHeader
 	private openIconPickerFor(tabKey: string, sourceEl?: HTMLElement): void {
 		const current = this.settings?.tabs?.[tabKey];
 		// sourceEl（leaf.tabHeaderEl）的 ownerDocument 保证 popout 下弹窗挂对窗口
-		const modal = new IconSelector(
-			this.app,
-			this.buildIconItems(),
-			current?.type ?? "lucide",
-			current?.color,
-			(icon, type) =>
-				void this.writeOverride(tabKey, {
-					id: tabKey,
-					icon,
-					type,
-					color: current?.color ?? "",
-				}),
-			sourceEl,
-		);
-		modal.open();
-	}
-
-	private buildIconItems(): Record<IconType, string[]> {
-		const lib = this.plugin.settings.customIconLib;
-		return {
-			lucide: getLucideIconNames(),
-			svg: [
-				...lib.svg.map((icon) => icon.id),
-				...this.plugin.iconPackStore.getEnabledIconIds(lib.packs),
-			],
-		};
+		new IconPickerModal(
+			this.plugin,
+			{
+				value: current?.icon ?? "",
+				type: current?.type ?? "lucide",
+				color: current?.color,
+				// 右键入口没有独立的颜色控件，弹窗内直接提供
+				colorEditable: true,
+				onChange: (icon, type, color) =>
+					void this.writeOverride(tabKey, {
+						id: tabKey,
+						icon,
+						type,
+						// color 为 undefined 表示未改动，保留原值
+						color: color ?? current?.color ?? "",
+					}),
+			},
+			{ sourceEl },
+		).open();
 	}
 
 	// ---------------------------------------------------------------------

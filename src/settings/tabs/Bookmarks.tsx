@@ -99,7 +99,6 @@ export const Bookmarks: FC = () => {
 						}}
 					/>
 					<IconPicker
-						app={settingsStore.app}
 						value={override.icon ?? ""}
 						type={override.type ?? "lucide"}
 						color={override.color}

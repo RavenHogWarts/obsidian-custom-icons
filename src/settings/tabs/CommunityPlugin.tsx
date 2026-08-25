@@ -216,7 +216,6 @@ export const CommunityPlugin: FC = () => {
 								}}
 							/>
 							<IconPicker
-								app={settingsStore.app}
 								value={defaultIcon.icon}
 								type={defaultIcon.type}
 								color={defaultIcon.color}
@@ -359,7 +358,6 @@ export const CommunityPlugin: FC = () => {
 										}}
 									/>
 									<IconPicker
-										app={settingsStore.app}
 										value={effectivePluginIcon.icon}
 										type={effectivePluginIcon.type}
 										color={effectivePluginIcon.color}

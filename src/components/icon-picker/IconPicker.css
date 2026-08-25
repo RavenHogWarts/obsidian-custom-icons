@@ -140,7 +140,13 @@
 	}
 }
 
-/* 星标：hover / 高亮时才浮现，避免整片网格布满小星星 */
+/*
+ * 收藏星标：字形右上角的小徽标，hover / 高亮时才浮现，
+ * 避免整片网格布满小星星。
+ *
+ * 这个按钮不套 `clickable-icon`：它有自己的尺寸（11px 字形、2px 内边距）与
+ * 底色，套上去反而要和 Obsidian 的 padding / --icon-size 打特异性官司。
+ */
 .ci-picker__tile-star {
 	position: absolute;
 	top: -2px;

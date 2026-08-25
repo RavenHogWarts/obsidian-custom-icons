@@ -442,6 +442,7 @@ export const SvgLib: React.FC<SvgLibProps> = ({ handoff, onNavigate }) => {
 				<DensityToggle value={density} onChange={setDensity} />
 
 				<button
+					className="clickable-icon"
 					onClick={handleToggleSort}
 					aria-label={`${svgLL.sort.label()}: ${svgLL.sort[sortMode]()}`}
 					title={`${svgLL.sort.label()}: ${svgLL.sort[sortMode]()}`}
@@ -456,6 +457,7 @@ export const SvgLib: React.FC<SvgLibProps> = ({ handoff, onNavigate }) => {
 				</button>
 
 				<button
+					className="clickable-icon"
 					onClick={() => void handleExport(false)}
 					aria-label={svgLL.exportLib.tooltip()}
 					title={svgLL.exportLib.tooltip()}
@@ -463,7 +465,12 @@ export const SvgLib: React.FC<SvgLibProps> = ({ handoff, onNavigate }) => {
 					<Download className="svg-icon" />
 				</button>
 
-				<button onClick={(e) => handleOpenAddModal(e.currentTarget)}>
+				<button
+					className="clickable-icon"
+					onClick={(e) => handleOpenAddModal(e.currentTarget)}
+					aria-label={svgLL.modal.addTitle()}
+					title={svgLL.modal.addTitle()}
+				>
 					<CirclePlus className="svg-icon" />
 				</button>
 			</div>

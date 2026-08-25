@@ -552,19 +552,28 @@
 	flex: none;
 }
 
-.ci-pack__section-title {
+/*
+ * 区块标题栏（折叠触发按钮）。
+ *
+ * 选择器带 `button.` 前缀是必要的——Obsidian 的 `button.clickable-icon` 同样是
+ * 「元素 + 类」，单靠 `.ci-pack__section-title` 压不住它的 padding，
+ * 标题会被推出 4px、与下方内容左边缘对不齐。
+ */
+button.ci-pack__section-title {
 	display: flex;
 	align-items: center;
 	gap: var(--size-4-2);
 	font-size: var(--font-ui-small);
 	font-weight: var(--font-medium);
 	color: var(--text-muted);
+	/* 凸起与阴影由 .clickable-icon 去掉，这里只补版式
+	   （满宽、左对齐、方角贴住下边框，hover 底色沿用 clickable-icon 的）。
+	   justify-content 要显式写回 flex-start：clickable-icon 默认居中，
+	   眼下靠 .ci-pack__section-label 的 auto 外边距吃掉了空隙才没露馅 */
+	width: 100%;
+	justify-content: flex-start;
 	padding: 0 0 var(--size-4-1) 0;
 	border-bottom: 1px solid var(--background-modifier-border);
-	/* 作为折叠触发按钮：清除 Obsidian 默认按钮外观 */
-	width: 100%;
-	background-color: transparent;
-	box-shadow: none;
 	border-radius: 0;
 	text-align: start;
 	cursor: pointer;
@@ -572,8 +581,6 @@
 
 .ci-pack__section-title:hover {
 	color: var(--text-normal);
-	background-color: transparent;
-	box-shadow: none;
 }
 
 /* 折叠箭头：收起时指向右，展开时旋转 90° 指向下 */

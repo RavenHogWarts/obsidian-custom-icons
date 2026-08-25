@@ -12,6 +12,7 @@ import {
 	IIconPackManifest,
 	IconSourceConfig,
 } from "@src/types/types";
+import { forgetPackIcons } from "@src/util/iconRefCleanup";
 import { removeIcon } from "obsidian";
 import { packIconId } from "./types";
 
@@ -136,6 +137,8 @@ export default class IconPackService {
 		await this.plugin.settingsStore.deleteSettingByPath(
 			`customIconLib.packs.${packId}`,
 		);
+		// 收藏 / 最近里指向该包的键随之作废（停用则不清——那是可逆的）
+		await forgetPackIcons(this.plugin.settingsStore, packId);
 	}
 
 	/** 启停：更新 manifest 后由 applyAll 注册/注销 */

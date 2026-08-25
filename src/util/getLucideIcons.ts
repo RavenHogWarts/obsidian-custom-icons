@@ -87,6 +87,22 @@ export function getLucideIconNames(): string[] {
 	return (cachedIconNames = Array.from(iconSet).sort());
 }
 
+/** 名称集缓存：`hasLucideIcon` 用，随 getLucideIconNames 一次构建 */
+let cachedIconNameSet: Set<string> | null = null;
+
+/**
+ * 该 lucide 名是否可渲染。
+ *
+ * 与 `getLucideIcon` 的区别是**不打日志**：校验 recent / favorites 里的历史键时，
+ * 失效项是预期输入而非异常，走 getLucideIcon 会让每次渲染都刷一串 warning。
+ */
+export function hasLucideIcon(name: string): boolean {
+	if (!cachedIconNameSet) {
+		cachedIconNameSet = new Set(getLucideIconNames());
+	}
+	return cachedIconNameSet.has(name);
+}
+
 /**
  * 将 PascalCase 组件名称转换为 kebab-case 名称
  * 与 getLucideIconNames 的提取规则一致（如 ArrowDownAZ -> arrow-down-a-z）

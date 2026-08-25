@@ -8,6 +8,7 @@ import { LL } from "@src/i18n/i18n";
 import { ICustomSVGIcon } from "@src/types/types";
 import { cardGridMetrics } from "@src/util/iconGridDensity";
 import { IconRef } from "@src/util/iconRef";
+import { forgetIcons, renameIconInLists } from "@src/util/iconRefCleanup";
 import {
 	applySelectionClick,
 	dropFromSelection,
@@ -209,6 +210,8 @@ export const SvgLib: React.FC<SvgLibProps> = ({ handoff, onNavigate }) => {
 						"customIconLib.svg",
 						newSvgIcons,
 					);
+					// 收藏 / 最近里的键不会随图标本体消失，留着就是一格空白
+					await forgetIcons(store, [{ type: "svg", id: iconId }]);
 					// 选区里同步剔掉：否则「已选 N」会把删掉的项一直算进去，
 					// 而「导出所选」按 id 过滤时又找不到它——计数会骗人
 					setSelection((prev) =>
@@ -245,6 +248,13 @@ export const SvgLib: React.FC<SvgLibProps> = ({ handoff, onNavigate }) => {
 		};
 
 		await store.updateSettingByPath("customIconLib.svg", newSvgIcons);
+		// 改名相当于旧 id 消失、新 id 出现：把收藏 / 最近里的键原位迁过去，
+		// 否则改个名字就把收藏弄丢了
+		await renameIconInLists(
+			store,
+			{ type: "svg", id: iconId },
+			{ type: "svg", id: newIconId },
+		);
 		return true;
 	};
 
@@ -324,6 +334,10 @@ export const SvgLib: React.FC<SvgLibProps> = ({ handoff, onNavigate }) => {
 					settings.customIconLib.svg.filter(
 						(icon) => !drop.has(icon.id),
 					),
+				);
+				await forgetIcons(
+					store,
+					ids.map((id) => ({ type: "svg" as const, id })),
 				);
 				clearSelection();
 			},

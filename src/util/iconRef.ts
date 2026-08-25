@@ -68,3 +68,46 @@ export function toggleFavorite(favorites: string[], key: string): string[] {
 		? favorites.filter((item) => item !== key)
 		: [...favorites, key];
 }
+
+/**
+ * 从复合键列表中移除指定键。
+ *
+ * 用于图标删除后清理 recent / favorites——这两份列表只存键，不会随图标本体
+ * 消失而自动收缩（渲染期另有 `buildIconExistence` 兜底，这里是不让死键积累）。
+ */
+export function removeIconKeys(
+	keys: string[],
+	drop: ReadonlySet<string>,
+): string[] {
+	return keys.filter((key) => !drop.has(key));
+}
+
+/**
+ * 移除所有以 prefix 开头的键。
+ * 用于卸载图标包：其全部图标的键形如 `svg:CI-{packId}-{name}`，按前缀扫比逐个枚举划算。
+ */
+export function removeIconKeysByPrefix(
+	keys: string[],
+	prefix: string,
+): string[] {
+	return keys.filter((key) => !key.startsWith(prefix));
+}
+
+/**
+ * 把 from 键原位换成 to 键（图标改名时跟着迁移，保留它在列表里的位置）。
+ *
+ * to 已经在列表里时只移除 from——否则改成一个已收藏的名字会留下两条重复项。
+ */
+export function renameIconKey(
+	keys: string[],
+	from: string,
+	to: string,
+): string[] {
+	if (from === to || !keys.includes(from)) {
+		return keys;
+	}
+	if (keys.includes(to)) {
+		return keys.filter((key) => key !== from);
+	}
+	return keys.map((key) => (key === from ? to : key));
+}

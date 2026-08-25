@@ -1,10 +1,12 @@
 import { LL } from "@src/i18n/i18n";
 import { validateSvgContent } from "@src/service/icon-packs/sanitize";
+import { normalizeGroupName } from "@src/util/svgGroups";
 import { parseSvgLibrary } from "@src/util/svgLibrary";
 import { Upload } from "lucide-react";
 import { Notice } from "obsidian";
 import { useEffect, useMemo, useState } from "react";
 import { Tab, TabItem } from "../tab/Tab";
+import { GroupInput } from "./GroupInput";
 import { SvgGlyph } from "./SvgGlyph";
 
 /** 添加方式：粘贴源码 / 上传 .svg 文件 / 导入导出的 JSON */
@@ -21,6 +23,8 @@ export interface PendingIcon {
 	content: string;
 	/** 导入时可能自带（保留原始添加时间）；否则由写入方补当前时间 */
 	addedAt?: number;
+	/** 所属分组；空串 / 缺失 = 不分组 */
+	group?: string;
 }
 
 /** 写入结果，用于如实告知用户实际发生了什么 */
@@ -34,6 +38,8 @@ export interface AddSvgResult {
 interface AddSvgProps {
 	/** 已存在的图标 ID，用于实时重名检测 */
 	existingIds: string[];
+	/** 已存在的分组名，作为组名输入的候选 */
+	existingGroups: string[];
 	onSubmit: (
 		icons: PendingIcon[],
 		strategy: DuplicateStrategy,
@@ -51,6 +57,8 @@ interface FileEntry {
 	duplicate: boolean;
 	/** 导入时自带的原始添加时间 */
 	addedAt?: number;
+	/** 导入时自带的分组（组名框留空则沿用它） */
+	group?: string;
 }
 
 /** 把结果拼成一条人话 Notice：只列出发生了的部分 */
@@ -71,6 +79,7 @@ const describeResult = (result: AddSvgResult): string => {
 
 export const AddSvg: React.FC<AddSvgProps> = ({
 	existingIds,
+	existingGroups,
 	onSubmit,
 	onReady,
 }) => {
@@ -82,9 +91,16 @@ export const AddSvg: React.FC<AddSvgProps> = ({
 	const [dragging, setDragging] = useState(false);
 	const [strategy, setStrategy] = useState<DuplicateStrategy>("skip");
 	const [error, setError] = useState<string | null>(null);
+	/** 组名：三个模式共用一份（换页签不清空——用户填了组名再换模式不该白填） */
+	const [group, setGroup] = useState("");
 
 	const modal = LL.view.CustomIconLib.svg.modal;
+	const groupLL = LL.view.CustomIconLib.svg.group;
 	const existing = useMemo(() => new Set(existingIds), [existingIds]);
+
+	// 组名走同一套收敛（trim + 长度上限），与「移到分组」写入的值形态一致，
+	// 否则同一个组会因为一处 trim 一处没 trim 而裂成两个
+	const trimmedGroup = normalizeGroupName(group);
 
 	// ---------- 粘贴模式的实时校验 ----------
 	const trimmedId = iconId.trim();
@@ -158,6 +174,7 @@ export const AddSvg: React.FC<AddSvgProps> = ({
 						: null,
 					duplicate: existing.has(icon.id),
 					addedAt: icon.addedAt,
+					group: icon.group,
 				})),
 			);
 		} catch (e) {
@@ -218,7 +235,13 @@ export const AddSvg: React.FC<AddSvgProps> = ({
 			}
 			return report(
 				await onSubmit(
-					[{ id: trimmedId, content: trimmedContent }],
+					[
+						{
+							id: trimmedId,
+							content: trimmedContent,
+							group: trimmedGroup,
+						},
+					],
 					strategy,
 				),
 			);
@@ -247,6 +270,9 @@ export const AddSvg: React.FC<AddSvgProps> = ({
 					content: f.content as string,
 					// 导入时保留原始添加时间，让「最近添加」排序仍然可信
 					...(f.addedAt !== undefined ? { addedAt: f.addedAt } : {}),
+					// 组名框留空时沿用文件自带的组（导入 JSON 才可能有），
+					// 填了则整批统一覆盖——importHint 就是在说这条规则
+					group: trimmedGroup || f.group || "",
 				})),
 				strategy,
 			),
@@ -280,6 +306,23 @@ export const AddSvg: React.FC<AddSvgProps> = ({
 				))}
 			</div>
 		</div>
+	);
+
+	/**
+	 * 组名输入：三个模式共用同一份 state，但说明文案不同——
+	 * 导入模式下「留空」有特殊语义（沿用文件里各自的组），必须写出来。
+	 */
+	const groupField = (
+		<GroupInput
+			groups={existingGroups}
+			value={group}
+			onChange={setGroup}
+			hint={
+				activeTab === "import"
+					? groupLL.importHint()
+					: groupLL.addHint()
+			}
+		/>
 	);
 
 	const pasteTab = (
@@ -318,6 +361,7 @@ export const AddSvg: React.FC<AddSvgProps> = ({
 					/>
 				</div>
 			)}
+			{groupField}
 			{conflictPicker}
 		</div>
 	);
@@ -394,6 +438,7 @@ export const AddSvg: React.FC<AddSvgProps> = ({
 			/>
 			<span className="ci-lib__form-hint">{modal.selectFilesDesc()}</span>
 			{fileList}
+			{groupField}
 			{conflictPicker}
 		</div>
 	);
@@ -410,6 +455,7 @@ export const AddSvg: React.FC<AddSvgProps> = ({
 			/>
 			<span className="ci-lib__form-hint">{modal.importDesc()}</span>
 			{fileList}
+			{groupField}
 			{conflictPicker}
 		</div>
 	);

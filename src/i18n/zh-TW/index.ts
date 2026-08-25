@@ -244,6 +244,31 @@ const zh_TW = {
 					"name-desc": "名稱 Z→A",
 					"added-desc": "最近新增",
 				},
+				group: {
+					stripLabel: "依分組篩選",
+					all: "全部",
+					ungrouped: "未分組",
+					label: "分組",
+					placeholder: "分組名稱（留空則不分組）",
+					addHint:
+						"可選擇既有分組，也可直接輸入新名稱。留空則不歸入任何分組。",
+					importHint:
+						"留空則沿用檔案中各圖示自帶的分組；填寫則統一歸入該分組。",
+					moveSelected: "移到分組…",
+					moveAction: "移到分組…",
+					moveTitle: "移到分組",
+					moveCount: "將移動 {count:number} 個圖示。",
+					moveOutHint: "留空即把這些圖示移出分組。",
+					mergeWarning:
+						"「{group:string}」已存在，將與其中既有的圖示合併",
+					moved: "已將 {count:number} 個圖示移到「{group:string}」",
+					movedOut: "已將 {count:number} 個圖示移出分組",
+					noResultsInGroup:
+						"「{group:string}」中沒有符合「{query:string}」的圖示",
+					noResultsUngrouped:
+						"未分組的圖示中沒有符合「{query:string}」的",
+					searchAllGroups: "搜尋全部分組",
+				},
 				exportLib: {
 					tooltip: "匯出為 JSON",
 					done: "已匯出 {count:number} 個圖示到 {path:string}",

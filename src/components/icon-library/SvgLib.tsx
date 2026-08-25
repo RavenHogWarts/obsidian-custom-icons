@@ -21,6 +21,18 @@ import {
 	sortSvgIcons,
 	svgLibraryExportName,
 } from "@src/util/svgLibrary";
+import {
+	SvgGroupFilter,
+	UNGROUPED,
+	assignGroup,
+	countUngrouped,
+	encodeSvgGroupPref,
+	filterByGroup,
+	iconGroup,
+	listSvgGroups,
+	normalizeGroupName,
+	normalizeSvgGroup,
+} from "@src/util/svgGroups";
 import { uniqueIconId } from "@src/util/svgUtils";
 import {
 	ArrowDownAZ,
@@ -43,8 +55,10 @@ import {
 import { DensityToggle } from "./DensityToggle";
 import { EditSvg } from "./EditSvg";
 import { FavoriteStrip } from "./FavoriteStrip";
+import { GroupStrip } from "./GroupStrip";
 import { LibEmptyState } from "./LibEmptyState";
 import { LibHandoff, LibNavigate } from "./libNav";
+import { MoveToGroup } from "./MoveToGroup";
 import { VirtualIconGrid } from "./VirtualIconGrid";
 import "./IconLib.css";
 
@@ -68,6 +82,16 @@ export const SvgLib: React.FC<SvgLibProps> = ({ handoff, onNavigate }) => {
 		"svgSort",
 		normalizeSvgSortMode,
 	);
+	// 分组筛选：渲染读本地状态、落盘是旁路（与排序同理，避免每次切档都等 applyAll）。
+	// 落盘只区分「全部」与某个组名，「仅未分组」不落盘——见 normalizeSvgGroup 的说明
+	const [groupFilter, setGroupFilter] = useState<SvgGroupFilter>(() =>
+		normalizeSvgGroup(
+			store.plugin.settings.customIconLib.ui?.svgGroup,
+			listSvgGroups(store.plugin.settings.customIconLib.svg).map(
+				(g) => g.name,
+			),
+		),
+	);
 	const [selection, setSelection] = useState(emptySelection);
 	const selected = selection.selected;
 	const searchRef = useRef<HTMLInputElement>(null);
@@ -79,27 +103,73 @@ export const SvgLib: React.FC<SvgLibProps> = ({ handoff, onNavigate }) => {
 	const metrics = cardGridMetrics(density);
 	const svgLL = LL.view.CustomIconLib.svg;
 
-	// 本页的收藏 = 类型为 svg 且确实是用户导入的图标（排除图标包的 CI-* 项）
+	const groups = useMemo(() => listSvgGroups(svgIcons), [svgIcons]);
+	const ungroupedCount = useMemo(
+		() => countUngrouped(svgIcons),
+		[svgIcons],
+	);
+	const groupNames = useMemo(() => groups.map((g) => g.name), [groups]);
+
+	/**
+	 * 当前筛选**取用时收敛**（而不是用 effect 去纠正 state）。
+	 *
+	 * 组会随成员被删 / 移出而消失（B-1），此时存着的组名就指向了一个不存在的档——
+	 * tab 行里没有它，用户也无从点回「全部」。与选择器的 `clampedIndex` 同一手法：
+	 * 让越界的 state 在读取处失效，不额外引入一次渲染。
+	 */
+	const effectiveGroup: SvgGroupFilter =
+		groupFilter === null
+			? null
+			: groupFilter === UNGROUPED
+				? ungroupedCount > 0
+					? UNGROUPED
+					: null
+				: groupNames.includes(groupFilter)
+					? groupFilter
+					: null;
+
+	// 本页的收藏 = 类型为 svg 且确实是用户导入的图标（排除图标包的 CI-* 项），
+	// 且跟随当前分组筛选收窄——否则「只看 weather」时上方却铺着别组的收藏
 	const ownFavorites = useMemo(() => {
-		const own = new Set(existingIds);
+		const own = new Set(
+			filterByGroup(svgIcons, effectiveGroup).map((icon) => icon.id),
+		);
 		return favorites.refs.filter(
 			(ref) => ref.type === "svg" && own.has(ref.id),
 		);
-	}, [favorites.refs, existingIds]);
+	}, [favorites.refs, svgIcons, effectiveGroup]);
 
-	// Filter and Sort Icons
+	// Filter and Sort Icons：分组与搜索是「且」关系，排序在结果内生效
 	const filteredIcons = useMemo(() => {
 		const query = searchQuery.toLowerCase();
-		const matched = svgIcons.filter(
+		const matched = filterByGroup(svgIcons, effectiveGroup).filter(
 			(icon) => !query || icon.id.toLowerCase().includes(query),
 		);
 		return sortSvgIcons(matched, sortMode);
-	}, [svgIcons, searchQuery, sortMode]);
+	}, [svgIcons, effectiveGroup, searchQuery, sortMode]);
 
 	// Handlers
 	const handleToggleSort = () => {
 		setSortMode(nextSvgSortMode(sortMode));
 	};
+
+	/** 切档：先改界面，再旁路落盘（「仅未分组」落成空串 = 下次开视图回到全部） */
+	const handleGroupChange = useCallback(
+		(next: SvgGroupFilter) => {
+			setGroupFilter(next);
+			// 换筛选后选区里可能有已不可见的项，「已选 N」会开始骗人
+			setSelection(emptySelection());
+			void store
+				.updateSettingByPath(
+					"customIconLib.ui.svgGroup",
+					encodeSvgGroupPref(next),
+				)
+				.catch((error: unknown) => {
+					console.error("Failed to save svg group filter:", error);
+				});
+		},
+		[store],
+	);
 
 	/**
 	 * 多选：Ctrl/Cmd 加选单个，Shift 从锚点连选一段。
@@ -138,10 +208,20 @@ export const SvgLib: React.FC<SvgLibProps> = ({ handoff, onNavigate }) => {
 		const result: AddSvgResult = { added: 0, overwritten: 0, skipped: [] };
 		const now = Date.now();
 		// 导入自带 addedAt 时保留原值，其余补当前时间（供「最近添加」排序）
-		const stamp = (icon: PendingIcon): ICustomSVGIcon => ({
-			...icon,
-			addedAt: icon.addedAt ?? now,
-		});
+		const stamp = (icon: PendingIcon): ICustomSVGIcon => {
+			const group = normalizeGroupName(icon.group);
+			const stamped: ICustomSVGIcon = {
+				...icon,
+				addedAt: icon.addedAt ?? now,
+			};
+			// 未分组不落 group 字段：空字符串和字段缺失语义相同，留着只是噪声
+			if (group) {
+				stamped.group = group;
+			} else {
+				delete stamped.group;
+			}
+			return stamped;
+		};
 
 		for (const icon of icons) {
 			if (!taken.has(icon.id)) {
@@ -183,6 +263,7 @@ export const SvgLib: React.FC<SvgLibProps> = ({ handoff, onNavigate }) => {
 				children: (
 					<AddSvg
 						existingIds={existingIds}
+						existingGroups={groupNames}
 						onSubmit={handleSubmit}
 						onReady={(submit) => {
 							submitFn = submit;
@@ -319,6 +400,70 @@ export const SvgLib: React.FC<SvgLibProps> = ({ handoff, onNavigate }) => {
 		[settings.customIconLib.svg, svgLL],
 	);
 
+	/**
+	 * 「移到分组」：批量条与单个图标的右键菜单共用。
+	 *
+	 * 写入后不清选区——刚归好类的这批往往还要继续操作（比如接着导出），
+	 * 而且选区里的 id 不因换组而失效。
+	 */
+	const openMoveToGroup = useCallback(
+		(ids: string[], sourceEl?: HTMLElement) => {
+			if (ids.length === 0) {
+				return;
+			}
+			// 单个图标时预填它当前的组，让「改组」而非「从零填」成为默认姿态
+			const only =
+				ids.length === 1
+					? settings.customIconLib.svg.find(
+							(icon) => icon.id === ids[0],
+						)
+					: undefined;
+			const initial = only ? iconGroup(only) : "";
+			let submitFn: (() => Promise<boolean>) | null = null;
+
+			new ConfirmDialog(
+				store.plugin,
+				{
+					title: svgLL.group.moveTitle(),
+					confirmLL: LL.common.save(),
+					children: (
+						<MoveToGroup
+							groups={groupNames}
+							count={ids.length}
+							initial={initial}
+							onSubmit={async (group) => {
+								await store.updateSettingByPath(
+									"customIconLib.svg",
+									assignGroup(
+										store.plugin.settings.customIconLib.svg,
+										new Set(ids),
+										group,
+									),
+								);
+								new Notice(
+									group
+										? svgLL.group.moved({
+												count: ids.length,
+												group,
+											})
+										: svgLL.group.movedOut({
+												count: ids.length,
+											}),
+								);
+							}}
+							onReady={(submit) => {
+								submitFn = submit;
+							}}
+						/>
+					),
+					onConfirm: async () => (submitFn ? await submitFn() : false),
+				},
+				{ sourceEl },
+			).open();
+		},
+		[store, settings.customIconLib.svg, groupNames, svgLL],
+	);
+
 	const handleDeleteSelected = () => {
 		const ids = Array.from(selected);
 		if (ids.length === 0) {
@@ -375,24 +520,56 @@ export const SvgLib: React.FC<SvgLibProps> = ({ handoff, onNavigate }) => {
 	};
 
 	// 稳定的 props 引用：配合 IconCard 的 memo，避免网格重渲时全量重执行
-	const copyAction = useMemo<CustomAction[]>(
+	const cardActions = useMemo<CustomAction[]>(
 		() => [
 			{
 				icon: "code",
 				title: LL.view.CustomIconLib.svg.copyAction(),
 				onClick: (id: string) => void handleCopySvgCode(id),
 			},
+			{
+				icon: "folder-input",
+				title: svgLL.group.moveTitle(),
+				// CustomAction 只透传 id，拿不到触发元素——弹窗因此没有 sourceEl，
+				// 跨窗口挂载回落到 activeDocument（右键菜单本就开在当前窗口，够用）
+				onClick: (id: string) => openMoveToGroup([id]),
+			},
 		],
-		[handleCopySvgCode],
+		[handleCopySvgCode, openMoveToGroup, svgLL],
 	);
 
-	// 空态：搜索无结果给"清空 / 换页去搜"，空库给"添加"引导
+	// 空态：搜索无结果给"清空 / 换页去搜"，空库给"添加"引导。
+	//
+	// 只分组不搜索时不会走到这里——组是从成员反推出来的（listSvgGroups 只报非空组，
+	// 「未分组」也只在 ungroupedCount > 0 时留得住），所以可选中的档必然有内容。
+	// 真正会空的只有「组内搜不到」，此时先给一条"去全部分组里搜"的路，
+	// 因为东西大概率在别的组，让用户手动切回全部再重敲一遍搜索词是白费功夫。
 	const emptyState = searchQuery ? (
 		<LibEmptyState
-			title={LL.view.CustomIconLib.empty.noResults({
-				query: searchQuery,
-			})}
+			title={
+				effectiveGroup === null
+					? LL.view.CustomIconLib.empty.noResults({
+							query: searchQuery,
+						})
+					: effectiveGroup === UNGROUPED
+						? svgLL.group.noResultsUngrouped({
+								query: searchQuery,
+							})
+						: svgLL.group.noResultsInGroup({
+								group: effectiveGroup,
+								query: searchQuery,
+							})
+			}
 			actions={[
+				...(effectiveGroup !== null
+					? [
+							{
+								label: svgLL.group.searchAllGroups(),
+								onClick: () => handleGroupChange(null),
+								cta: true,
+							},
+						]
+					: []),
 				{
 					label: LL.view.CustomIconLib.empty.clearSearch(),
 					onClick: () => setSearchQuery(""),
@@ -495,6 +672,16 @@ export const SvgLib: React.FC<SvgLibProps> = ({ handoff, onNavigate }) => {
 					<span className="ci-lib__batch-count">
 						{svgLL.selection.count({ count: selected.size })}
 					</span>
+					<button
+						onClick={(e) =>
+							openMoveToGroup(
+								Array.from(selected),
+								e.currentTarget,
+							)
+						}
+					>
+						{svgLL.group.moveTitle()}
+					</button>
 					<button onClick={handleDeleteSelected}>
 						{svgLL.selection.deleteSelected()}
 					</button>
@@ -505,6 +692,20 @@ export const SvgLib: React.FC<SvgLibProps> = ({ handoff, onNavigate }) => {
 						{svgLL.selection.clear()}
 					</button>
 				</div>
+			)}
+
+			{/*
+			 * 分组筛选行：一个分组都没有时整行不渲染——只剩「全部」一档等于没有
+			 * 信息量，白占一行高度（方案 §4.1）
+			 */}
+			{groups.length > 0 && (
+				<GroupStrip
+					groups={groups}
+					ungroupedCount={ungroupedCount}
+					totalCount={svgIcons.length}
+					value={effectiveGroup}
+					onChange={handleGroupChange}
+				/>
 			)}
 
 			{/* 多选手势不写出来就没人知道：常驻一行淡提示 */}
@@ -523,7 +724,7 @@ export const SvgLib: React.FC<SvgLibProps> = ({ handoff, onNavigate }) => {
 					onToggleFavorite={handleToggleFavoriteRef}
 					onEdit={handleOpenEditModal}
 					onDelete={handleDeleteIcon}
-					customActions={copyAction}
+					customActions={cardActions}
 					minColumnWidth={metrics.minColumnWidth}
 				/>
 			)}
@@ -537,7 +738,7 @@ export const SvgLib: React.FC<SvgLibProps> = ({ handoff, onNavigate }) => {
 						id={icon.id}
 						onDelete={handleDeleteIcon}
 						onEdit={handleOpenEditModal}
-						customActions={copyAction}
+						customActions={cardActions}
 						favorite={favorites.isFavorite({
 							type: "svg",
 							id: icon.id,

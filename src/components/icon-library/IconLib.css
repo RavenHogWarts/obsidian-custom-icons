@@ -73,6 +73,46 @@
 	color: var(--text-normal);
 }
 
+/*
+ * 分组筛选行（「我的 SVG」页，至少存在一个分组时才渲染）。
+ *
+ * 与图标选择器的分段行同一形态、同一实现（.ci-strip + useStripAutoScroll）：
+ * 两处都是"横向一行可溢出的筛选档"，长得一样用户才不用重新学。
+ * 滚动、隐藏滚动条、淡出边缘都在 .ci-strip（见 useStripAutoScroll.css）。
+ */
+.ci-lib__gstrip {
+	flex: none;
+	gap: var(--size-4-1);
+	padding-bottom: 2px;
+}
+
+.ci-lib__gstrip-tab {
+	display: inline-flex;
+	align-items: center;
+	gap: var(--size-4-1);
+	flex: none;
+	height: auto;
+	padding: var(--size-4-1) var(--size-4-2);
+	font-size: var(--font-ui-small);
+	white-space: nowrap;
+}
+
+.ci-lib__gstrip-tab.is-active {
+	background-color: var(--interactive-accent);
+	color: var(--text-on-accent);
+	box-shadow: none;
+}
+
+.ci-lib__gstrip-count {
+	color: var(--text-faint);
+	font-size: var(--font-ui-smaller);
+}
+
+.ci-lib__gstrip-tab.is-active .ci-lib__gstrip-count {
+	color: var(--text-on-accent);
+	opacity: 0.75;
+}
+
 /* 拖放区（添加弹窗的「上传文件」页） */
 .ci-lib__dropzone {
 	display: flex;
@@ -367,6 +407,12 @@
 	align-items: center;
 	gap: var(--size-4-2);
 	flex-wrap: wrap;
+}
+
+/* 「标签 + 输入框」的一行：输入框吃掉剩余宽度，不缩成 Obsidian 的默认窄框 */
+.ci-lib__form-row--field .ci-lib__form__input {
+	flex: 1;
+	min-width: 0;
 }
 
 /* 重名策略三选一（仅在检测到重名时出现） */

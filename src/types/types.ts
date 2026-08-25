@@ -142,6 +142,14 @@ export interface ICustomIconLibUI {
 	lastTab: "all" | "pack" | "svg" | "lucide";
 	/** 「我的 SVG」页的排序方式（见 util/svgLibrary.ts） */
 	svgSort: "name-asc" | "name-desc" | "added-desc";
+	/**
+	 * 「我的 SVG」页的分组筛选：`""` = 全部，其余 = 组名（见 util/svgGroups.ts）。
+	 *
+	 * 「仅未分组」这一档不落盘（重开视图回到全部）：`mergeWithDefaults` 按 `typeof`
+	 * 比对，默认值写成 `null` 会让已存的字符串被丢弃，于是三个筛选态只能压进一个
+	 * 字符串；而组名允许任意字符，再造哨兵值总有相撞的余地。
+	 */
+	svgGroup: string;
 }
 
 /** 「最近使用」保留条数上限 */
@@ -156,6 +164,19 @@ export interface ICustomSVGIcon {
 	 * 旧数据没有这个字段，排序时按数组顺序（= 插入顺序）兜底，无需迁移。
 	 */
 	addedAt?: number;
+	/**
+	 * 所属分组（用户自己划的一套图标），用于「我的 SVG」页内筛选。
+	 *
+	 * 缺失 / 空串 = 未分组。组名即身份且**区分大小写**（`Weather` 与 `weather`
+	 * 是两个组），重命名等于改写全部成员的该字段——本方案不设独立分组注册表，
+	 * 组名的唯一真相就是成员身上的这个值，因此空组不存在。
+	 *
+	 * **永不参与注册 id 构成**：id 是 `addIcon` 的注册键，又被 fileExplorer /
+	 * bookmarks / ribbon / tabHeader / communityPlugins 五张覆盖表引用，改 id
+	 * 会打断用户已配好的图标（详见 dev/260825/自定义SVG分组方案.md §2.2）。
+	 * 也因此改组不会让收藏 / 最近失效（那两份存 `${type}:${id}`）。
+	 */
+	group?: string;
 }
 
 /** 图标库数据源配置（安装时快照，重装/更新时复用） */
@@ -226,6 +247,11 @@ export const DEFAULT_SETTINGS: IPluginSettings = {
 		packs: {},
 		recent: [],
 		favorites: [],
-		ui: { density: "normal", lastTab: "all", svgSort: "name-asc" },
+		ui: {
+			density: "normal",
+			lastTab: "all",
+			svgSort: "name-asc",
+			svgGroup: "",
+		},
 	},
 };

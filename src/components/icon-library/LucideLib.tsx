@@ -5,8 +5,8 @@ import { LL } from "@src/i18n/i18n";
 import { getLucideIconCatalog } from "@src/util/getLucideIcons";
 import { compactGridMetrics } from "@src/util/iconGridDensity";
 import { IconRef } from "@src/util/iconRef";
-import { setIcon } from "obsidian";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { ArrowDownAZ, ArrowUpAZ } from "lucide-react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { IconCard } from "../icon-card/IconCard";
 import { DensityToggle } from "./DensityToggle";
 import { FavoriteStrip } from "./FavoriteStrip";
@@ -43,7 +43,6 @@ export const LucideLib: React.FC<LucideLibProps> = ({
 	const [filter, setFilter] = useState<LucideFilter>(
 		handoff ? "all" : "extra",
 	);
-	const sortButtonRef = useRef<HTMLButtonElement>(null);
 	const searchRef = useRef<HTMLInputElement>(null);
 	const clearSearch = useCallback(() => setSearchQuery(""), []);
 	const handleShortcuts = useLibShortcuts(searchRef, clearSearch);
@@ -88,20 +87,16 @@ export const LucideLib: React.FC<LucideLibProps> = ({
 		return result;
 	}, [catalog, filter, searchQuery, sortOrder]);
 
-	// Update sort button icon when sortOrder changes
-	useEffect(() => {
-		if (sortButtonRef.current) {
-			sortButtonRef.current.empty();
-			const iconName =
-				sortOrder === "asc" ? "arrow-up-az" : "arrow-up-za";
-			setIcon(sortButtonRef.current, iconName);
-		}
-	}, [sortOrder]);
-
 	// Handlers
 	const handleToggleSort = () => {
 		setSortOrder((prev) => (prev === "asc" ? "desc" : "asc"));
 	};
+
+	// 排序按钮：图标与无障碍标签都随 sortOrder 走，文案全部经 i18n
+	const sortLL = LL.view.CustomIconLib.lucide.sort;
+	const sortLabel = `${sortLL.label()}: ${
+		sortOrder === "asc" ? sortLL.asc() : sortLL.desc()
+	}`;
 
 	// 空态：搜索无结果给"清空 / 换页去搜"，筛选无结果给"放宽筛选"
 	const emptyState = searchQuery ? (
@@ -186,10 +181,16 @@ export const LucideLib: React.FC<LucideLibProps> = ({
 				<DensityToggle value={density} onChange={setDensity} />
 
 				<button
-					ref={sortButtonRef}
 					onClick={handleToggleSort}
-					aria-label={sortOrder === "asc" ? "A-Z" : "Z-A"}
-				/>
+					aria-label={sortLabel}
+					title={sortLabel}
+				>
+					{sortOrder === "asc" ? (
+						<ArrowUpAZ className="svg-icon" />
+					) : (
+						<ArrowDownAZ className="svg-icon" />
+					)}
+				</button>
 			</div>
 
 			{/* Count and description */}

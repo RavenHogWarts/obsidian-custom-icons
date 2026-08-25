@@ -17,6 +17,7 @@ import {
 import { packIconId } from "@src/service/icon-packs/types";
 import { IIconPackManifest, IconSourceConfig } from "@src/types/types";
 import {
+	ArrowDownAZ,
 	ArrowLeft,
 	ChevronRight,
 	DownloadCloud,
@@ -35,12 +36,33 @@ import { FavoriteStrip } from "./FavoriteStrip";
 import { LibEmptyState, LibGridSkeleton } from "./LibEmptyState";
 import { LibHandoff } from "./libNav";
 import { NpmSvgForm } from "./NpmSvgForm";
+import { ObsidianToggle } from "./ObsidianToggle";
 import { SvgGlyph } from "./SvgGlyph";
 import { VirtualIconGrid } from "./VirtualIconGrid";
 import "./IconLib.css";
 
 /** 大包确认阈值：超过该图标数时在确认弹窗中附加提示 */
 const BIG_PACK_THRESHOLD = 3000;
+
+/**
+ * 目录卡片单批渲染上限。
+ *
+ * Iconify 目录有 220+ 集，每张卡都带一个 IntersectionObserver 与最多 8 个内联样例
+ * 字形——全量铺开是这一页唯一没受约束的渲染成本。分批铺（配合区块默认折叠）把首屏
+ * 成本压到常数级；不走 VirtualIconGrid 是因为整页共用一个滚动体，
+ * 在里面再套一个自带滚动的虚拟化视口会互相挤压（见 IconLib.css 的注释）。
+ */
+const CATALOG_PAGE_SIZE = 48;
+
+/** 卸载成功通知的停留时长：里面有「重新下载」可点，得给足点击时间 */
+const UNINSTALL_NOTICE_MS = 10000;
+
+/** 目录按安装状态筛选 */
+type CatalogFilter = "all" | "installed" | "notInstalled";
+const CATALOG_FILTERS: CatalogFilter[] = ["all", "installed", "notInstalled"];
+
+/** 目录排序：按名称（字典序）/ 按图标数（多→少） */
+type CatalogSort = "name" | "count";
 
 /** npm 预设 → 安装配置（卡片预览与安装动作共用同一 glob 语义） */
 const presetToConfig = (preset: INpmSvgPreset): IconSourceConfig => ({
@@ -53,29 +75,57 @@ const presetToConfig = (preset: INpmSvgPreset): IconSourceConfig => ({
 /**
  * 可折叠区块：点击标题栏展开/收起内容。
  * 标题栏由左侧箭头 + 图标 + 标题 + 可选尾部（计数/状态徽标）组成。
+ *
+ * 标题栏是真 `<button>`（原先是 `div` + `aria-expanded` + `onClick`），
+ * 于是键盘聚焦、Enter / 空格展开、读屏播报全部白拿，不用自己补 role/tabIndex/onKeyDown。
  */
 const CollapsibleSection: React.FC<{
 	icon: React.ReactNode;
 	title: React.ReactNode;
 	trailing?: React.ReactNode;
+	/** 标题后附带的命中数（只在搜索时传，平时不显示） */
+	hits?: number;
 	defaultOpen?: boolean;
+	/**
+	 * 覆盖用户的手动折叠状态：搜索时由调用方算出「本区块有没有命中」，
+	 * 有命中的自动展开、没命中的自动收起；清空搜索后回到用户自己的状态。
+	 */
+	forceOpen?: boolean;
 	children: React.ReactNode;
-}> = ({ icon, title, trailing, defaultOpen = true, children }) => {
-	const [open, setOpen] = useState(defaultOpen);
+}> = ({
+	icon,
+	title,
+	trailing,
+	hits,
+	defaultOpen = true,
+	forceOpen,
+	children,
+}) => {
+	const [userOpen, setUserOpen] = useState(defaultOpen);
+	const open = forceOpen ?? userOpen;
 	return (
 		<div className="ci-pack__section">
-			<div
+			<button
+				type="button"
 				className="ci-pack__section-title"
 				aria-expanded={open}
-				onClick={() => setOpen((v) => !v)}
+				onClick={() => setUserOpen((v) => !v)}
 			>
 				<ChevronRight
 					className={`svg-icon ci-pack__section-chevron${open ? " is-open" : ""}`}
 				/>
 				{icon}
-				<span className="ci-pack__section-label">{title}</span>
+				<span className="ci-pack__section-label">
+					{title}
+					{hits !== undefined && (
+						<span className="ci-pack__section-hits">
+							{" "}
+							({hits})
+						</span>
+					)}
+				</span>
 				{trailing}
-			</div>
+			</button>
 			{open && children}
 		</div>
 	);
@@ -101,6 +151,16 @@ export const PackLib: React.FC<PackLibProps> = ({ handoff }) => {
 				: null) ?? null,
 	);
 	const [installing, setInstalling] = useState(false);
+	/** 安装进度（null = 未在安装）；用于行内进度条 */
+	const [progress, setProgress] = useState<{
+		done: number;
+		total: number;
+	} | null>(null);
+	/** 当前安装的取消句柄：service 层早已支持协作式取消，这里才终于把它接上 */
+	const abortRef = useRef<AbortController | null>(null);
+	const [catalogFilter, setCatalogFilter] = useState<CatalogFilter>("all");
+	const [catalogSort, setCatalogSort] = useState<CatalogSort>("name");
+	const [catalogLimit, setCatalogLimit] = useState(CATALOG_PAGE_SIZE);
 	const [catalog, setCatalog] = useState<ICollectionInfo[] | null>(null);
 	const [catalogMeta, setCatalogMeta] = useState<{
 		fromCache: boolean;
@@ -134,40 +194,106 @@ export const PackLib: React.FC<PackLibProps> = ({ handoff }) => {
 		void loadCatalog(false);
 	}, []);
 
-	// 已安装包（按安装时间倒序）
-	const installedPacks = useMemo(
-		() =>
-			Object.values(settings.customIconLib.packs).sort(
-				(a, b) => b.installedAt - a.installedAt,
-			),
-		[settings.customIconLib.packs],
-	);
+	const query = searchQuery.trim().toLowerCase();
 
-	// 目录搜索过滤
-	const filteredCatalog = useMemo(() => {
+	/*
+	 * 三块内容全部参与搜索过滤。
+	 *
+	 * 「已安装」原先的 useMemo 没有 searchQuery 依赖，而目录与预设两块默认折叠，
+	 * 于是输完关键词整页看起来毫无反应——这是这一页体感最差的一条。
+	 */
+	const installedPacks = useMemo(() => {
+		const all = Object.values(settings.customIconLib.packs).sort(
+			(a, b) => b.installedAt - a.installedAt,
+		);
+		return query
+			? all.filter(
+					(manifest) =>
+						manifest.name.toLowerCase().includes(query) ||
+						manifest.id.toLowerCase().includes(query),
+				)
+			: all;
+	}, [settings.customIconLib.packs, query]);
+
+	// 只按搜索词过滤的目录命中：区块是否自动展开、以及"全局无命中"都看这一份，
+	// 免得用户把安装状态筛成「已安装」后被告知"没有匹配的图标包"
+	const catalogHits = useMemo(() => {
 		if (!catalog) {
 			return [];
 		}
-		const query = searchQuery.toLowerCase();
-		return catalog.filter(
-			(info) =>
-				!query ||
-				info.name.toLowerCase().includes(query) ||
-				info.prefix.toLowerCase().includes(query),
-		);
-	}, [catalog, searchQuery]);
+		return query
+			? catalog.filter(
+					(info) =>
+						info.name.toLowerCase().includes(query) ||
+						info.prefix.toLowerCase().includes(query),
+				)
+			: catalog;
+	}, [catalog, query]);
 
-	const filteredPresets = useMemo(() => {
-		const query = searchQuery.toLowerCase();
-		return NPM_SVG_PRESETS.filter(
-			(preset) =>
-				!query ||
-				preset.name.toLowerCase().includes(query) ||
-				preset.id.toLowerCase().includes(query),
+	// 再叠加安装状态筛选与排序（这一份才是实际渲染的列表）
+	const catalogMatches = useMemo(() => {
+		const packs = settings.customIconLib.packs;
+		const matched =
+			catalogFilter === "all"
+				? [...catalogHits]
+				: catalogHits.filter(
+						(info) =>
+							(catalogFilter === "installed") ===
+							Boolean(packs[info.prefix]),
+					);
+		matched.sort((a, b) =>
+			catalogSort === "count"
+				? (b.total ?? 0) - (a.total ?? 0)
+				: a.name.localeCompare(b.name),
 		);
-	}, [searchQuery]);
+		return matched;
+	}, [
+		catalogHits,
+		catalogFilter,
+		catalogSort,
+		settings.customIconLib.packs,
+	]);
 
-	// 安装执行（网络只在此处发生，离线不变式 O1）
+	const shownCatalog = useMemo(
+		() => catalogMatches.slice(0, catalogLimit),
+		[catalogMatches, catalogLimit],
+	);
+
+	const filteredPresets = useMemo(
+		() =>
+			query
+				? NPM_SVG_PRESETS.filter(
+						(preset) =>
+							preset.name.toLowerCase().includes(query) ||
+							preset.id.toLowerCase().includes(query),
+					)
+				: NPM_SVG_PRESETS,
+		[query],
+	);
+
+	// 换了搜索词 / 筛选 / 排序就从第一批重新铺，否则会停在上次翻到的位置
+	useEffect(() => {
+		setCatalogLimit(CATALOG_PAGE_SIZE);
+	}, [query, catalogFilter, catalogSort]);
+
+	/*
+	 * 全局无命中：三块一个都没中。
+	 * 只判断"搜索词有没有命中"（不含安装状态筛选），且目录已就绪——
+	 * 目录还在加载时说"没有匹配"是在撒谎。
+	 */
+	const noMatch =
+		query.length > 0 &&
+		catalog !== null &&
+		installedPacks.length === 0 &&
+		catalogHits.length === 0 &&
+		filteredPresets.length === 0;
+
+	/**
+	 * 安装执行（网络只在此处发生，离线不变式 O1）。
+	 *
+	 * 进度同时喂给 Notice 与页面上的行内进度条；`signal` 接到 service 层已有的
+	 * 协作式取消上，取消后不会写盘，因此不会留下半个包。
+	 */
 	const doInstall = async (
 		config: IconSourceConfig,
 		options: InstallOptions,
@@ -175,15 +301,20 @@ export const PackLib: React.FC<PackLibProps> = ({ handoff }) => {
 		if (installing) {
 			return;
 		}
+		const controller = new AbortController();
+		abortRef.current = controller;
 		setInstalling(true);
+		setProgress({ done: 0, total: 0 });
 		const notice = new Notice(LL.view.CustomIconLib.pack.installing(), 0);
 		try {
 			const manifest = await service.install(config, {
 				...options,
+				signal: controller.signal,
 				onProgress: (done, total) => {
 					notice.setMessage(
 						LL.view.CustomIconLib.pack.progress({ done, total }),
 					);
+					setProgress({ done, total });
 				},
 			});
 			new Notice(
@@ -192,14 +323,25 @@ export const PackLib: React.FC<PackLibProps> = ({ handoff }) => {
 				}),
 			);
 		} catch (error) {
-			console.error("Failed to install icon pack:", error);
-			new Notice(
-				`${LL.view.CustomIconLib.pack.installFailed()}: ${error instanceof Error ? error.message : String(error)}`,
-			);
+			// 用户主动取消不是故障：不报红，只确认"已经停下了"
+			if (controller.signal.aborted) {
+				new Notice(LL.view.CustomIconLib.pack.installCancelled());
+			} else {
+				console.error("Failed to install icon pack:", error);
+				new Notice(
+					`${LL.view.CustomIconLib.pack.installFailed()}: ${error instanceof Error ? error.message : String(error)}`,
+				);
+			}
 		} finally {
 			notice.hide();
+			abortRef.current = null;
+			setProgress(null);
 			setInstalling(false);
 		}
+	};
+
+	const handleCancelInstall = () => {
+		abortRef.current?.abort();
 	};
 
 	// Handlers（sourceEl：触发元素，弹窗挂载到其所在窗口，防跨窗口错位）
@@ -316,30 +458,6 @@ export const PackLib: React.FC<PackLibProps> = ({ handoff }) => {
 		}, { sourceEl }).open();
 	};
 
-	const handleUninstall = (manifest: IIconPackManifest, sourceEl?: HTMLElement) => {
-		new ConfirmDialog(store.plugin, {
-			title: `${LL.common.delete()} "${manifest.name}"?`,
-			confirmLL: LL.common.delete(),
-			children: (
-				<div className="ci-pack__confirm">
-					<div className="ci-pack__confirm-hint">
-						{LL.view.CustomIconLib.pack.uninstallHint({
-							count: manifest.iconCount,
-						})}
-					</div>
-				</div>
-			),
-			onConfirm: async () => {
-				try {
-					await service.uninstall(manifest.id);
-				} catch (error) {
-					console.error("Failed to uninstall icon pack:", error);
-					new Notice(LL.view.CustomIconLib.pack.uninstallFailed());
-				}
-			},
-		}, { sourceEl }).open();
-	};
-
 	const handleRedownload = (
 		manifest: IIconPackManifest,
 		sourceEl?: HTMLElement,
@@ -374,6 +492,73 @@ export const PackLib: React.FC<PackLibProps> = ({ handoff }) => {
 					license: manifest.license,
 				}),
 		}, { sourceEl }).open();
+	};
+
+	/**
+	 * 卸载成功的回音：除了「已卸载」，再给一条「重新下载」的出路。
+	 *
+	 * `manifest.source` 是安装时留下的快照，重下是现成能力——误删了不必再回目录里
+	 * 自己找一遍。通知里带可点元素，故停留时间放长。
+	 */
+	const noticeUninstalled = (manifest: IIconPackManifest) => {
+		// Notice 挂在当前活动窗口上，故用 activeDocument 而非 document（分离窗口兼容）
+		const doc = activeDocument;
+		const fragment = doc.createDocumentFragment();
+		fragment.appendChild(
+			doc.createTextNode(
+				`${LL.view.CustomIconLib.pack.uninstalled({
+					name: manifest.name,
+				})} `,
+			),
+		);
+		const action = doc.createElement("a");
+		action.textContent = LL.view.CustomIconLib.pack.redownload();
+		action.className = "ci-pack__notice-action";
+		action.addEventListener("click", (event) => {
+			event.preventDefault();
+			// 不让点击冒泡到 Notice 自身的"点一下就关"上，免得重下弹窗还没开就被关掉
+			event.stopPropagation();
+			handleRedownload(manifest);
+		});
+		fragment.appendChild(action);
+		new Notice(fragment, UNINSTALL_NOTICE_MS);
+	};
+
+	const handleUninstall = (
+		manifest: IIconPackManifest,
+		sourceEl?: HTMLElement,
+	) => {
+		new ConfirmDialog(
+			store.plugin,
+			{
+				title: `${LL.common.delete()} "${manifest.name}"?`,
+				confirmLL: LL.common.delete(),
+				children: (
+					<div className="ci-pack__confirm">
+						<div className="ci-pack__confirm-hint">
+							{LL.view.CustomIconLib.pack.uninstallHint({
+								count: manifest.iconCount,
+							})}
+						</div>
+					</div>
+				),
+				onConfirm: async () => {
+					try {
+						await service.uninstall(manifest.id);
+						noticeUninstalled(manifest);
+					} catch (error) {
+						console.error(
+							"Failed to uninstall icon pack:",
+							error,
+						);
+						new Notice(
+							LL.view.CustomIconLib.pack.uninstallFailed(),
+						);
+					}
+				},
+			},
+			{ sourceEl },
+		).open();
 	};
 
 	const handleToggleEnabled = async (
@@ -416,6 +601,45 @@ export const PackLib: React.FC<PackLibProps> = ({ handoff }) => {
 		/>
 	);
 
+	const catalogSortLL = LL.view.CustomIconLib.pack.catalogSort;
+	const catalogSortLabel = `${catalogSortLL.label()}: ${
+		catalogSort === "name" ? catalogSortLL.name() : catalogSortLL.count()
+	}`;
+
+	/*
+	 * 目录空态：搜索词与安装状态筛选可以各自把结果筛空，两条出路按需给。
+	 * 只放"清空搜索"会让筛成「已安装」却一个都没装的用户无路可走。
+	 */
+	const catalogEmpty = (
+		<LibEmptyState
+			title={
+				query
+					? LL.view.CustomIconLib.empty.noResults({
+							query: searchQuery,
+						})
+					: LL.view.CustomIconLib.pack.noMatch()
+			}
+			actions={[
+				...(query
+					? [
+							{
+								label: LL.view.CustomIconLib.empty.clearSearch(),
+								onClick: () => setSearchQuery(""),
+							},
+						]
+					: []),
+				...(catalogFilter === "all"
+					? []
+					: [
+							{
+								label: LL.view.CustomIconLib.pack.catalogFilter.all(),
+								onClick: () => setCatalogFilter("all"),
+							},
+						]),
+			]}
+		/>
+	);
+
 	return (
 		<div className="ci-lib-container">
 			{/* Toolbar */}
@@ -446,12 +670,75 @@ export const PackLib: React.FC<PackLibProps> = ({ handoff }) => {
 				</button>
 			</div>
 
+			{/* 行内进度 + 取消：装大包时不用盯着 Notice，也终于能中途停下 */}
+			{installing && (
+				<div className="ci-pack__progress">
+					<span className="ci-pack__progress-label">
+						{progress && progress.total > 0
+							? LL.view.CustomIconLib.pack.progress({
+									done: progress.done,
+									total: progress.total,
+								})
+							: LL.view.CustomIconLib.pack.installing()}
+					</span>
+					<div
+						className="ci-pack__progress-track"
+						role="progressbar"
+						aria-valuemin={0}
+						aria-valuemax={100}
+						aria-valuenow={
+							progress && progress.total > 0
+								? Math.round(
+										(progress.done / progress.total) * 100,
+									)
+								: undefined
+						}
+					>
+						<div
+							className={`ci-pack__progress-fill${
+								progress && progress.total > 0
+									? ""
+									: " is-indeterminate"
+							}`}
+							style={
+								progress && progress.total > 0
+									? {
+											width: `${Math.round(
+												(progress.done /
+													progress.total) *
+													100,
+											)}%`,
+										}
+									: undefined
+							}
+						/>
+					</div>
+					<button onClick={handleCancelInstall}>
+						{LL.common.cancel()}
+					</button>
+				</div>
+			)}
+
 			{/* 单一滚动体：三个区块自然排列，避免多级滚动导致内容被裁切 */}
 			<div className="ci-pack__body">
+				{/* 三块都没中：与"某一块没中"区分开，否则用户只看到几个折叠的空区块 */}
+				{noMatch && (
+					<LibEmptyState
+						title={LL.view.CustomIconLib.pack.noMatch()}
+						actions={[
+							{
+								label: LL.view.CustomIconLib.empty.clearSearch(),
+								onClick: () => setSearchQuery(""),
+							},
+						]}
+					/>
+				)}
 				{/* Installed packs */}
 				<CollapsibleSection
 					icon={<Layers className="svg-icon" />}
 					title={LL.view.CustomIconLib.pack.installedSection()}
+					hits={query ? installedPacks.length : undefined}
+					forceOpen={query ? installedPacks.length > 0 : undefined}
 					trailing={
 						<span className="ci-pack__section-count">
 							{installedPacks.length}
@@ -491,16 +778,15 @@ export const PackLib: React.FC<PackLibProps> = ({ handoff }) => {
 										</span>
 									</div>
 									<div className="ci-pack__item-actions">
-										<input
-											type="checkbox"
-											checked={manifest.enabled}
-											onChange={(e) =>
+										<ObsidianToggle
+											value={manifest.enabled}
+											ariaLabel={LL.view.CustomIconLib.pack.enabledTooltip()}
+											onChange={(enabled) =>
 												void handleToggleEnabled(
 													manifest,
-													e.target.checked,
+													enabled,
 												)
 											}
-											aria-label={LL.view.CustomIconLib.pack.enabledTooltip()}
 										/>
 										<button
 											className="clickable-icon"
@@ -548,6 +834,8 @@ export const PackLib: React.FC<PackLibProps> = ({ handoff }) => {
 					icon={<Globe className="svg-icon" />}
 					title={LL.view.CustomIconLib.pack.catalogSection()}
 					defaultOpen={false}
+					hits={query ? catalogHits.length : undefined}
+					forceOpen={query ? catalogHits.length > 0 : undefined}
 					trailing={
 						catalogMeta && (
 							<span
@@ -576,18 +864,180 @@ export const PackLib: React.FC<PackLibProps> = ({ handoff }) => {
 						<div className="ci-pack__empty">
 							{LL.view.CustomIconLib.pack.catalogLoading()}
 						</div>
-					) : filteredCatalog.length === 0 ? (
+					) : (
+						<>
+							{/* 220+ 集里最常问的两句：「我装过哪些」与「哪个图标多」 */}
+							<div className="ci-pack__section-tools">
+								<div
+									className="ci-lib__filter"
+									role="group"
+									aria-label={LL.view.CustomIconLib.pack.catalogFilter.group()}
+								>
+									{CATALOG_FILTERS.map((key) => (
+										<button
+											key={key}
+											className={`ci-lib__filter-btn${catalogFilter === key ? " is-active" : ""}`}
+											onClick={() =>
+												setCatalogFilter(key)
+											}
+											aria-pressed={
+												catalogFilter === key
+											}
+										>
+											{LL.view.CustomIconLib.pack.catalogFilter[
+												key
+											]()}
+										</button>
+									))}
+								</div>
+								<button
+									className="ci-lib__filter-btn ci-lib__density-btn"
+									onClick={() =>
+										setCatalogSort((prev) =>
+											prev === "name" ? "count" : "name",
+										)
+									}
+									aria-label={catalogSortLabel}
+									title={catalogSortLabel}
+								>
+									{catalogSort === "name" ? (
+										<ArrowDownAZ className="svg-icon" />
+									) : (
+										<Layers className="svg-icon" />
+									)}
+								</button>
+							</div>
+
+							{catalogMatches.length === 0 ? (
+								catalogEmpty
+							) : (
+								<>
+									<div className="ci-pack__grid">
+										{shownCatalog.map((info) => {
+											const installed = Boolean(
+												settings.customIconLib.packs[
+													info.prefix
+												],
+											);
+											const samples = info.samples ?? [];
+											return (
+												<div
+													key={info.prefix}
+													className={`ci-pack__card${installing ? " is-disabled" : ""}${
+														installed
+															? " is-installed"
+															: ""
+													}`}
+													role="button"
+													tabIndex={0}
+													aria-disabled={installing}
+													onClick={(e) => {
+														if (!installing) {
+															handleInstallIconify(
+																info,
+																e.currentTarget,
+															);
+														}
+													}}
+													onKeyDown={(e) => {
+														if (
+															e.key === "Enter" ||
+															e.key === " "
+														) {
+															e.preventDefault();
+															if (!installing) {
+																handleInstallIconify(
+																	info,
+																	e.currentTarget,
+																);
+															}
+														}
+													}}
+												>
+													<span className="ci-pack__card-name">
+														{info.name}
+													</span>
+													<span className="ci-pack__card-meta">
+														{installed
+															? LL.view.CustomIconLib.pack.alreadyInstalled()
+															: info.total !==
+																undefined
+															? LL.view.CustomIconLib.pack.iconCountLabel(
+																	{
+																		count: info.total,
+																	},
+																)
+															: info.prefix}
+													</span>
+													{samples.length > 0 && (
+														<CardSamples
+															cacheKey={
+																info.prefix
+															}
+															placeholderCount={Math.min(
+																samples.length,
+																8,
+															)}
+															load={() =>
+																service.previewIconify(
+																	info.prefix,
+																	samples,
+																)
+															}
+														/>
+													)}
+												</div>
+											);
+										})}
+									</div>
+
+									{/* 分批铺开：一次挂 220 张卡（每张一个 IntersectionObserver）不值当 */}
+									{catalogMatches.length >
+										shownCatalog.length && (
+										<div className="ci-pack__show-more">
+											<button
+												onClick={() =>
+													setCatalogLimit(
+														(n) =>
+															n +
+															CATALOG_PAGE_SIZE,
+													)
+												}
+											>
+												{LL.view.CustomIconLib.pack.showMore(
+													{
+														shown: shownCatalog.length,
+														total: catalogMatches.length,
+													},
+												)}
+											</button>
+										</div>
+									)}
+								</>
+							)}
+						</>
+					)}
+				</CollapsibleSection>
+
+				{/* npm presets */}
+				<CollapsibleSection
+					icon={<Globe className="svg-icon" />}
+					title={LL.view.CustomIconLib.pack.presetsSection()}
+					defaultOpen={false}
+					hits={query ? filteredPresets.length : undefined}
+					forceOpen={query ? filteredPresets.length > 0 : undefined}
+				>
+					{filteredPresets.length === 0 ? (
 						searchEmpty
 					) : (
-							<div className="ci-pack__grid">
-								{filteredCatalog.map((info) => {
-									const installed = Boolean(
-										settings.customIconLib.packs[info.prefix],
-									);
-									const samples = info.samples ?? [];
-									return (
+						<div className="ci-pack__grid">
+							{filteredPresets.map((preset) => {
+								const installed = Boolean(
+									settings.customIconLib.packs[preset.id],
+								);
+								return (
 									<div
-										key={info.prefix}
+										key={preset.id}
 										className={`ci-pack__card${installing ? " is-disabled" : ""}${
 											installed ? " is-installed" : ""
 										}`}
@@ -596,7 +1046,10 @@ export const PackLib: React.FC<PackLibProps> = ({ handoff }) => {
 										aria-disabled={installing}
 										onClick={(e) => {
 											if (!installing) {
-												handleInstallIconify(info, e.currentTarget);
+												handleInstallPreset(
+													preset,
+													e.currentTarget,
+												);
 											}
 										}}
 										onKeyDown={(e) => {
@@ -606,77 +1059,23 @@ export const PackLib: React.FC<PackLibProps> = ({ handoff }) => {
 											) {
 												e.preventDefault();
 												if (!installing) {
-													handleInstallIconify(info, e.currentTarget);
+													handleInstallPreset(
+														preset,
+														e.currentTarget,
+													);
 												}
 											}
 										}}
 									>
 										<span className="ci-pack__card-name">
-											{info.name}
+											{preset.name}
 										</span>
 										<span className="ci-pack__card-meta">
 											{installed
 												? LL.view.CustomIconLib.pack.alreadyInstalled()
-												: info.total !== undefined
-													? LL.view.CustomIconLib.pack.iconCountLabel(
-															{
-																count: info.total,
-															},
-														)
-													: info.prefix}
+												: (preset.license ??
+												preset.package)}
 										</span>
-										{samples.length > 0 && (
-											<CardSamples
-												cacheKey={info.prefix}
-												placeholderCount={Math.min(
-													samples.length,
-													8,
-												)}
-												load={() =>
-													service.previewIconify(
-														info.prefix,
-														samples,
-													)
-												}
-											/>
-										)}
-									</div>
-								);
-							})}
-						</div>
-					)}
-				</CollapsibleSection>
-
-				{/* npm presets */}
-				<CollapsibleSection
-					icon={<Globe className="svg-icon" />}
-					title={LL.view.CustomIconLib.pack.presetsSection()}
-					defaultOpen={false}
-				>
-					{filteredPresets.length === 0 ? (
-						searchEmpty
-					) : (
-						<div className="ci-pack__grid">
-							{filteredPresets.map((preset) => {
-							const installed = Boolean(
-								settings.customIconLib.packs[preset.id],
-							);
-							return (
-								<div
-									key={preset.id}
-									className={`ci-pack__card${installing ? " is-disabled" : ""}${
-										installed ? " is-installed" : ""
-									}`}
-									onClick={(e) => handleInstallPreset(preset, e.currentTarget)}
-								>
-								<span className="ci-pack__card-name">
-									{preset.name}
-								</span>
-								<span className="ci-pack__card-meta">
-									{installed
-										? LL.view.CustomIconLib.pack.alreadyInstalled()
-										: (preset.license ?? preset.package)}
-								</span>
 										<CardSamples
 											cacheKey={`npm:${preset.id}`}
 											load={() =>
@@ -686,8 +1085,8 @@ export const PackLib: React.FC<PackLibProps> = ({ handoff }) => {
 											}
 										/>
 									</div>
-							);
-						})}
+								);
+							})}
 						</div>
 					)}
 				</CollapsibleSection>

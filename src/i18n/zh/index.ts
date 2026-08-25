@@ -270,6 +270,27 @@ const zh = {
 					noResultsUngrouped:
 						"未分组里没有匹配「{query:string}」的图标",
 					searchAllGroups: "在全部分组里搜索",
+					menuHint: "右键分组标签可重命名或删除",
+					renameAction: "重命名分组",
+					renameTitle: "重命名「{group:string}」",
+					renameCount: "该分组有 {count:number} 个图标。",
+					renameEmpty:
+						"请输入组名。想去掉分组但保留图标，用「删除分组，保留图标」。",
+					renamed: "已把「{from:string}」改名为「{to:string}」",
+					dissolveAction: "删除分组，保留图标",
+					dissolveTitle: "删除「{group:string}」？",
+					dissolveBody:
+						"组内 {count:number} 个图标会保留下来，变成未分组。",
+					dissolveConfirm: "删除分组",
+					dissolved:
+						"已删除「{group:string}」，{count:number} 个图标转为未分组",
+					purgeAction: "删除分组及其中的图标",
+					purgeTitle: "删除「{group:string}」及其中的图标？",
+					purgeBody:
+						"这会真的删掉 {count:number} 个图标。已分配过它们的地方会回落到默认图标。",
+					purgeConfirm: "删除图标",
+					purged: "已删除「{group:string}」及其中的 {count:number} 个图标",
+					gone: "「{group:string}」已不存在",
 				},
 				exportLib: {
 					tooltip: "导出为 JSON",

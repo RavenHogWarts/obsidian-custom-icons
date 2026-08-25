@@ -268,6 +268,28 @@ const ru = {
 					noResultsUngrouped:
 						"Среди иконок без группы нет совпадений с «{query:string}»",
 					searchAllGroups: "Искать во всех группах",
+					menuHint:
+						"Правый клик по вкладке группы — переименовать или удалить",
+					renameAction: "Переименовать группу",
+					renameTitle: "Переименовать «{group:string}»",
+					renameCount: "В этой группе иконок: {count:number}.",
+					renameEmpty:
+						"Введите название группы. Чтобы убрать группу, но сохранить иконки, выберите «Удалить группу, иконки сохранить».",
+					renamed: "«{from:string}» переименована в «{to:string}»",
+					dissolveAction: "Удалить группу, иконки сохранить",
+					dissolveTitle: "Удалить «{group:string}»?",
+					dissolveBody:
+						"Иконки этой группы ({count:number}) сохранятся и перейдут в «Без группы».",
+					dissolveConfirm: "Удалить группу",
+					dissolved:
+						"«{group:string}» удалена, иконок без группы: {count:number}",
+					purgeAction: "Удалить группу вместе с иконками",
+					purgeTitle: "Удалить «{group:string}» вместе с иконками?",
+					purgeBody:
+						"Иконки ({count:number}) будут удалены безвозвратно. Везде, где они назначены, вернётся стандартная иконка.",
+					purgeConfirm: "Удалить иконки",
+					purged: "«{group:string}» удалена вместе с иконками ({count:number})",
+					gone: "«{group:string}» больше не существует",
 				},
 				exportLib: {
 					tooltip: "Экспорт в JSON",

@@ -816,6 +816,87 @@ type RootTranslation = {
 					 * 在​全​部​分​组​里​搜​索
 					 */
 					searchAllGroups: string
+					/**
+					 * 右​键​分​组​标​签​可​重​命​名​或​删​除
+					 */
+					menuHint: string
+					/**
+					 * 重​命​名​分​组
+					 */
+					renameAction: string
+					/**
+					 * 重​命​名​「​{​g​r​o​u​p​}​」
+					 * @param {string} group
+					 */
+					renameTitle: RequiredParams<'group'>
+					/**
+					 * 该​分​组​有​ ​{​c​o​u​n​t​}​ ​个​图​标​。
+					 * @param {number} count
+					 */
+					renameCount: RequiredParams<'count'>
+					/**
+					 * 请​输​入​组​名​。​想​去​掉​分​组​但​保​留​图​标​，​用​「​删​除​分​组​，​保​留​图​标​」​。
+					 */
+					renameEmpty: string
+					/**
+					 * 已​把​「​{​f​r​o​m​}​」​改​名​为​「​{​t​o​}​」
+					 * @param {string} from
+					 * @param {string} to
+					 */
+					renamed: RequiredParams<'from' | 'to'>
+					/**
+					 * 删​除​分​组​，​保​留​图​标
+					 */
+					dissolveAction: string
+					/**
+					 * 删​除​「​{​g​r​o​u​p​}​」​？
+					 * @param {string} group
+					 */
+					dissolveTitle: RequiredParams<'group'>
+					/**
+					 * 组​内​ ​{​c​o​u​n​t​}​ ​个​图​标​会​保​留​下​来​，​变​成​未​分​组​。
+					 * @param {number} count
+					 */
+					dissolveBody: RequiredParams<'count'>
+					/**
+					 * 删​除​分​组
+					 */
+					dissolveConfirm: string
+					/**
+					 * 已​删​除​「​{​g​r​o​u​p​}​」​，​{​c​o​u​n​t​}​ ​个​图​标​转​为​未​分​组
+					 * @param {number} count
+					 * @param {string} group
+					 */
+					dissolved: RequiredParams<'count' | 'group'>
+					/**
+					 * 删​除​分​组​及​其​中​的​图​标
+					 */
+					purgeAction: string
+					/**
+					 * 删​除​「​{​g​r​o​u​p​}​」​及​其​中​的​图​标​？
+					 * @param {string} group
+					 */
+					purgeTitle: RequiredParams<'group'>
+					/**
+					 * 这​会​真​的​删​掉​ ​{​c​o​u​n​t​}​ ​个​图​标​。​已​分​配​过​它​们​的​地​方​会​回​落​到​默​认​图​标​。
+					 * @param {number} count
+					 */
+					purgeBody: RequiredParams<'count'>
+					/**
+					 * 删​除​图​标
+					 */
+					purgeConfirm: string
+					/**
+					 * 已​删​除​「​{​g​r​o​u​p​}​」​及​其​中​的​ ​{​c​o​u​n​t​}​ ​个​图​标
+					 * @param {number} count
+					 * @param {string} group
+					 */
+					purged: RequiredParams<'count' | 'group'>
+					/**
+					 * 「​{​g​r​o​u​p​}​」​已​不​存​在
+					 * @param {string} group
+					 */
+					gone: RequiredParams<'group'>
 				}
 				exportLib: {
 					/**
@@ -2125,6 +2206,74 @@ export type TranslationFunctions = {
 					 * 在全部分组里搜索
 					 */
 					searchAllGroups: () => LocalizedString
+					/**
+					 * 右键分组标签可重命名或删除
+					 */
+					menuHint: () => LocalizedString
+					/**
+					 * 重命名分组
+					 */
+					renameAction: () => LocalizedString
+					/**
+					 * 重命名「{group}」
+					 */
+					renameTitle: (arg: { group: string }) => LocalizedString
+					/**
+					 * 该分组有 {count} 个图标。
+					 */
+					renameCount: (arg: { count: number }) => LocalizedString
+					/**
+					 * 请输入组名。想去掉分组但保留图标，用「删除分组，保留图标」。
+					 */
+					renameEmpty: () => LocalizedString
+					/**
+					 * 已把「{from}」改名为「{to}」
+					 */
+					renamed: (arg: { from: string, to: string }) => LocalizedString
+					/**
+					 * 删除分组，保留图标
+					 */
+					dissolveAction: () => LocalizedString
+					/**
+					 * 删除「{group}」？
+					 */
+					dissolveTitle: (arg: { group: string }) => LocalizedString
+					/**
+					 * 组内 {count} 个图标会保留下来，变成未分组。
+					 */
+					dissolveBody: (arg: { count: number }) => LocalizedString
+					/**
+					 * 删除分组
+					 */
+					dissolveConfirm: () => LocalizedString
+					/**
+					 * 已删除「{group}」，{count} 个图标转为未分组
+					 */
+					dissolved: (arg: { count: number, group: string }) => LocalizedString
+					/**
+					 * 删除分组及其中的图标
+					 */
+					purgeAction: () => LocalizedString
+					/**
+					 * 删除「{group}」及其中的图标？
+					 */
+					purgeTitle: (arg: { group: string }) => LocalizedString
+					/**
+					 * 这会真的删掉 {count} 个图标。已分配过它们的地方会回落到默认图标。
+					 */
+					purgeBody: (arg: { count: number }) => LocalizedString
+					/**
+					 * 删除图标
+					 */
+					purgeConfirm: () => LocalizedString
+					/**
+					 * 已删除「{group}」及其中的 {count} 个图标
+					 */
+					purged: (arg: { count: number, group: string }) => LocalizedString
+					/**
+					 * 「{group}」已不存在
+					 */
+					gone: (arg: { group: string }) => LocalizedString
 				}
 				exportLib: {
 					/**

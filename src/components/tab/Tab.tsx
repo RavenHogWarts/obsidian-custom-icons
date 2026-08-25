@@ -1,4 +1,5 @@
 import { SettingContainerContext } from "@src/context/SettingContext";
+import { useStripAutoScroll } from "@src/hooks/useStripAutoScroll";
 import { Tabs } from "radix-ui";
 import { FC, ReactNode, useEffect, useRef, useState } from "react";
 import "./Tab.css";
@@ -32,6 +33,18 @@ export const Tab: FC<TabProps> = ({
 }) => {
 	const defaultTab = defaultValue || items[0]?.id;
 
+	/**
+	 * 当前页的镜像，只为把激活页签滚进可视区。
+	 *
+	 * 非受控模式下选中态由 Radix 自己持有，外部读不到，所以这里跟着
+	 * `onValueChange` 记一份；受控模式直接用 `value`（程序化切页不触发
+	 * `onValueChange`，若只靠回调记，跨页交接后页签行就不会跟着滚）。
+	 */
+	const [uncontrolled, setUncontrolled] = useState(defaultTab);
+	const activeValue = value ?? uncontrolled;
+
+	const listRef = useStripAutoScroll<HTMLDivElement>(activeValue);
+
 	return (
 		<Tabs.Root
 			// 受控与非受控互斥：同时传 value 和 defaultValue 会被 Radix 警告
@@ -40,9 +53,16 @@ export const Tab: FC<TabProps> = ({
 				: { value })}
 			className={`ci-tab ${className}`}
 			data-orientation={orientation}
-			onValueChange={onChange}
+			onValueChange={(next) => {
+				setUncontrolled(next);
+				onChange?.(next);
+			}}
 		>
-			<Tabs.List className="ci-tab__list" data-orientation={orientation}>
+			<Tabs.List
+				ref={listRef}
+				className="ci-strip ci-tab__list"
+				data-orientation={orientation}
+			>
 				{orientation === "vertical" && (
 					<div className="ci-tab__resize-bar"></div>
 				)}

@@ -1,0 +1,63 @@
+/*
+ * 横向滚动条（页签行 / 分段行）共用的滚动与溢出提示，配合 useStripAutoScroll。
+ *
+ * 滚动条本身是隐藏的（原生滚动条在这种一行高的容器里又粗又丑），
+ * 于是「这一侧还有内容」只能靠淡出边缘表达——否则靠后的项就是
+ * 凭空消失，用户不会想到这里能横向滚。
+ */
+.ci-strip {
+	display: flex;
+	overflow-x: auto;
+	/* 隐藏滚动条：Firefox / WebKit 各一套 */
+	scrollbar-width: none;
+	-webkit-overflow-scrolling: touch;
+	--ci-strip-fade: 20px;
+	/* 自定义属性会继承：页签行嵌套页签行时，内层若不显式归零，
+	   就会套用外层算出的遮罩（内层其实没溢出） */
+	--ci-strip-mask: none;
+}
+
+.ci-strip::-webkit-scrollbar {
+	display: none;
+}
+
+/*
+ * data-overflow 由 useStripAutoScroll 写入：none / start / end / both。
+ * 放在 data 属性而不是 JS 直接改样式——溢出状态在 DevTools 里一眼可见，
+ * 也不会因为改样式触发额外渲染。
+ *
+ * 用 mask 而不是叠一层伪元素，省去猜背景色：页签行与分段行的底色不同，
+ * 纯色遮罩总有一处露馅。各状态只改变量，真正上遮罩的只有下面这一条规则。
+ */
+.ci-strip[data-overflow="end"] {
+	--ci-strip-mask: linear-gradient(
+		to right,
+		#000 0,
+		#000 calc(100% - var(--ci-strip-fade)),
+		transparent 100%
+	);
+}
+
+.ci-strip[data-overflow="start"] {
+	--ci-strip-mask: linear-gradient(
+		to right,
+		transparent 0,
+		#000 var(--ci-strip-fade),
+		#000 100%
+	);
+}
+
+.ci-strip[data-overflow="both"] {
+	--ci-strip-mask: linear-gradient(
+		to right,
+		transparent 0,
+		#000 var(--ci-strip-fade),
+		#000 calc(100% - var(--ci-strip-fade)),
+		transparent 100%
+	);
+}
+
+.ci-strip[data-overflow] {
+	-webkit-mask-image: var(--ci-strip-mask, none);
+	mask-image: var(--ci-strip-mask, none);
+}

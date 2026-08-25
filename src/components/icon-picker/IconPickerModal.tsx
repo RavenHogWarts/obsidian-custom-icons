@@ -1,4 +1,5 @@
 import { VirtualIconGrid } from "@src/components/icon-library/VirtualIconGrid";
+import { useStripAutoScroll } from "@src/hooks/useStripAutoScroll";
 import { LL } from "@src/i18n/i18n";
 import CIPlugin from "@src/main";
 import { IconType, RECENT_LIMIT } from "@src/types/types";
@@ -266,6 +267,13 @@ const IconPickerView: React.FC<IconPickerViewProps> = ({
 	);
 	const activeSegment = segments[activeSegmentIndex];
 
+	/**
+	 * 分段行会溢出：收藏 / 最近 / Lucide / 我的 SVG 之后，每个已启用图标包再占一段，
+	 * 装两三个包就排不下了。Tab 键换段是主要走法（焦点常驻搜索框，不会滚到目标上），
+	 * 所以必须由这里把当前段滚进可视区。
+	 */
+	const segmentsRef = useStripAutoScroll<HTMLDivElement>(activeSegmentId);
+
 	// 各段命中总数：分组徽标要显示"这一段有多少个匹配"，所以全段都要统计，
 	// 但只统计不取下标（limit 0），代价是一次 indexOf 扫描
 	const totals = useMemo(() => {
@@ -468,7 +476,11 @@ const IconPickerView: React.FC<IconPickerViewProps> = ({
 				aria-activedescendant={activeKey ? ACTIVE_TILE_ID : undefined}
 			/>
 
-			<div className="ci-picker__segments" role="tablist">
+			<div
+				ref={segmentsRef}
+				className="ci-strip ci-picker__segments"
+				role="tablist"
+			>
 				{segments.map((seg, index) => (
 					<button
 						key={seg.id}

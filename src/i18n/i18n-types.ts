@@ -401,10 +401,6 @@ type RootTranslation = {
 				 * 网​址
 				 */
 				url: string
-				/**
-				 * 重​置
-				 */
-				resetTooltip: string
 			}
 			overrides: {
 				/**
@@ -568,7 +564,7 @@ type RootTranslation = {
 				 */
 				hint: string
 				/**
-				 * 查​看​全​部​ ​{​c​o​u​n​t​}​ ​个​ ​→
+				 * 查​看​全​部​ ​{​c​o​u​n​t​}​ ​个
 				 * @param {number} count
 				 */
 				showAll: RequiredParams<'count'>
@@ -1648,10 +1644,6 @@ export type TranslationFunctions = {
 				 * 网址
 				 */
 				url: () => LocalizedString
-				/**
-				 * 重置
-				 */
-				resetTooltip: () => LocalizedString
 			}
 			overrides: {
 				/**
@@ -1815,7 +1807,7 @@ export type TranslationFunctions = {
 				 */
 				hint: () => LocalizedString
 				/**
-				 * 查看全部 {count} 个 →
+				 * 查看全部 {count} 个
 				 */
 				showAll: (arg: { count: number }) => LocalizedString
 			}

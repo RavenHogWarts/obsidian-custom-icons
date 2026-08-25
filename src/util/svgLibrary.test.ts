@@ -2,11 +2,29 @@ import {
 	ISvgLibraryExport,
 	SVG_LIBRARY_EXPORT_VERSION,
 	nextSvgSortMode,
+	normalizeSvgSortMode,
 	parseSvgLibrary,
 	serializeSvgLibrary,
 	sortSvgIcons,
 	svgLibraryExportName,
 } from "./svgLibrary";
+
+describe("normalizeSvgSortMode", () => {
+	test("合法值原样通过", () => {
+		expect(normalizeSvgSortMode("name-asc")).toBe("name-asc");
+		expect(normalizeSvgSortMode("name-desc")).toBe("name-desc");
+		expect(normalizeSvgSortMode("added-desc")).toBe("added-desc");
+	});
+
+	test("脏值 / 缺失一律回落到 name-asc", () => {
+		expect(normalizeSvgSortMode(undefined)).toBe("name-asc");
+		expect(normalizeSvgSortMode(null)).toBe("name-asc");
+		expect(normalizeSvgSortMode("")).toBe("name-asc");
+		expect(normalizeSvgSortMode("added-asc")).toBe("name-asc");
+		expect(normalizeSvgSortMode(1)).toBe("name-asc");
+		expect(normalizeSvgSortMode({ mode: "name-desc" })).toBe("name-asc");
+	});
+});
 
 describe("sortSvgIcons", () => {
 	const icons = [

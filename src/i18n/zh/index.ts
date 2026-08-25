@@ -137,7 +137,6 @@ const zh = {
 				search: "搜索",
 				graph: "关系图",
 				url: "网址",
-				resetTooltip: "重置",
 			},
 			overrides: {
 				name: "单项覆盖",
@@ -195,7 +194,7 @@ const zh = {
 				tabName: "全部",
 				prompt: "输入关键词，跨 Lucide、我的 SVG 与已安装图标包一起搜索。",
 				hint: "跨来源搜索结果按来源分组；点击图标可复制名称。",
-				showAll: "查看全部 {count:number} 个 →",
+				showAll: "查看全部 {count:number} 个",
 			},
 			empty: {
 				noResults: "没有匹配「{query:string}」的图标",

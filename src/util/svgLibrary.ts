@@ -24,6 +24,19 @@ export function nextSvgSortMode(mode: SvgSortMode): SvgSortMode {
 }
 
 /**
+ * 把落盘的 `ui.svgSort` 收敛成合法排序方式。
+ *
+ * 与 `normalizeLibTab` 同理：`data.json` 可手改，而设置合并只比类型不校验
+ * 取值——脏值会让 `sortSvgIcons` 走进 `name-desc` 分支（因为只判 name-asc），
+ * 而按钮图标又落在 `Clock` 上，界面与实际排序对不上。
+ */
+export function normalizeSvgSortMode(raw: unknown): SvgSortMode {
+	return SVG_SORT_MODES.includes(raw as SvgSortMode)
+		? (raw as SvgSortMode)
+		: "name-asc";
+}
+
+/**
  * 按指定方式排序（不改动入参）。
  *
  * `added-desc` 的兜底：旧数据没有 `addedAt`，一律视作 0，此时按**数组下标倒序**

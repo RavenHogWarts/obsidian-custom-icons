@@ -246,6 +246,10 @@ export const CommunityPlugin: FC = () => {
 
 			{/* 插件列表分组 */}
 			<SettingGroup title={LL.settings.communityPlugin.pluginList.name()}>
+				{/* 分组说明行：与 ribbon.list / bookmarks.overrides 等分组一致 */}
+				<SettingItem
+					desc={LL.settings.communityPlugin.pluginList.desc()}
+				/>
 				<SettingItem
 					name={
 						<Search

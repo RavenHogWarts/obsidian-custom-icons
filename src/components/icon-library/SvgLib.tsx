@@ -1,6 +1,7 @@
 import { useIconFavorites } from "@src/hooks/useIconFavorites";
 import { useIconGridDensity } from "@src/hooks/useIconGridDensity";
 import { useLibShortcuts } from "@src/hooks/useLibShortcuts";
+import { useLibUIPrefLocal } from "@src/hooks/useLibUIPref";
 import usePluginSettings from "@src/hooks/usePluginSettings";
 import useSettingsStore from "@src/hooks/useSettingsStore";
 import { LL } from "@src/i18n/i18n";
@@ -9,11 +10,12 @@ import { cardGridMetrics } from "@src/util/iconGridDensity";
 import { IconRef } from "@src/util/iconRef";
 import {
 	applySelectionClick,
+	dropFromSelection,
 	emptySelection,
 } from "@src/util/iconSelection";
 import {
-	SvgSortMode,
 	nextSvgSortMode,
+	normalizeSvgSortMode,
 	serializeSvgLibrary,
 	sortSvgIcons,
 	svgLibraryExportName,
@@ -24,7 +26,6 @@ import {
 	ArrowUpAZ,
 	CirclePlus,
 	Clock,
-	Code,
 	Download,
 	Shapes,
 } from "lucide-react";
@@ -61,7 +62,11 @@ export const SvgLib: React.FC<SvgLibProps> = ({ handoff, onNavigate }) => {
 
 	// Local State
 	const [searchQuery, setSearchQuery] = useState(handoff?.query ?? "");
-	const [sortMode, setSortMode] = useState<SvgSortMode>("name-asc");
+	// 排序偏好落盘在 ui.svgSort（重开视图保持），渲染读本地状态避免每次轮换都等 applyAll
+	const [sortMode, setSortMode] = useLibUIPrefLocal(
+		"svgSort",
+		normalizeSvgSortMode,
+	);
 	const [selection, setSelection] = useState(emptySelection);
 	const selected = selection.selected;
 	const searchRef = useRef<HTMLInputElement>(null);
@@ -92,7 +97,7 @@ export const SvgLib: React.FC<SvgLibProps> = ({ handoff, onNavigate }) => {
 
 	// Handlers
 	const handleToggleSort = () => {
-		setSortMode((prev) => nextSvgSortMode(prev));
+		setSortMode(nextSvgSortMode(sortMode));
 	};
 
 	/**
@@ -204,6 +209,13 @@ export const SvgLib: React.FC<SvgLibProps> = ({ handoff, onNavigate }) => {
 						"customIconLib.svg",
 						newSvgIcons,
 					);
+					// 选区里同步剔掉：否则「已选 N」会把删掉的项一直算进去，
+					// 而「导出所选」按 id 过滤时又找不到它——计数会骗人
+					setSelection((prev) =>
+						prev.selected.has(iconId)
+							? dropFromSelection(prev, iconId)
+							: prev,
+					);
 				},
 			}).open();
 		},
@@ -241,7 +253,10 @@ export const SvgLib: React.FC<SvgLibProps> = ({ handoff, onNavigate }) => {
 			const icon = settings.customIconLib.svg.find(
 				(icon) => icon.id === iconId,
 			);
+			// 图标已不在（例如在另一窗口被删、或右键菜单开着时被批量删掉）：
+			// 说一句再退出，不然点了「编辑」什么都不发生，又是一处静默失败
 			if (!icon) {
+				new Notice(svgLL.modal.targetMissing());
 				return;
 			}
 
@@ -269,7 +284,7 @@ export const SvgLib: React.FC<SvgLibProps> = ({ handoff, onNavigate }) => {
 				onConfirm: async () => (submitFn ? await submitFn() : false),
 			}).open();
 		},
-		[store, settings.customIconLib.svg],
+		[store, settings.customIconLib.svg, svgLL],
 	);
 
 	const handleCopySvgCode = useCallback(
@@ -349,7 +364,7 @@ export const SvgLib: React.FC<SvgLibProps> = ({ handoff, onNavigate }) => {
 	const copyAction = useMemo<CustomAction[]>(
 		() => [
 			{
-				icon: <Code className="svg-icon" />,
+				icon: "code",
 				title: LL.view.CustomIconLib.svg.copyAction(),
 				onClick: (id: string) => void handleCopySvgCode(id),
 			},

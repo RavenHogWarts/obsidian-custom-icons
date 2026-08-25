@@ -10,7 +10,13 @@ import "./IconCard.css";
 const COPIED_FEEDBACK_MS = 1000;
 
 export interface CustomAction {
-	icon: React.ReactNode;
+	/**
+	 * 右键菜单项的图标名（Obsidian 内置 lucide 名，如 `"code"`）。
+	 *
+	 * 是**名字**而不是 React 节点：这些动作只出现在 Obsidian 原生 `Menu` 里，
+	 * 而 `MenuItem.setIcon` 只接受注册名——传节点进来会被静默忽略。
+	 */
+	icon?: string;
 	title: string;
 	onClick: (id: string) => void | Promise<void>;
 }
@@ -182,12 +188,14 @@ export const IconCard = memo(function IconCard({
 		}
 
 		for (const action of customActions) {
-			menu.addItem((item) =>
-				item
-					.setTitle(action.title)
-					.setIcon("code")
-					.onClick(() => void action.onClick(id)),
-			);
+			menu.addItem((item) => {
+				item.setTitle(action.title).onClick(
+					() => void action.onClick(id),
+				);
+				if (action.icon) {
+					item.setIcon(action.icon);
+				}
+			});
 		}
 
 		if (onToggleFavorite) {
@@ -264,10 +272,18 @@ export const IconCard = memo(function IconCard({
 				</div>
 			)}
 
-			{/* 复制成功的瞬时反馈，取代原来每次都弹的系统 Notice */}
+			{/*
+			  复制成功的瞬时反馈，取代原来每次都弹的系统 Notice。
+
+			  ✓ 只是视觉记号（aria-hidden），文字走 role="status" 的 live region——
+			  否则读屏用户对"复制成功"没有任何回音，Notice 又已经撤掉了。
+			*/}
 			{copied && (
-				<span className="ci-lib-icon__card-copied" aria-hidden="true">
-					<Check className="svg-icon" />
+				<span className="ci-lib-icon__card-copied" role="status">
+					<Check className="svg-icon" aria-hidden="true" />
+					<span className="ci-lib-icon__card-copied-sr">
+						{card.copied()}
+					</span>
 				</span>
 			)}
 

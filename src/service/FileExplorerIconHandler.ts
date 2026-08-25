@@ -374,7 +374,7 @@ export default class FileExplorerIconHandler extends AbstractIconHandler<IFileEx
 	}
 
 	/**
-	 * 定位弹窗应挂载的窗口（返回该窗口内的一个元素，供 IconSelector 取 ownerDocument）。
+	 * 定位弹窗应挂载的窗口（返回该窗口内的一个元素，供 IconPickerModal 取 ownerDocument）。
 	 * 优先级：被右键文件的真实树节点 → 聚焦窗口的浏览器容器 → 事件 leaf → 任一浏览器。
 	 */
 	private resolveSourceEl(

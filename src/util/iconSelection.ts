@@ -64,3 +64,25 @@ export function applySelectionClick(
 export function emptySelection(): SelectionState {
 	return { selected: new Set(), anchorId: null };
 }
+
+/**
+ * 从选区里移除一个 id（图标被删除时同步）。
+ *
+ * 不这么做的话，「已选 N」会一直把删掉的项算进去，而按 id 过滤的批量动作
+ * 又找不到它——计数与实际能操作的东西对不上。它同时是锚点时，锚点一并清掉：
+ * 留着一个不存在的锚点会让下一次 Shift 连选退化成加选。
+ */
+export function dropFromSelection(
+	state: SelectionState,
+	id: string,
+): SelectionState {
+	if (!state.selected.has(id) && state.anchorId !== id) {
+		return state;
+	}
+	const selected = new Set(state.selected);
+	selected.delete(id);
+	return {
+		selected,
+		anchorId: state.anchorId === id ? null : state.anchorId,
+	};
+}

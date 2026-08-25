@@ -137,7 +137,6 @@ const en = {
 				search: "Search",
 				graph: "Graph",
 				url: "URL",
-				resetTooltip: "Reset",
 			},
 			overrides: {
 				name: "Per-item overrides",
@@ -195,7 +194,7 @@ const en = {
 				tabName: "All",
 				prompt: "Type a keyword to search Lucide, your SVG icons and every installed icon pack at once.",
 				hint: "Results are grouped by source. Click an icon to copy its name.",
-				showAll: "See all {count:number} →",
+				showAll: "See all {count:number}",
 			},
 			empty: {
 				noResults: "No icons match \"{query:string}\"",

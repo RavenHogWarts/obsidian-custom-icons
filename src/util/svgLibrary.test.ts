@@ -159,4 +159,27 @@ describe("serializeSvgLibrary / parseSvgLibrary", () => {
 	test("合法但为空的 icons 数组返回空数组（不是 null）", () => {
 		expect(parseSvgLibrary('{"version":1,"icons":[]}')).toEqual([]);
 	});
+
+	test("分组随导出往返，大小写原样保留", () => {
+		const grouped = [
+			{ id: "sun", content: "<svg/>", group: "Weather" },
+			{ id: "rain", content: "<svg/>", group: "weather" },
+		];
+		expect(parseSvgLibrary(serializeSvgLibrary(grouped))).toEqual(grouped);
+	});
+
+	test("脏 group 收敛成未分组，且不落字段", () => {
+		const text = JSON.stringify({
+			icons: [
+				{ id: "a", content: "<svg/>", group: 42 },
+				{ id: "b", content: "<svg/>", group: "   " },
+				{ id: "c", content: "<svg/>", group: " Weather " },
+			],
+		});
+		expect(parseSvgLibrary(text)).toEqual([
+			{ id: "a", content: "<svg/>" },
+			{ id: "b", content: "<svg/>" },
+			{ id: "c", content: "<svg/>", group: "Weather" },
+		]);
+	});
 });

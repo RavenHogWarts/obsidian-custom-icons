@@ -244,6 +244,31 @@ const ru = {
 					"name-desc": "Имя Z→A",
 					"added-desc": "Недавно добавленные",
 				},
+				group: {
+					stripLabel: "Фильтр по группам",
+					all: "Все",
+					ungrouped: "Без группы",
+					label: "Группа",
+					placeholder: "Название группы (пусто — без группы)",
+					addHint:
+						"Выберите существующую группу или введите новое название. Оставьте пустым, чтобы добавить без группы.",
+					importHint:
+						"Если оставить пустым, сохранятся группы из файла; если заполнить, все иконки попадут в указанную группу.",
+					moveSelected: "Переместить в группу…",
+					moveAction: "Переместить в группу…",
+					moveTitle: "Переместить в группу",
+					moveCount: "Будет перемещено иконок: {count:number}.",
+					moveOutHint: "Пусто — иконки будут убраны из групп.",
+					mergeWarning:
+						"«{group:string}» уже существует — иконки будут объединены с ней",
+					moved: "Иконок перемещено в «{group:string}»: {count:number}",
+					movedOut: "Иконок убрано из групп: {count:number}",
+					noResultsInGroup:
+						"В «{group:string}» нет иконок по запросу «{query:string}»",
+					noResultsUngrouped:
+						"Среди иконок без группы нет совпадений с «{query:string}»",
+					searchAllGroups: "Искать во всех группах",
+				},
 				exportLib: {
 					tooltip: "Экспорт в JSON",
 					done: "Экспортировано иконок: {count:number} → {path:string}",

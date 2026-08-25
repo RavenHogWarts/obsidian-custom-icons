@@ -246,6 +246,31 @@ const zh = {
 					"name-desc": "名称 Z→A",
 					"added-desc": "最近添加",
 				},
+				group: {
+					stripLabel: "按分组筛选",
+					all: "全部",
+					ungrouped: "未分组",
+					label: "分组",
+					placeholder: "分组名（留空则不分组）",
+					addHint:
+						"可选择已有分组，也可直接输入新名称。留空则不归入任何分组。",
+					importHint:
+						"留空则沿用文件中各图标自带的分组；填写则统一归入该分组。",
+					moveSelected: "移到分组…",
+					moveAction: "移到分组…",
+					moveTitle: "移到分组",
+					moveCount: "将移动 {count:number} 个图标。",
+					moveOutHint: "留空即把这些图标移出分组。",
+					mergeWarning:
+						"「{group:string}」已存在，将与其中已有的图标合并",
+					moved: "已把 {count:number} 个图标移到「{group:string}」",
+					movedOut: "已把 {count:number} 个图标移出分组",
+					noResultsInGroup:
+						"「{group:string}」里没有匹配「{query:string}」的图标",
+					noResultsUngrouped:
+						"未分组里没有匹配「{query:string}」的图标",
+					searchAllGroups: "在全部分组里搜索",
+				},
 				exportLib: {
 					tooltip: "导出为 JSON",
 					done: "已导出 {count:number} 个图标到 {path:string}",

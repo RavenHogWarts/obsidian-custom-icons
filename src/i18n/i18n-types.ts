@@ -735,6 +735,88 @@ type RootTranslation = {
 					 */
 					'added-desc': string
 				}
+				group: {
+					/**
+					 * 按​分​组​筛​选
+					 */
+					stripLabel: string
+					/**
+					 * 全​部
+					 */
+					all: string
+					/**
+					 * 未​分​组
+					 */
+					ungrouped: string
+					/**
+					 * 分​组
+					 */
+					label: string
+					/**
+					 * 分​组​名​（​留​空​则​不​分​组​）
+					 */
+					placeholder: string
+					/**
+					 * 可​选​择​已​有​分​组​，​也​可​直​接​输​入​新​名​称​。​留​空​则​不​归​入​任​何​分​组​。
+					 */
+					addHint: string
+					/**
+					 * 留​空​则​沿​用​文​件​中​各​图​标​自​带​的​分​组​；​填​写​则​统​一​归​入​该​分​组​。
+					 */
+					importHint: string
+					/**
+					 * 移​到​分​组​…
+					 */
+					moveSelected: string
+					/**
+					 * 移​到​分​组​…
+					 */
+					moveAction: string
+					/**
+					 * 移​到​分​组
+					 */
+					moveTitle: string
+					/**
+					 * 将​移​动​ ​{​c​o​u​n​t​}​ ​个​图​标​。
+					 * @param {number} count
+					 */
+					moveCount: RequiredParams<'count'>
+					/**
+					 * 留​空​即​把​这​些​图​标​移​出​分​组​。
+					 */
+					moveOutHint: string
+					/**
+					 * 「​{​g​r​o​u​p​}​」​已​存​在​，​将​与​其​中​已​有​的​图​标​合​并
+					 * @param {string} group
+					 */
+					mergeWarning: RequiredParams<'group'>
+					/**
+					 * 已​把​ ​{​c​o​u​n​t​}​ ​个​图​标​移​到​「​{​g​r​o​u​p​}​」
+					 * @param {number} count
+					 * @param {string} group
+					 */
+					moved: RequiredParams<'count' | 'group'>
+					/**
+					 * 已​把​ ​{​c​o​u​n​t​}​ ​个​图​标​移​出​分​组
+					 * @param {number} count
+					 */
+					movedOut: RequiredParams<'count'>
+					/**
+					 * 「​{​g​r​o​u​p​}​」​里​没​有​匹​配​「​{​q​u​e​r​y​}​」​的​图​标
+					 * @param {string} group
+					 * @param {string} query
+					 */
+					noResultsInGroup: RequiredParams<'group' | 'query'>
+					/**
+					 * 未​分​组​里​没​有​匹​配​「​{​q​u​e​r​y​}​」​的​图​标
+					 * @param {string} query
+					 */
+					noResultsUngrouped: RequiredParams<'query'>
+					/**
+					 * 在​全​部​分​组​里​搜​索
+					 */
+					searchAllGroups: string
+				}
 				exportLib: {
 					/**
 					 * 导​出​为​ ​J​S​O​N
@@ -1969,6 +2051,80 @@ export type TranslationFunctions = {
 					 * 最近添加
 					 */
 					'added-desc': () => LocalizedString
+				}
+				group: {
+					/**
+					 * 按分组筛选
+					 */
+					stripLabel: () => LocalizedString
+					/**
+					 * 全部
+					 */
+					all: () => LocalizedString
+					/**
+					 * 未分组
+					 */
+					ungrouped: () => LocalizedString
+					/**
+					 * 分组
+					 */
+					label: () => LocalizedString
+					/**
+					 * 分组名（留空则不分组）
+					 */
+					placeholder: () => LocalizedString
+					/**
+					 * 可选择已有分组，也可直接输入新名称。留空则不归入任何分组。
+					 */
+					addHint: () => LocalizedString
+					/**
+					 * 留空则沿用文件中各图标自带的分组；填写则统一归入该分组。
+					 */
+					importHint: () => LocalizedString
+					/**
+					 * 移到分组…
+					 */
+					moveSelected: () => LocalizedString
+					/**
+					 * 移到分组…
+					 */
+					moveAction: () => LocalizedString
+					/**
+					 * 移到分组
+					 */
+					moveTitle: () => LocalizedString
+					/**
+					 * 将移动 {count} 个图标。
+					 */
+					moveCount: (arg: { count: number }) => LocalizedString
+					/**
+					 * 留空即把这些图标移出分组。
+					 */
+					moveOutHint: () => LocalizedString
+					/**
+					 * 「{group}」已存在，将与其中已有的图标合并
+					 */
+					mergeWarning: (arg: { group: string }) => LocalizedString
+					/**
+					 * 已把 {count} 个图标移到「{group}」
+					 */
+					moved: (arg: { count: number, group: string }) => LocalizedString
+					/**
+					 * 已把 {count} 个图标移出分组
+					 */
+					movedOut: (arg: { count: number }) => LocalizedString
+					/**
+					 * 「{group}」里没有匹配「{query}」的图标
+					 */
+					noResultsInGroup: (arg: { group: string, query: string }) => LocalizedString
+					/**
+					 * 未分组里没有匹配「{query}」的图标
+					 */
+					noResultsUngrouped: (arg: { query: string }) => LocalizedString
+					/**
+					 * 在全部分组里搜索
+					 */
+					searchAllGroups: () => LocalizedString
 				}
 				exportLib: {
 					/**

@@ -1,6 +1,13 @@
 import { ICustomSVGIcon } from "@src/types/types";
+import { normalizeGroupName } from "./svgGroups";
 
-/** 导出文件的结构版本：字段演进时 +1，导入端据此判断能否识别 */
+/**
+ * 导出文件的结构版本：**不兼容**的结构变化才 +1，导入端据此判断能否识别。
+ *
+ * `group` 这类纯新增的可选字段不算：老版本解析时按未知字段丢掉，图标照样能导入
+ * （落地成未分组，语义正确）；反过来新版本读老文件也只是全都未分组。为它 +1
+ * 只会让新导出的文件在老版本里被整份拒收，白丢一层兼容性。
+ */
 export const SVG_LIBRARY_EXPORT_VERSION = 1;
 
 export interface ISvgLibraryExport {
@@ -117,17 +124,21 @@ export function parseSvgLibrary(text: string): ICustomSVGIcon[] | null {
 		if (!entry || typeof entry !== "object") {
 			continue;
 		}
-		const { id, content, addedAt } = entry as Partial<ICustomSVGIcon>;
+		const { id, content, addedAt, group } = entry as Partial<ICustomSVGIcon>;
 		if (typeof id !== "string" || typeof content !== "string") {
 			continue;
 		}
 		if (!id.trim() || !content.trim()) {
 			continue;
 		}
+		// group 过 normalizeGroupName：脏值（数字 / 超长 / 只有空格）收敛成未分组，
+		// 而不是让它带着进设置，否则筛选 tab 会多出一个点不开的组
+		const normalizedGroup = normalizeGroupName(group);
 		icons.push({
 			id: id.trim(),
 			content: content.trim(),
 			...(typeof addedAt === "number" ? { addedAt } : {}),
+			...(normalizedGroup ? { group: normalizedGroup } : {}),
 		});
 	}
 

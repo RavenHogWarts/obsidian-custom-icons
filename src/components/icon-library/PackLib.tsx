@@ -25,7 +25,9 @@ import { Notice } from "obsidian";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { IconCard } from "../icon-card/IconCard";
 import { ConfirmDialog } from "../modal/ConfirmDialog";
+import { LibEmptyState, LibGridSkeleton } from "./LibEmptyState";
 import { NpmSvgForm } from "./NpmSvgForm";
+import { SvgGlyph } from "./SvgGlyph";
 import { VirtualIconGrid } from "./VirtualIconGrid";
 import "./IconLib.css";
 
@@ -277,7 +279,7 @@ export const PackLib: React.FC = () => {
 	};
 
 	const handleOpenNpmForm = (sourceEl?: HTMLElement) => {
-		let submitFn: (() => Promise<void>) | null = null;
+		let submitFn: (() => Promise<boolean>) | null = null;
 		new ConfirmDialog(store.plugin, {
 			title: LL.view.CustomIconLib.pack.npmModal.title(),
 			confirmLL: LL.common.add(),
@@ -290,11 +292,8 @@ export const PackLib: React.FC = () => {
 					}}
 				/>
 			),
-			onConfirm: async () => {
-				if (submitFn) {
-					await submitFn();
-				}
-			},
+			// 表单自行校验并逐字段解释；返回 false 时弹窗保持打开
+			onConfirm: async () => (submitFn ? await submitFn() : false),
 		}, { sourceEl }).open();
 	};
 
@@ -381,6 +380,20 @@ export const PackLib: React.FC = () => {
 	}
 
 	// 目录视图
+	const searchEmpty = (
+		<LibEmptyState
+			title={LL.view.CustomIconLib.empty.noResults({
+				query: searchQuery,
+			})}
+			actions={[
+				{
+					label: LL.view.CustomIconLib.empty.clearSearch(),
+					onClick: () => setSearchQuery(""),
+				},
+			]}
+		/>
+	);
+
 	return (
 		<div className="ci-lib-container">
 			{/* Toolbar */}
@@ -541,6 +554,8 @@ export const PackLib: React.FC = () => {
 						<div className="ci-pack__empty">
 							{LL.view.CustomIconLib.pack.catalogLoading()}
 						</div>
+					) : filteredCatalog.length === 0 ? (
+						searchEmpty
 					) : (
 							<div className="ci-pack__grid">
 								{filteredCatalog.map((info) => {
@@ -616,8 +631,11 @@ export const PackLib: React.FC = () => {
 					title={LL.view.CustomIconLib.pack.presetsSection()}
 					defaultOpen={false}
 				>
-					<div className="ci-pack__grid">
-						{filteredPresets.map((preset) => {
+					{filteredPresets.length === 0 ? (
+						searchEmpty
+					) : (
+						<div className="ci-pack__grid">
+							{filteredPresets.map((preset) => {
 							const installed = Boolean(
 								settings.customIconLib.packs[preset.id],
 							);
@@ -648,7 +666,8 @@ export const PackLib: React.FC = () => {
 									</div>
 							);
 						})}
-					</div>
+						</div>
+					)}
 				</CollapsibleSection>
 			</div>
 		</div>
@@ -680,6 +699,30 @@ const PackDetail: React.FC<{
 		);
 	}, [names, searchQuery]);
 
+	// 加载中 → 骨架；已加载但过滤为空 → 无结果；包本身为空 → 0 个图标
+	const detailEmptyState =
+		names === null ? (
+			<LibGridSkeleton
+				label={LL.view.CustomIconLib.pack.detailLoading()}
+			/>
+		) : searchQuery ? (
+			<LibEmptyState
+				title={LL.view.CustomIconLib.empty.noResults({
+					query: searchQuery,
+				})}
+				actions={[
+					{
+						label: LL.view.CustomIconLib.empty.clearSearch(),
+						onClick: () => setSearchQuery(""),
+					},
+				]}
+			/>
+		) : (
+			<LibEmptyState
+				title={LL.view.CustomIconLib.pack.iconCountLabel({ count: 0 })}
+			/>
+		);
+
 	return (
 		<div className="ci-lib-container">
 			<div className="ci-lib__toolbar">
@@ -704,9 +747,11 @@ const PackDetail: React.FC<{
 			<div className="ci-lib__hint">
 				<span className="ci-lib__hint-count">
 					{manifest.name} ·{" "}
-					{LL.view.CustomIconLib.pack.iconCountLabel({
-						count: filteredNames.length,
-					})}
+					{names === null
+						? LL.view.CustomIconLib.pack.detailLoading()
+						: LL.view.CustomIconLib.pack.iconCountLabel({
+								count: filteredNames.length,
+							})}
 				</span>
 				<span className="ci-lib__hint-desc">
 					{LL.view.CustomIconLib.pack.detailHint()}
@@ -722,6 +767,7 @@ const PackDetail: React.FC<{
 				minColumnWidth={92}
 				estimateRowHeight={88}
 				className="ci-vgrid--compact"
+				emptyState={detailEmptyState}
 			/>
 		</div>
 	);
@@ -731,39 +777,6 @@ const PackDetail: React.FC<{
 
 /** 卡片内联样例的会话级缓存：cacheKey → 名称 → 已 sanitize 的 SVG（避免重复请求） */
 const cardSampleCache = new Map<string, Record<string, string>>();
-
-/** 单个样例字形：SVG 字符串解析后以节点方式注入（内容已过 sanitize） */
-const SampleGlyph: React.FC<{ svg: string }> = ({ svg }) => {
-	const ref = useRef<HTMLSpanElement>(null);
-
-	useEffect(() => {
-		const container = ref.current;
-		if (!container) {
-			return;
-		}
-		container.empty();
-		try {
-			const parsed = new DOMParser().parseFromString(
-				svg,
-				"image/svg+xml",
-			);
-			const el = parsed.documentElement;
-			if (
-				el &&
-				el.tagName.toLowerCase() === "svg" &&
-				container.ownerDocument
-			) {
-				container.appendChild(
-					container.ownerDocument.importNode(el, true),
-				);
-			}
-		} catch {
-			// 单个样例解析失败时静默跳过
-		}
-	}, [svg]);
-
-	return <span className="ci-pack__card-sample" ref={ref} />;
-};
 
 /**
  * 卡片内联样例（Iconify 目录卡与 npm 预设卡共用）：
@@ -844,7 +857,11 @@ const CardSamples: React.FC<{
 		<div className="ci-pack__card-samples" ref={ref} aria-hidden="true">
 			{shown.map(([name, svg]) =>
 				icons ? (
-					<SampleGlyph key={name} svg={svg} />
+					<SvgGlyph
+						key={name}
+						svg={svg}
+						className="ci-pack__card-sample"
+					/>
 				) : (
 					<span
 						key={name}
@@ -862,42 +879,12 @@ const CardSamples: React.FC<{
 const PreviewIcon: React.FC<{ svg: string; name: string }> = ({
 	svg,
 	name,
-}) => {
-	const ref = useRef<HTMLDivElement>(null);
-
-	useEffect(() => {
-		const container = ref.current;
-		if (!container) {
-			return;
-		}
-		container.empty();
-		try {
-			const parsed = new DOMParser().parseFromString(
-				svg,
-				"image/svg+xml",
-			);
-			const el = parsed.documentElement;
-			if (
-				el &&
-				el.tagName.toLowerCase() === "svg" &&
-				container.ownerDocument
-			) {
-				container.appendChild(
-					container.ownerDocument.importNode(el, true),
-				);
-			}
-		} catch {
-			// 单个样例解析失败时静默跳过，不影响其余预览
-		}
-	}, [svg]);
-
-	return (
-		<div className="ci-pack__preview-tile" title={name}>
-			<div ref={ref} className="ci-pack__preview-svg" />
-			<span className="ci-pack__preview-name">{name}</span>
-		</div>
-	);
-};
+}) => (
+	<div className="ci-pack__preview-tile" title={name}>
+		<SvgGlyph svg={svg} className="ci-pack__preview-svg" />
+		<span className="ci-pack__preview-name">{name}</span>
+	</div>
+);
 
 /** 下载前预览：懒加载样例图标（加载中/失败/无样例/就绪四态） */
 export const PackPreview: React.FC<{

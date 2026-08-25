@@ -100,3 +100,43 @@ export function sanitizeSvg(svgContent: string): string | null {
 
 	return root.outerHTML;
 }
+
+/**
+ * 补上缺失的 SVG 命名空间声明。
+ *
+ * 手写或手工裁剪的 SVG 常省略 `xmlns`，此时 `DOMParser` 解析出的根元素
+ * `namespaceURI` 为 null，`sanitizeSvg` 会判为非法。**导入期校验需要比注册期更宽容**
+ * （注册期有 `cleanSvg` 兜底，导入期一旦拒绝用户就加不进来），
+ * 因此先按原文校验，失败再补 `xmlns` 重试。
+ *
+ * @returns 补过 xmlns 的字符串；本来就声明了 xmlns、或找不到 `<svg` 根标签时返回 null
+ */
+export function ensureSvgNamespace(svgContent: string): string | null {
+	if (/\sxmlns\s*=/i.test(svgContent)) {
+		return null;
+	}
+	const match = /<svg\b/i.exec(svgContent);
+	if (!match) {
+		return null;
+	}
+	const at = match.index + match[0].length;
+	return `${svgContent.slice(0, at)} xmlns="${SVG_NAMESPACE}"${svgContent.slice(at)}`;
+}
+
+/**
+ * 导入期校验：判断一段文本能否作为图标使用。
+ *
+ * 与 `sanitizeSvg` 的区别是对缺失 `xmlns` 的写法宽容（见 `ensureSvgNamespace`）。
+ * 返回值仅用于**校验判定与预览渲染**——存储仍保留用户原文，
+ * 注册时由 `CustomIconLibHandler` 再次 sanitize。
+ *
+ * @returns 规范化后的 SVG 字符串；无法作为图标使用时返回 null
+ */
+export function validateSvgContent(svgContent: string): string | null {
+	const direct = sanitizeSvg(svgContent);
+	if (direct) {
+		return direct;
+	}
+	const withNamespace = ensureSvgNamespace(svgContent);
+	return withNamespace ? sanitizeSvg(withNamespace) : null;
+}

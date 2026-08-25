@@ -137,6 +137,204 @@
 	font-family: monospace;
 }
 
+/* ------------------------------ 表单校验与预览 ------------------------------ */
+/*
+ * 就地反馈：错误显示在字段旁而不是 Notice——用户此刻正看着表单，
+ * 飘走的通知帮不上忙。红色留给"改了才能提交"，黄色留给"能提交但要留意"。
+ */
+.ci-lib__form__input.is-invalid,
+.ci-lib__form__textarea.is-invalid {
+	border-color: var(--text-error);
+	box-shadow: 0 0 0 1px var(--text-error);
+}
+
+.ci-lib__form-error {
+	color: var(--text-error);
+	font-size: var(--font-ui-smaller);
+}
+
+.ci-lib__form-warning {
+	color: var(--text-warning);
+	font-size: var(--font-ui-smaller);
+}
+
+.ci-lib__form-hint {
+	color: var(--text-faint);
+	font-size: var(--font-ui-smaller);
+}
+
+.ci-lib__form-label {
+	color: var(--text-muted);
+	font-size: var(--font-ui-small);
+	font-weight: var(--font-medium);
+}
+
+.ci-lib__form-row {
+	display: flex;
+	align-items: center;
+	gap: var(--size-4-2);
+	flex-wrap: wrap;
+}
+
+/* 重名策略三选一（仅在检测到重名时出现） */
+.ci-lib__form-choices {
+	display: flex;
+	gap: var(--size-4-1);
+}
+
+.ci-lib__form-choice {
+	height: auto;
+	padding: var(--size-4-1) var(--size-4-2);
+	font-size: var(--font-ui-small);
+}
+
+.ci-lib__form-choice.is-active {
+	background-color: var(--interactive-accent);
+	color: var(--text-on-accent);
+	box-shadow: none;
+}
+
+/* 实时预览：校验通过即显示，所见即所得 */
+.ci-lib__form-preview {
+	display: flex;
+	align-items: center;
+	gap: var(--size-4-2);
+}
+
+.ci-lib__form-preview-glyph {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 32px;
+	height: 32px;
+	padding: var(--size-4-1);
+	border: 1px solid var(--background-modifier-border);
+	border-radius: var(--radius-s);
+	background-color: var(--background-primary);
+	color: var(--text-normal);
+
+	svg {
+		width: 100%;
+		height: 100%;
+	}
+}
+
+/* 批量上传的逐文件校验结果 */
+.ci-lib__file-list {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	max-height: 180px;
+	overflow-y: auto;
+}
+
+.ci-lib__file-item {
+	display: flex;
+	align-items: center;
+	gap: var(--size-4-2);
+	font-size: var(--font-ui-smaller);
+}
+
+.ci-lib__file-name {
+	flex: 1;
+	min-width: 0;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	color: var(--text-muted);
+	direction: ltr;
+}
+
+.ci-lib__file-status {
+	flex: none;
+}
+
+.ci-lib__file-status--ok {
+	color: var(--text-success, var(--text-accent));
+}
+
+.ci-lib__file-status--duplicate {
+	color: var(--text-warning);
+}
+
+.ci-lib__file-status--invalid {
+	color: var(--text-error);
+}
+
+/* ------------------------------ 空态 / 骨架 ------------------------------ */
+/*
+ * 三种场景共用：空库、搜索无结果、筛选无结果。
+ * 铁律：永远给出至少一个可点的下一步——纯白页面分不清"没有"和"坏了"。
+ */
+.ci-lib__empty {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: var(--size-4-2);
+	padding: var(--size-4-8, 2rem) var(--size-4-4, 1rem);
+	text-align: center;
+}
+
+.ci-lib__empty-icon {
+	color: var(--text-faint);
+
+	svg {
+		width: 2.5rem;
+		height: 2.5rem;
+	}
+}
+
+.ci-lib__empty-title {
+	color: var(--text-normal);
+	font-size: var(--font-ui-medium, 1em);
+	font-weight: var(--font-medium);
+}
+
+.ci-lib__empty-desc {
+	color: var(--text-muted);
+	font-size: var(--font-ui-small);
+	max-width: 42ch;
+	line-height: var(--line-height-normal);
+}
+
+.ci-lib__empty-actions {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	gap: var(--size-4-2);
+	margin-top: var(--size-4-1);
+}
+
+/* 读包 / 首屏计算期间的占位，让"加载中"与"什么都没有"可区分 */
+.ci-lib__skeleton {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(92px, 1fr));
+	gap: var(--size-4-3);
+	padding: 4px;
+}
+
+.ci-lib__skeleton-tile {
+	height: 88px;
+	border-radius: var(--radius-m);
+	background-color: var(--background-modifier-border);
+	opacity: 0.4;
+	animation: ci-lib-skeleton-pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes ci-lib-skeleton-pulse {
+	0%,
+	100% {
+		opacity: 0.25;
+	}
+	50% {
+		opacity: 0.5;
+	}
+}
+
 /* ------------------------------ 图标库（Pack）页 ------------------------------ */
 
 /*

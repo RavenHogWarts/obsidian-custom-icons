@@ -17,6 +17,11 @@ interface VirtualIconGridProps<T> {
 	estimateRowHeight?: number;
 	/** 透传到滚动视口，复用既有网格外观（如 ci-vgrid--compact 紧凑只读风格） */
 	className?: string;
+	/**
+	 * items 为空时替代网格渲染的内容（空态 / 无结果 / 加载骨架）。
+	 * 未传则保持原行为：什么都不画。
+	 */
+	emptyState?: React.ReactNode;
 }
 
 /**
@@ -33,6 +38,7 @@ export function VirtualIconGrid<T>({
 	gap = 12,
 	estimateRowHeight = 130,
 	className = "",
+	emptyState,
 }: VirtualIconGridProps<T>) {
 	const parentRef = useRef<HTMLDivElement>(null);
 	const columns = useResponsiveColumns(parentRef, minColumnWidth, gap);
@@ -47,41 +53,49 @@ export function VirtualIconGrid<T>({
 		measureElement: (el) => el.getBoundingClientRect().height + gap,
 	});
 
+	// 空态渲染在视口内部（而非取代视口）：parentRef 始终挂载，
+	// 否则 useResponsiveColumns 的 ResizeObserver 会在首次有数据时仍停留在 1 列。
 	return (
 		<div ref={parentRef} className={`ci-vgrid__viewport ${className}`}>
-			<div
-				className="ci-vgrid__sizer"
-				style={{
-					height: rowVirtualizer.getTotalSize(),
-					position: "relative",
-				}}
-			>
-				{rowVirtualizer.getVirtualItems().map((vRow) => {
-					const start = vRow.index * columns;
-					const rowItems = items.slice(start, start + columns);
-					return (
-						<div
-							key={vRow.key}
-							data-index={vRow.index}
-							ref={rowVirtualizer.measureElement}
-							className="ci-vgrid__row"
-							style={{
-								position: "absolute",
-								top: 0,
-								left: 0,
-								width: "100%",
-								transform: `translateY(${vRow.start}px)`,
-								gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))`,
-								gap,
-							}}
-						>
-							{rowItems.map((item) => (
-								<div key={getKey(item)}>{renderItem(item)}</div>
-							))}
-						</div>
-					);
-				})}
-			</div>
+			{items.length === 0 && emptyState ? (
+				emptyState
+			) : (
+				<div
+					className="ci-vgrid__sizer"
+					style={{
+						height: rowVirtualizer.getTotalSize(),
+						position: "relative",
+					}}
+				>
+					{rowVirtualizer.getVirtualItems().map((vRow) => {
+						const start = vRow.index * columns;
+						const rowItems = items.slice(start, start + columns);
+						return (
+							<div
+								key={vRow.key}
+								data-index={vRow.index}
+								ref={rowVirtualizer.measureElement}
+								className="ci-vgrid__row"
+								style={{
+									position: "absolute",
+									top: 0,
+									left: 0,
+									width: "100%",
+									transform: `translateY(${vRow.start}px)`,
+									gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))`,
+									gap,
+								}}
+							>
+								{rowItems.map((item) => (
+									<div key={getKey(item)}>
+										{renderItem(item)}
+									</div>
+								))}
+							</div>
+						);
+					})}
+				</div>
+			)}
 		</div>
 	);
 }

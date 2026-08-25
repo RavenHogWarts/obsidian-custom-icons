@@ -716,6 +716,72 @@ type RootTranslation = {
 				 * 添​加​图​标
 				 */
 				emptyAction: string
+				sort: {
+					/**
+					 * 排​序
+					 */
+					label: string
+					/**
+					 * 名​称​ ​A​→​Z
+					 */
+					'name-asc': string
+					/**
+					 * 名​称​ ​Z​→​A
+					 */
+					'name-desc': string
+					/**
+					 * 最​近​添​加
+					 */
+					'added-desc': string
+				}
+				exportLib: {
+					/**
+					 * 导​出​为​ ​J​S​O​N
+					 */
+					tooltip: string
+					/**
+					 * 已​导​出​ ​{​c​o​u​n​t​}​ ​个​图​标​到​ ​{​p​a​t​h​}
+					 * @param {number} count
+					 * @param {string} path
+					 */
+					done: RequiredParams<'count' | 'path'>
+					/**
+					 * 导​出​失​败
+					 */
+					failed: string
+					/**
+					 * 没​有​可​导​出​的​图​标
+					 */
+					empty: string
+				}
+				selection: {
+					/**
+					 * C​t​r​l​/​C​m​d​+​点​击​ ​加​选​，​S​h​i​f​t​+​点​击​ ​连​选
+					 */
+					hint: string
+					/**
+					 * 已​选​ ​{​c​o​u​n​t​}​ ​个
+					 * @param {number} count
+					 */
+					count: RequiredParams<'count'>
+					/**
+					 * 删​除​所​选
+					 */
+					deleteSelected: string
+					/**
+					 * 导​出​所​选
+					 */
+					exportSelected: string
+					/**
+					 * 取​消​选​择
+					 */
+					clear: string
+					/**
+					 * 删​除​所​选​的​ ​{​c​o​u​n​t​}​ ​个​图​标​？
+					 * @param {number} count
+					 */
+					deleteConfirm: RequiredParams<'count'>
+				}
 				modal: {
 					/**
 					 * 粘​贴​源​码
@@ -725,6 +791,34 @@ type RootTranslation = {
 					 * 上​传​文​件
 					 */
 					uploadMode: string
+					/**
+					 * 导​入​ ​J​S​O​N
+					 */
+					importMode: string
+					/**
+					 * 选​择​导​出​的​ ​J​S​O​N​ ​文​件
+					 */
+					importPick: string
+					/**
+					 * 选​择​此​前​「​导​出​」​生​成​的​ ​.​j​s​o​n​ ​文​件​，​可​用​于​跨​ ​v​a​u​l​t​ ​迁​移​或​还​原​备​份​。
+					 */
+					importDesc: string
+					/**
+					 * 无​法​识​别​的​文​件​格​式​（​需​要​「​导​出​」​生​成​的​ ​J​S​O​N​）
+					 */
+					importInvalid: string
+					/**
+					 * 文​件​里​没​有​可​导​入​的​图​标
+					 */
+					importEmpty: string
+					/**
+					 * 把​ ​.​s​v​g​ ​文​件​拖​到​这​里​，​或​点​击​下​方​选​择
+					 */
+					dropHint: string
+					/**
+					 * 松​手​即​可​添​加
+					 */
+					dropActive: string
 					/**
 					 * 图​标​I​D​ ​(​例​如​:​ ​m​y​-​i​c​o​n​)
 					 */
@@ -1790,6 +1884,68 @@ export type TranslationFunctions = {
 				 * 添加图标
 				 */
 				emptyAction: () => LocalizedString
+				sort: {
+					/**
+					 * 排序
+					 */
+					label: () => LocalizedString
+					/**
+					 * 名称 A→Z
+					 */
+					'name-asc': () => LocalizedString
+					/**
+					 * 名称 Z→A
+					 */
+					'name-desc': () => LocalizedString
+					/**
+					 * 最近添加
+					 */
+					'added-desc': () => LocalizedString
+				}
+				exportLib: {
+					/**
+					 * 导出为 JSON
+					 */
+					tooltip: () => LocalizedString
+					/**
+					 * 已导出 {count} 个图标到 {path}
+					 */
+					done: (arg: { count: number, path: string }) => LocalizedString
+					/**
+					 * 导出失败
+					 */
+					failed: () => LocalizedString
+					/**
+					 * 没有可导出的图标
+					 */
+					empty: () => LocalizedString
+				}
+				selection: {
+					/**
+					 * Ctrl/Cmd+点击 加选，Shift+点击 连选
+					 */
+					hint: () => LocalizedString
+					/**
+					 * 已选 {count} 个
+					 */
+					count: (arg: { count: number }) => LocalizedString
+					/**
+					 * 删除所选
+					 */
+					deleteSelected: () => LocalizedString
+					/**
+					 * 导出所选
+					 */
+					exportSelected: () => LocalizedString
+					/**
+					 * 取消选择
+					 */
+					clear: () => LocalizedString
+					/**
+					 * 删除所选的 {count} 个图标？
+					 */
+					deleteConfirm: (arg: { count: number }) => LocalizedString
+				}
 				modal: {
 					/**
 					 * 粘贴源码
@@ -1799,6 +1955,34 @@ export type TranslationFunctions = {
 					 * 上传文件
 					 */
 					uploadMode: () => LocalizedString
+					/**
+					 * 导入 JSON
+					 */
+					importMode: () => LocalizedString
+					/**
+					 * 选择导出的 JSON 文件
+					 */
+					importPick: () => LocalizedString
+					/**
+					 * 选择此前「导出」生成的 .json 文件，可用于跨 vault 迁移或还原备份。
+					 */
+					importDesc: () => LocalizedString
+					/**
+					 * 无法识别的文件格式（需要「导出」生成的 JSON）
+					 */
+					importInvalid: () => LocalizedString
+					/**
+					 * 文件里没有可导入的图标
+					 */
+					importEmpty: () => LocalizedString
+					/**
+					 * 把 .svg 文件拖到这里，或点击下方选择
+					 */
+					dropHint: () => LocalizedString
+					/**
+					 * 松手即可添加
+					 */
+					dropActive: () => LocalizedString
 					/**
 					 * 图标ID (例如: my-icon)
 					 */

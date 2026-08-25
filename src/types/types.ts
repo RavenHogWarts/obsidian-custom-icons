@@ -139,6 +139,11 @@ export const RECENT_LIMIT = 40;
 export interface ICustomSVGIcon {
 	id: string;
 	content: string;
+	/**
+	 * 添加时间戳，用于「最近添加」排序。
+	 * 旧数据没有这个字段，排序时按数组顺序（= 插入顺序）兜底，无需迁移。
+	 */
+	addedAt?: number;
 }
 
 /** 图标库数据源配置（安装时快照，重装/更新时复用） */

@@ -53,6 +53,57 @@
 	}
 }
 
+/* 批量操作条（「我的 SVG」页有选中项时出现在工具栏下方） */
+.ci-lib__batch {
+	display: flex;
+	flex: none;
+	align-items: center;
+	gap: var(--size-4-2);
+	flex-wrap: wrap;
+	padding: var(--size-4-1) var(--size-4-2);
+	border: 1px solid var(--interactive-accent);
+	border-radius: var(--radius-s);
+	background-color: var(--background-secondary-alt);
+}
+
+.ci-lib__batch-count {
+	margin-inline-end: auto;
+	font-size: var(--font-ui-small);
+	font-weight: var(--font-medium);
+	color: var(--text-normal);
+}
+
+/* 拖放区（添加弹窗的「上传文件」页） */
+.ci-lib__dropzone {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: var(--size-4-1);
+	padding: var(--size-4-4, 1rem);
+	border: 1px dashed var(--background-modifier-border);
+	border-radius: var(--radius-m);
+	background-color: var(--background-primary);
+	color: var(--text-muted);
+	font-size: var(--font-ui-small);
+	text-align: center;
+	transition:
+		border-color 0.15s ease,
+		background-color 0.15s ease;
+
+	svg {
+		width: 1.5rem;
+		height: 1.5rem;
+	}
+}
+
+.ci-lib__dropzone.is-active {
+	border-color: var(--interactive-accent);
+	border-style: solid;
+	background-color: var(--background-modifier-hover);
+	color: var(--text-normal);
+}
+
 /* ------------------------------ 收藏置顶 ------------------------------ */
 /*
  * 钉在虚拟化网格上方的一小片收藏，与图标选择器共享同一份 favorites 数据。

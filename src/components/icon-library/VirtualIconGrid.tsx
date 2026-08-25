@@ -1,5 +1,5 @@
 import { useVirtualizer } from "@tanstack/react-virtual";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { useResponsiveColumns } from "./useResponsiveColumns";
 
 interface VirtualIconGridProps<T> {
@@ -22,6 +22,15 @@ interface VirtualIconGridProps<T> {
 	 * 未传则保持原行为：什么都不画。
 	 */
 	emptyState?: React.ReactNode;
+	/**
+	 * 报告当前列数。外部做方向键走位时需要它把「左右」与「上下」换算成下标增量。
+	 */
+	onColumnsChange?: (columns: number) => void;
+	/**
+	 * 需要滚动进可视区的条目下标（受控）。
+	 * 每次变化都会滚动，因此调用方用它跟随「当前高亮项」即可。
+	 */
+	scrollToIndex?: number;
 }
 
 /**
@@ -39,6 +48,8 @@ export function VirtualIconGrid<T>({
 	estimateRowHeight = 130,
 	className = "",
 	emptyState,
+	onColumnsChange,
+	scrollToIndex,
 }: VirtualIconGridProps<T>) {
 	const parentRef = useRef<HTMLDivElement>(null);
 	const columns = useResponsiveColumns(parentRef, minColumnWidth, gap);
@@ -52,6 +63,23 @@ export function VirtualIconGrid<T>({
 		overscan: 4,
 		measureElement: (el) => el.getBoundingClientRect().height + gap,
 	});
+
+	useEffect(() => {
+		onColumnsChange?.(columns);
+	}, [columns, onColumnsChange]);
+
+	// 跟随外部高亮项滚动。rowVirtualizer 每次渲染都是新引用，
+	// 放进依赖会无限循环，故只依赖真正的触发源。
+	const scrollRef = useRef(rowVirtualizer);
+	scrollRef.current = rowVirtualizer;
+	useEffect(() => {
+		if (scrollToIndex === undefined || scrollToIndex < 0) {
+			return;
+		}
+		scrollRef.current.scrollToIndex(Math.floor(scrollToIndex / columns), {
+			align: "auto",
+		});
+	}, [scrollToIndex, columns]);
 
 	// 空态渲染在视口内部（而非取代视口）：parentRef 始终挂载，
 	// 否则 useResponsiveColumns 的 ResizeObserver 会在首次有数据时仍停留在 1 列。

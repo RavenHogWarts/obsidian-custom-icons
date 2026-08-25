@@ -238,7 +238,6 @@ export const TabHeader: FC = () => {
 								onChange={(value) => setSelectedType(value)}
 							/>
 							<IconPicker
-								app={settingsStore.app}
 								value={newIcon}
 								type={newType}
 								onChange={(value, type) => {
@@ -278,7 +277,6 @@ export const TabHeader: FC = () => {
 									}}
 								/>
 								<IconPicker
-									app={settingsStore.app}
 									value={override.icon ?? ""}
 									type={override.type ?? "lucide"}
 									color={override.color}
@@ -321,7 +319,6 @@ export const TabHeader: FC = () => {
 								onChange={(value) => setSelectedTab(value)}
 							/>
 							<IconPicker
-								app={settingsStore.app}
 								value={tabIcon}
 								type={tabIconType}
 								onChange={(value, type) => {
@@ -367,7 +364,6 @@ export const TabHeader: FC = () => {
 										}}
 									/>
 									<IconPicker
-										app={settingsStore.app}
 										value={override.icon ?? ""}
 										type={override.type ?? "lucide"}
 										color={override.color}

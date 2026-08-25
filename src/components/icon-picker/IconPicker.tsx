@@ -1,15 +1,11 @@
-import usePluginSettings from "@src/hooks/usePluginSettings";
 import useSettingsStore from "@src/hooks/useSettingsStore";
 import { IconType } from "@src/types/types";
-import { getLucideIconNames } from "@src/util/getLucideIcons";
 import setIcon from "@src/util/setIcon";
-import { App } from "obsidian";
 import * as React from "react";
-import { IconSelector } from "./IconSelector";
+import { IconPickerModal } from "./IconPickerModal";
 import "./IconPicker.css";
 
 interface IconPickerProps {
-	app: App;
 	value: string;
 	type: IconType;
 	color?: string;
@@ -17,52 +13,36 @@ interface IconPickerProps {
 }
 
 export const IconPicker: React.FC<IconPickerProps> = ({
-	app,
 	value,
 	type,
 	color,
 	onChange,
 }) => {
 	const settingsStore = useSettingsStore();
-	const settings = usePluginSettings(settingsStore);
-
-	const iconItems = React.useMemo(() => {
-		return {
-			lucide: getLucideIconNames(),
-			svg: [
-				// 用户单个导入的 SVG（裸 id，渲染走 CI- 回退）
-				...settings.customIconLib.svg.map((icon) => icon.id),
-				// 已启用图标库的图标（完整注册 id CI-{packId}-{name}）
-				...settingsStore.plugin.iconPackStore.getEnabledIconIds(
-					settings.customIconLib.packs,
-				),
-			],
-		};
-	}, [
-		settings.customIconLib.svg,
-		settings.customIconLib.packs,
-		settingsStore,
-	]);
 
 	const [selectedIcon, setSelectedIcon] = React.useState<string>(value);
 	const [selectedType, setSelectedType] = React.useState<IconType>(type);
 	const buttonRef = React.useRef<HTMLDivElement>(null);
 
 	const handleClick = () => {
-		const modal = new IconSelector(
-			app,
-			iconItems,
-			selectedType,
-			color,
-			(icon, type) => {
-				setSelectedIcon(icon);
-				setSelectedType(type);
-				void onChange(icon, type);
+		// 候选列表不再在这里构建：过去每个实例都在 useMemo 里把所有启用包的图标
+		// 摊平成一个上万条的数组（设置页 N 行 = N 份），改由弹窗按分组自取。
+		new IconPickerModal(
+			settingsStore.plugin,
+			{
+				value: selectedIcon,
+				type: selectedType,
+				color,
+				// 设置页每行旁边已有独立的 Color 控件，弹窗内不再重复提供
+				onChange: (icon, iconType) => {
+					setSelectedIcon(icon);
+					setSelectedType(iconType);
+					void onChange(icon, iconType);
+				},
 			},
 			// 触发元素：弹窗挂载到选择器按钮所在的窗口（跨窗口防错位）
-			buttonRef.current ?? undefined,
-		);
-		modal.open();
+			{ sourceEl: buttonRef.current ?? undefined },
+		).open();
 	};
 
 	React.useEffect(() => {

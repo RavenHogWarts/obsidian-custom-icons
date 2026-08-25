@@ -517,6 +517,107 @@ type RootTranslation = {
 				 */
 				searchInSvg: RequiredParams<'query'>
 			}
+			picker: {
+				/**
+				 * 选​择​图​标
+				 */
+				title: string
+				/**
+				 * 搜​索​图​标​…
+				 */
+				searchPlaceholder: string
+				segment: {
+					/**
+					 * 收​藏
+					 */
+					favorites: string
+					/**
+					 * 最​近​使​用
+					 */
+					recent: string
+					/**
+					 * L​u​c​i​d​e
+					 */
+					lucide: string
+					/**
+					 * 我​的​ ​S​V​G
+					 */
+					svg: string
+				}
+				/**
+				 * {​c​o​u​n​t​}​ ​个​匹​配
+				 * @param {number} count
+				 */
+				matchCount: RequiredParams<'count'>
+				/**
+				 * 当​前​：​{​i​d​}
+				 * @param {string} id
+				 */
+				current: RequiredParams<'id'>
+				/**
+				 * 不​使​用​图​标
+				 */
+				clearIcon: string
+				/**
+				 * 加​入​收​藏
+				 */
+				favoriteAdd: string
+				/**
+				 * 取​消​收​藏
+				 */
+				favoriteRemove: string
+				/**
+				 * 颜​色
+				 */
+				colorLabel: string
+				/**
+				 * 清​除​颜​色
+				 */
+				colorReset: string
+				/**
+				 * 还​没​有​收​藏​的​图​标​。​把​常​用​图​标​点​上​ ​★​，​下​次​打​开​就​在​这​里​。
+				 */
+				emptyFavorites: string
+				/**
+				 * 还​没​有​最​近​使​用​的​图​标​，​选​过​的​会​自​动​出​现​在​这​里​。
+				 */
+				emptyRecent: string
+				/**
+				 * 该​分​组​暂​无​图​标
+				 */
+				emptySegment: string
+				/**
+				 * 该​分​组​没​有​匹​配​「​{​q​u​e​r​y​}​」​的​图​标
+				 * @param {string} query
+				 */
+				noResults: RequiredParams<'query'>
+				hint: {
+					/**
+					 * 移​动
+					 */
+					navigate: string
+					/**
+					 * 选​择
+					 */
+					select: string
+					/**
+					 * 切​换​分​组
+					 */
+					segment: string
+					/**
+					 * 收​藏
+					 */
+					favorite: string
+					/**
+					 * 清​除​图​标
+					 */
+					clear: string
+					/**
+					 * 关​闭
+					 */
+					dismiss: string
+				}
+			}
 			svg: {
 				/**
 				 * S​V​G​（​实​验​性​）
@@ -1416,6 +1517,104 @@ export type TranslationFunctions = {
 				 * 在我的 SVG 中搜索「{query}」
 				 */
 				searchInSvg: (arg: { query: string }) => LocalizedString
+			}
+			picker: {
+				/**
+				 * 选择图标
+				 */
+				title: () => LocalizedString
+				/**
+				 * 搜索图标…
+				 */
+				searchPlaceholder: () => LocalizedString
+				segment: {
+					/**
+					 * 收藏
+					 */
+					favorites: () => LocalizedString
+					/**
+					 * 最近使用
+					 */
+					recent: () => LocalizedString
+					/**
+					 * Lucide
+					 */
+					lucide: () => LocalizedString
+					/**
+					 * 我的 SVG
+					 */
+					svg: () => LocalizedString
+				}
+				/**
+				 * {count} 个匹配
+				 */
+				matchCount: (arg: { count: number }) => LocalizedString
+				/**
+				 * 当前：{id}
+				 */
+				current: (arg: { id: string }) => LocalizedString
+				/**
+				 * 不使用图标
+				 */
+				clearIcon: () => LocalizedString
+				/**
+				 * 加入收藏
+				 */
+				favoriteAdd: () => LocalizedString
+				/**
+				 * 取消收藏
+				 */
+				favoriteRemove: () => LocalizedString
+				/**
+				 * 颜色
+				 */
+				colorLabel: () => LocalizedString
+				/**
+				 * 清除颜色
+				 */
+				colorReset: () => LocalizedString
+				/**
+				 * 还没有收藏的图标。把常用图标点上 ★，下次打开就在这里。
+				 */
+				emptyFavorites: () => LocalizedString
+				/**
+				 * 还没有最近使用的图标，选过的会自动出现在这里。
+				 */
+				emptyRecent: () => LocalizedString
+				/**
+				 * 该分组暂无图标
+				 */
+				emptySegment: () => LocalizedString
+				/**
+				 * 该分组没有匹配「{query}」的图标
+				 */
+				noResults: (arg: { query: string }) => LocalizedString
+				hint: {
+					/**
+					 * 移动
+					 */
+					navigate: () => LocalizedString
+					/**
+					 * 选择
+					 */
+					select: () => LocalizedString
+					/**
+					 * 切换分组
+					 */
+					segment: () => LocalizedString
+					/**
+					 * 收藏
+					 */
+					favorite: () => LocalizedString
+					/**
+					 * 清除图标
+					 */
+					clear: () => LocalizedString
+					/**
+					 * 关闭
+					 */
+					dismiss: () => LocalizedString
+				}
 			}
 			svg: {
 				/**

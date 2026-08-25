@@ -149,7 +149,6 @@ export const Ribbon: FC = () => {
 										}}
 									/>
 									<IconPicker
-										app={settingsStore.app}
 										// 未分配时显示按钮当前图标（从原生 svg class 提取）
 										value={
 											override?.icon ??

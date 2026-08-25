@@ -1,5 +1,5 @@
 import type CIPlugin from "@src/main";
-import { IconSelector } from "@src/components/icon-picker/IconSelector";
+import { IconPickerModal } from "@src/components/icon-picker/IconPickerModal";
 import { LL } from "@src/i18n/i18n";
 import { IIcon, IconType } from "@src/types/types";
 import {
@@ -8,7 +8,6 @@ import {
 	resolveFileIcon,
 	resolveFolderIcon,
 } from "@src/util/fileExplorerIcon";
-import { getLucideIconNames } from "@src/util/getLucideIcons";
 import { AbstractIconHandler } from "@src/util/IconHandler";
 import setIcon, { cleanupIcon } from "@src/util/setIcon";
 import { EventRef, Menu, TAbstractFile, TFolder, WorkspaceLeaf } from "obsidian";
@@ -352,22 +351,26 @@ export default class FileExplorerIconHandler extends AbstractIconHandler<IFileEx
 		// 注意：从文件树触发的 file-menu 不传 leaf，activeDocument 也不可靠，
 		// 故直接用被右键文件在浏览器里的真实节点定位其 ownerDocument（ground truth）。
 		const sourceEl = this.resolveSourceEl(file, leaf);
-		const modal = new IconSelector(
-			this.app,
-			this.buildIconItems(),
-			current?.type ?? "lucide",
-			current?.color,
-			(icon, type) => {
-				void this.writeOverride(mapKey, file.path, {
-					id: file.path,
-					icon,
-					type,
-					color: current?.color ?? "",
-				});
+		new IconPickerModal(
+			this.plugin,
+			{
+				value: current?.icon ?? "",
+				type: current?.type ?? "lucide",
+				color: current?.color,
+				// 右键入口没有独立的颜色控件，弹窗内直接提供
+				colorEditable: true,
+				onChange: (icon, type, color) => {
+					void this.writeOverride(mapKey, file.path, {
+						id: file.path,
+						icon,
+						type,
+						// color 为 undefined 表示未改动，保留原值
+						color: color ?? current?.color ?? "",
+					});
+				},
 			},
-			sourceEl,
-		);
-		modal.open();
+			{ sourceEl },
+		).open();
 	}
 
 	/**
@@ -410,17 +413,6 @@ export default class FileExplorerIconHandler extends AbstractIconHandler<IFileEx
 
 		// 事件带的 leaf（编辑器/视图触发时才有）→ 兜底第一个浏览器
 		return leaf?.view.containerEl ?? explorers[0];
-	}
-
-	private buildIconItems(): Record<IconType, string[]> {
-		const lib = this.plugin.settings.customIconLib;
-		return {
-			lucide: getLucideIconNames(),
-			svg: [
-				...lib.svg.map((icon) => icon.id),
-				...this.plugin.iconPackStore.getEnabledIconIds(lib.packs),
-			],
-		};
 	}
 
 	// ---------------------------------------------------------------------

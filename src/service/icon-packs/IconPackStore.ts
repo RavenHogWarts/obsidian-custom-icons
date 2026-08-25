@@ -90,22 +90,19 @@ export default class IconPackStore {
 		return this.cache.get(id) ?? null;
 	}
 
-	/** 同步收集已启用包的全部图标完整 id（CI-{packId}-{name}），供 IconPicker 使用 */
-	getEnabledIconIds(packs: Record<string, IIconPackManifest>): string[] {
-		const ids: string[] = [];
-		for (const manifest of Object.values(packs)) {
-			if (!manifest.enabled) {
-				continue;
-			}
-			const pack = this.getCachedPack(manifest.id);
-			if (!pack) {
-				continue;
-			}
-			for (const name of Object.keys(pack.icons)) {
-				ids.push(packIconId(manifest.id, name));
-			}
+	/**
+	 * 同步取某个包的全部图标完整 id（CI-{packId}-{name}），未加载时返回空数组。
+	 *
+	 * 图标选择器按「每个包一段」惰性取数，因此按包返回而非把所有包摊平成一个
+	 * 大数组——后者会让每个 IconPicker 实例各自构建上万条候选（见
+	 * dev/260825/图标库UI-UX分析与改进方案.md §1.2）。
+	 */
+	getPackIconIds(packId: string): string[] {
+		const pack = this.getCachedPack(packId);
+		if (!pack) {
+			return [];
 		}
-		return ids;
+		return Object.keys(pack.icons).map((name) => packIconId(packId, name));
 	}
 
 	/** 预载全部 manifest 声明的包（启动时调用一次，使缓存就绪） */

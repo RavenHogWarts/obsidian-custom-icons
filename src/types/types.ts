@@ -113,7 +113,20 @@ export interface ICustomIconLib {
 	svg: ICustomSVGIcon[];
 	/** 已安装图标库的 manifest（仅元数据，图标内容存插件目录 icon-packs/ 文件） */
 	packs: Record<string, IIconPackManifest>;
+	/**
+	 * 最近使用（新→旧），元素为 `${type}:${id}` 复合键。
+	 *
+	 * 用复合键而非裸 id：`lucide` 与 `svg` 是两个命名空间，可能撞名
+	 * （`svg` 侧还混了用户裸 id 与 `CI-{packId}-{name}` 两种形态）。
+	 * 写入时去重并截断到 RECENT_LIMIT。
+	 */
+	recent: string[];
+	/** 收藏（用户手动，保持添加顺序），元素同为 `${type}:${id}` */
+	favorites: string[];
 }
+
+/** 「最近使用」保留条数上限 */
+export const RECENT_LIMIT = 40;
 
 // Definition
 export interface ICustomSVGIcon {
@@ -187,5 +200,7 @@ export const DEFAULT_SETTINGS: IPluginSettings = {
 	customIconLib: {
 		svg: [],
 		packs: {},
+		recent: [],
+		favorites: [],
 	},
 };

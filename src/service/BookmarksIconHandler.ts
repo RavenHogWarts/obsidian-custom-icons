@@ -1,4 +1,4 @@
-import { IconSelector } from "@src/components/icon-picker/IconSelector";
+import { IconPickerModal } from "@src/components/icon-picker/IconPickerModal";
 import { LL } from "@src/i18n/i18n";
 import type CIPlugin from "@src/main";
 import { BookmarkKind, IIcon, IconType } from "@src/types/types";
@@ -7,7 +7,6 @@ import {
 	isBookmarkKind,
 	resolveBookmarkIcon,
 } from "@src/util/bookmarkIcon";
-import { getLucideIconNames } from "@src/util/getLucideIcons";
 import { AbstractIconHandler } from "@src/util/IconHandler";
 import setIcon, { cleanupIcon } from "@src/util/setIcon";
 import { EventRef, Menu, WorkspaceLeaf } from "obsidian";
@@ -436,32 +435,25 @@ export default class BookmarksIconHandler extends AbstractIconHandler<IBookmarks
 		sourceItem?: BookmarkItemLike,
 	): void {
 		const current = this.settings?.items?.[keys[0]];
-		const modal = new IconSelector(
-			this.app,
-			this.buildIconItems(),
-			current?.type ?? "lucide",
-			current?.color,
-			(icon, type) => {
-				void this.writeItemOverrides(keys, {
-					icon,
-					type,
-					color: current?.color ?? "",
-				});
+		new IconPickerModal(
+			this.plugin,
+			{
+				value: current?.icon ?? "",
+				type: current?.type ?? "lucide",
+				color: current?.color,
+				// 右键入口没有独立的颜色控件，弹窗内直接提供
+				colorEditable: true,
+				onChange: (icon, type, color) => {
+					void this.writeItemOverrides(keys, {
+						icon,
+						type,
+						// color 为 undefined 表示未改动，保留原值
+						color: color ?? current?.color ?? "",
+					});
+				},
 			},
-			this.findRowEl(sourceItem),
-		);
-		modal.open();
-	}
-
-	private buildIconItems(): Record<IconType, string[]> {
-		const lib = this.plugin.settings.customIconLib;
-		return {
-			lucide: getLucideIconNames(),
-			svg: [
-				...lib.svg.map((icon) => icon.id),
-				...this.plugin.iconPackStore.getEnabledIconIds(lib.packs),
-			],
-		};
+			{ sourceEl: this.findRowEl(sourceItem) },
+		).open();
 	}
 
 	// ---------------------------------------------------------------------

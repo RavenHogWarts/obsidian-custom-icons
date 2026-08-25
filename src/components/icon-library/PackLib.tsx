@@ -142,13 +142,26 @@ export const PackLib: React.FC<PackLibProps> = ({ handoff }) => {
 	const service = store.plugin.iconPackService;
 
 	// Local State
-	const [searchQuery, setSearchQuery] = useState("");
 	// 交接指定了图标包时直接落到该包的详情页（否则停在目录，用户还要自己找一遍）
 	const [browsing, setBrowsing] = useState<IIconPackManifest | null>(
 		() =>
 			(handoff?.packId
 				? settings.customIconLib.packs[handoff.packId]
 				: null) ?? null,
+	);
+	/*
+	 * 交接来的查询词，在**落不进详情页时**由目录页接住。
+	 *
+	 * 原先这里硬编码 `useState("")`：交接的包没装（或已被卸载）时 `browsing` 为
+	 * null，用户跳过来看到的是一个空搜索框的目录页，查询词无声消失。目录搜的是
+	 * **图标集名称**、拿图标名去搜通常无命中，但那时至少有「没有匹配的图标包」
+	 * 加清空搜索的出路，比凭空蒸发好。
+	 *
+	 * 反过来，已经进了详情页就不再往目录的搜索框里填——否则从详情页返回时，
+	 * 目录会莫名其妙地被一个图标名筛空。
+	 */
+	const [searchQuery, setSearchQuery] = useState(() =>
+		browsing ? "" : (handoff?.query ?? ""),
 	);
 	const [installing, setInstalling] = useState(false);
 	/** 安装进度（null = 未在安装）；用于行内进度条 */
@@ -167,6 +180,10 @@ export const PackLib: React.FC<PackLibProps> = ({ handoff }) => {
 		fetchedAt: number;
 	} | null>(null);
 	const [catalogError, setCatalogError] = useState<string | null>(null);
+	// 与其它四页一致的页内快捷键（`/` 聚焦搜索、Esc 清空）
+	const searchRef = useRef<HTMLInputElement>(null);
+	const clearSearch = useCallback(() => setSearchQuery(""), []);
+	const handleShortcuts = useLibShortcuts(searchRef, clearSearch);
 
 	// 目录加载（带落盘缓存，断网时展示缓存快照）
 	const loadCatalog = async (force = false) => {
@@ -350,7 +367,6 @@ export const PackLib: React.FC<PackLibProps> = ({ handoff }) => {
 		new ConfirmDialog(store.plugin, {
 			title: `${LL.common.add()} "${info.name}"`,
 			confirmLL: LL.common.add(),
-			disableConfirm: installing,
 			children: (
 				<div className="ci-pack__confirm">
 					<div className="ci-pack__confirm-row">
@@ -399,7 +415,6 @@ export const PackLib: React.FC<PackLibProps> = ({ handoff }) => {
 		new ConfirmDialog(store.plugin, {
 			title: `${LL.common.add()} "${preset.name}"`,
 			confirmLL: LL.common.add(),
-			disableConfirm: installing,
 			children: (
 				<div className="ci-pack__confirm">
 					<div className="ci-pack__confirm-row">
@@ -444,7 +459,6 @@ export const PackLib: React.FC<PackLibProps> = ({ handoff }) => {
 		new ConfirmDialog(store.plugin, {
 			title: LL.view.CustomIconLib.pack.npmModal.title(),
 			confirmLL: LL.common.add(),
-			disableConfirm: installing,
 			children: (
 				<NpmSvgForm
 					onSubmit={(config, options) => doInstall(config, options)}
@@ -465,7 +479,6 @@ export const PackLib: React.FC<PackLibProps> = ({ handoff }) => {
 		new ConfirmDialog(store.plugin, {
 			title: `${LL.view.CustomIconLib.pack.redownload()} "${manifest.name}"?`,
 			confirmLL: LL.view.CustomIconLib.pack.redownload(),
-			disableConfirm: installing,
 			children: (
 				<div className="ci-pack__confirm">
 					<div className="ci-pack__confirm-row">
@@ -514,11 +527,21 @@ export const PackLib: React.FC<PackLibProps> = ({ handoff }) => {
 		const action = doc.createElement("a");
 		action.textContent = LL.view.CustomIconLib.pack.redownload();
 		action.className = "ci-pack__notice-action";
-		action.addEventListener("click", (event) => {
+		// 无 href 的 <a> 既不可聚焦也不被读屏当按钮，补上按钮语义与键盘通道，
+		// 否则这条出路是纯鼠标专属
+		action.setAttribute("role", "button");
+		action.tabIndex = 0;
+		const trigger = (event: Event) => {
 			event.preventDefault();
 			// 不让点击冒泡到 Notice 自身的"点一下就关"上，免得重下弹窗还没开就被关掉
 			event.stopPropagation();
 			handleRedownload(manifest);
+		};
+		action.addEventListener("click", trigger);
+		action.addEventListener("keydown", (event) => {
+			if (event.key === "Enter" || event.key === " ") {
+				trigger(event);
+			}
 		});
 		fragment.appendChild(action);
 		new Notice(fragment, UNINSTALL_NOTICE_MS);
@@ -641,13 +664,19 @@ export const PackLib: React.FC<PackLibProps> = ({ handoff }) => {
 	);
 
 	return (
-		<div className="ci-lib-container">
+		<div
+			className="ci-lib-container"
+			tabIndex={-1}
+			onKeyDown={handleShortcuts}
+		>
 			{/* Toolbar */}
 			<div className="ci-lib__toolbar">
 				<div className="ci-lib__search">
 					<input
+						ref={searchRef}
 						type="search"
 						placeholder={LL.view.CustomIconLib.searchPlaceholder()}
+						title={LL.view.CustomIconLib.searchHint()}
 						value={searchQuery}
 						onChange={(e) => setSearchQuery(e.target.value)}
 					/>

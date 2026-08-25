@@ -1,10 +1,15 @@
 import { AllLib } from "@src/components/icon-library/AllLib";
-import { LibNavigate, LibTabId } from "@src/components/icon-library/libNav";
+import {
+	LibNavigate,
+	LibTabId,
+	normalizeLibTab,
+} from "@src/components/icon-library/libNav";
 import { LucideLib } from "@src/components/icon-library/LucideLib";
 import { PackLib } from "@src/components/icon-library/PackLib";
 import { SvgLib } from "@src/components/icon-library/SvgLib";
 import { Tab, TabItem } from "@src/components/tab/Tab";
 import { SettingsStoreContext } from "@src/context/SettingsStoreContext";
+import { useLibUIPrefLocal } from "@src/hooks/useLibUIPref";
 import { LL } from "@src/i18n/i18n";
 import CIPlugin from "@src/main";
 import { ItemView, WorkspaceLeaf } from "obsidian";
@@ -25,12 +30,13 @@ interface Handoff {
 /**
  * 图标库四页外壳。
  *
- * 持有当前页签，并在页之间传递「搜索交接」——「全部」页里某个来源点
- * 「查看全部」，或某页搜索无结果想换页再找，都带着查询词跳过去
- * （Radix 会卸载非活动页，目标页重新挂载时把 handoff 当作初始状态）。
+ * 持有当前页签（落盘在 `ui.lastTab`，重开视图回到上次停留的页），并在页之间
+ * 传递「搜索交接」——「全部」页里某个来源点「查看全部」，或某页搜索无结果想
+ * 换页再找，都带着查询词跳过去（Radix 会卸载非活动页，目标页重新挂载时把
+ * handoff 当作初始状态）。
  */
 const IconLibShell: React.FC = () => {
-	const [tab, setTab] = useState<LibTabId>("all");
+	const [tab, setTab] = useLibUIPrefLocal("lastTab", normalizeLibTab);
 	const [handoff, setHandoff] = useState<Handoff | null>(null);
 
 	const navigate: LibNavigate = (target, query, packId) => {

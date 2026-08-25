@@ -1,6 +1,7 @@
 import {
 	SelectionState,
 	applySelectionClick,
+	dropFromSelection,
 	emptySelection,
 } from "./iconSelection";
 
@@ -96,5 +97,37 @@ describe("applySelectionClick · 边界", () => {
 			selected: new Set(),
 			anchorId: null,
 		});
+	});
+});
+
+describe("dropFromSelection", () => {
+	test("移除选中项，其余保留", () => {
+		let state = applySelectionClick(emptySelection(), ids, "a", CTRL);
+		state = applySelectionClick(state, ids, "c", CTRL);
+		state = dropFromSelection(state, "a");
+		expect(list(state)).toEqual(["c"]);
+	});
+
+	test("被移除的项同时是锚点时，锚点一并清掉", () => {
+		const state = applySelectionClick(emptySelection(), ids, "b", CTRL);
+		expect(state.anchorId).toBe("b");
+		expect(dropFromSelection(state, "b").anchorId).toBeNull();
+	});
+
+	test("移除的不是锚点时，锚点保持不动", () => {
+		let state = applySelectionClick(emptySelection(), ids, "a", CTRL);
+		state = applySelectionClick(state, ids, "c", CTRL);
+		expect(dropFromSelection(state, "a").anchorId).toBe("c");
+	});
+
+	test("与选区无关的 id 原样返回（不产生新对象）", () => {
+		const state = applySelectionClick(emptySelection(), ids, "a", CTRL);
+		expect(dropFromSelection(state, "zzz")).toBe(state);
+	});
+
+	test("不改动入参选区", () => {
+		const state = applySelectionClick(emptySelection(), ids, "a", CTRL);
+		dropFromSelection(state, "a");
+		expect([...state.selected]).toEqual(["a"]);
 	});
 });

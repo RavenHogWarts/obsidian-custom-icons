@@ -137,7 +137,6 @@ const zh_TW = {
 				search: "搜尋",
 				graph: "關係圖",
 				url: "網址",
-				resetTooltip: "重置",
 			},
 			overrides: {
 				name: "單項覆蓋",
@@ -195,7 +194,7 @@ const zh_TW = {
 				tabName: "全部",
 				prompt: "輸入關鍵詞，跨 Lucide、我的 SVG 與已安裝圖示庫一起搜尋。",
 				hint: "跨來源搜尋結果按來源分組；點擊圖示可複製名稱。",
-				showAll: "查看全部 {count:number} 個 →",
+				showAll: "查看全部 {count:number} 個",
 			},
 			empty: {
 				noResults: "沒有符合「{query:string}」的圖示",

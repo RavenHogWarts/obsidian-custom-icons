@@ -129,17 +129,8 @@
 	border-color: var(--color-blue);
 }
 
-/* 删除按钮特定样式 */
-.ci-lib-icon__card-delete:hover {
-	background-color: var(--background-modifier-error);
-	border-color: var(--background-modifier-error);
-}
-
-/* 自定义按钮保持默认的 accent 颜色 */
-.ci-lib-icon__card-custom:hover {
-	background-color: var(--interactive-accent);
-	border-color: var(--interactive-accent);
-}
+/* 删除与自定义动作已下沉到右键菜单，浮层只剩星标与编辑，
+   原来的 .ci-lib-icon__card-delete / --custom 两条规则已随之删除 */
 
 /* 收藏星标：已收藏为实心黄星 */
 .ci-lib-icon__card-star.is-on {
@@ -198,6 +189,19 @@
 		width: 1.5rem;
 		height: 1.5rem;
 	}
+}
+
+/* 「已复制」的读屏文字：视觉上不占位，但留在无障碍树里供 live region 播报 */
+.ci-lib-icon__card-copied-sr {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	margin: -1px;
+	padding: 0;
+	border: 0;
+	overflow: hidden;
+	clip-path: inset(50%);
+	white-space: nowrap;
 }
 
 @keyframes ci-card-copied-in {

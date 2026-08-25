@@ -83,6 +83,11 @@ export function VirtualIconGrid<T>({
 
 	// 空态渲染在视口内部（而非取代视口）：parentRef 始终挂载，
 	// 否则 useResponsiveColumns 的 ResizeObserver 会在首次有数据时仍停留在 1 列。
+	//
+	// sizer / row / 单元格三层壳都标 role="presentation"：图标选择器把整个网格
+	// 包在 role="listbox" 里，而 listbox 只允许 option（或 group）作为后代——
+	// 这三层纯布局 div 会让 option 变成"隔了三层的后代"。标为呈现性后，
+	// 无障碍树里 option 直接挂在 listbox 下；对库视图的普通网格没有语义影响。
 	return (
 		<div ref={parentRef} className={`ci-vgrid__viewport ${className}`}>
 			{items.length === 0 && emptyState ? (
@@ -90,6 +95,7 @@ export function VirtualIconGrid<T>({
 			) : (
 				<div
 					className="ci-vgrid__sizer"
+					role="presentation"
 					style={{
 						height: rowVirtualizer.getTotalSize(),
 						position: "relative",
@@ -104,6 +110,7 @@ export function VirtualIconGrid<T>({
 								data-index={vRow.index}
 								ref={rowVirtualizer.measureElement}
 								className="ci-vgrid__row"
+								role="presentation"
 								style={{
 									position: "absolute",
 									top: 0,
@@ -115,7 +122,7 @@ export function VirtualIconGrid<T>({
 								}}
 							>
 								{rowItems.map((item) => (
-									<div key={getKey(item)}>
+									<div key={getKey(item)} role="presentation">
 										{renderItem(item)}
 									</div>
 								))}

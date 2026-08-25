@@ -127,9 +127,21 @@ export interface ICustomIconLib {
 	ui: ICustomIconLibUI;
 }
 
+/**
+ * 图标库视图偏好。
+ *
+ * 这里的字面量联合与 `util/iconGridDensity.ts`（`IconGridDensity`）、
+ * `components/icon-library/libNav.ts`（`LibTabId`）、`util/svgLibrary.ts`
+ * （`SvgSortMode`）各自的命名类型同构——types.ts 不向 util / components 反向
+ * 依赖，故在此重复声明；两端由 `normalize*` 函数在读取时对齐。
+ */
 export interface ICustomIconLibUI {
 	/** 网格密度：紧凑 / 标准 / 大（见 util/iconGridDensity.ts） */
 	density: "compact" | "normal" | "large";
+	/** 上次停留的页签，重开视图时回到这里（见 components/icon-library/libNav.ts） */
+	lastTab: "all" | "pack" | "svg" | "lucide";
+	/** 「我的 SVG」页的排序方式（见 util/svgLibrary.ts） */
+	svgSort: "name-asc" | "name-desc" | "added-desc";
 }
 
 /** 「最近使用」保留条数上限 */
@@ -214,6 +226,6 @@ export const DEFAULT_SETTINGS: IPluginSettings = {
 		packs: {},
 		recent: [],
 		favorites: [],
-		ui: { density: "normal" },
+		ui: { density: "normal", lastTab: "all", svgSort: "name-asc" },
 	},
 };

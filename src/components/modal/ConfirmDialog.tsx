@@ -16,9 +16,13 @@ interface ConfirmDialogProps {
 	 *
 	 * 这条契约替代了原来的「无条件关闭」：表单 early-return 不再表现为
 	 * 「点了就关、啥也没发生」。
+	 *
+	 * 没有 `disableConfirm` 这类"外部禁用"入口是有意的：它只能是构造期的静态值
+	 * （弹窗内容是 React 树，外层 props 不会随调用方状态更新），看着像防护、
+	 * 实际永远是打开那一刻的快照。防重复提交由下面的 `busy` 负责，
+	 * 校验则遵循「不要禁用提交，而要解释原因」。
 	 */
 	onConfirm: () => void | boolean | Promise<void | boolean>;
-	disableConfirm?: boolean;
 }
 
 export interface ConfirmDialogViewProps extends ConfirmDialogProps {
@@ -31,7 +35,6 @@ const ConfirmDialogView: React.FC<ConfirmDialogViewProps> = ({
 	confirmLL,
 	onConfirm,
 	onClose,
-	disableConfirm,
 }) => {
 	// 提交中：兼作防重复点击（下载/写盘期间可能持续数秒）
 	const [busy, setBusy] = useState(false);
@@ -65,7 +68,7 @@ const ConfirmDialogView: React.FC<ConfirmDialogViewProps> = ({
 					onClick={() => {
 						void handleConfirm();
 					}}
-					disabled={disableConfirm || busy}
+					disabled={busy}
 				>
 					{confirmLL}
 				</button>

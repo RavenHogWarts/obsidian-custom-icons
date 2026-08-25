@@ -240,9 +240,37 @@ const zh = {
 				emptyDesc:
 					"粘贴 SVG 源码或上传 .svg 文件即可添加，添加后可在插件各处使用。",
 				emptyAction: "添加图标",
+				sort: {
+					label: "排序",
+					"name-asc": "名称 A→Z",
+					"name-desc": "名称 Z→A",
+					"added-desc": "最近添加",
+				},
+				exportLib: {
+					tooltip: "导出为 JSON",
+					done: "已导出 {count:number} 个图标到 {path:string}",
+					failed: "导出失败",
+					empty: "没有可导出的图标",
+				},
+				selection: {
+					hint: "Ctrl/Cmd+点击 加选，Shift+点击 连选",
+					count: "已选 {count:number} 个",
+					deleteSelected: "删除所选",
+					exportSelected: "导出所选",
+					clear: "取消选择",
+					deleteConfirm: "删除所选的 {count:number} 个图标？",
+				},
 				modal: {
 					pasteMode: "粘贴源码",
 					uploadMode: "上传文件",
+					importMode: "导入 JSON",
+					importPick: "选择导出的 JSON 文件",
+					importDesc:
+						"选择此前「导出」生成的 .json 文件，可用于跨 vault 迁移或还原备份。",
+					importInvalid: "无法识别的文件格式（需要「导出」生成的 JSON）",
+					importEmpty: "文件里没有可导入的图标",
+					dropHint: "把 .svg 文件拖到这里，或点击下方选择",
+					dropActive: "松手即可添加",
 					idPlaceholder: "图标ID (例如: my-icon)",
 					contentPlaceholder: "SVG 内容 (<svg>...</svg>)",
 					selectFiles: "选择 SVG 文件",

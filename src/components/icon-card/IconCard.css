@@ -162,6 +162,21 @@
 	border-radius: var(--radius-s);
 }
 
+/*
+ * 支持多选的卡片：禁掉文本选中。
+ * 否则 Shift+点击名称会顺手拖出一段文字高亮，Ctrl/Cmd+点击也容易带出选区。
+ */
+.ci-lib-icon__card.is-selectable {
+	user-select: none;
+}
+
+/* 多选态：accent 描边，与「已复制」的短暂高亮区分开（后者会自动消失） */
+.ci-lib-icon__card.is-selected {
+	border-color: var(--interactive-accent);
+	box-shadow: inset 0 0 0 2px var(--interactive-accent);
+	background-color: var(--background-modifier-hover);
+}
+
 /* 「已复制」微反馈：卡片压一层强调色，中间打勾，1s 后自动消失 */
 .ci-lib-icon__card.is-copied {
 	border-color: var(--interactive-accent);

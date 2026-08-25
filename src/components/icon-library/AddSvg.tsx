@@ -1,9 +1,14 @@
 import { LL } from "@src/i18n/i18n";
 import { validateSvgContent } from "@src/service/icon-packs/sanitize";
+import { parseSvgLibrary } from "@src/util/svgLibrary";
+import { Upload } from "lucide-react";
 import { Notice } from "obsidian";
 import { useEffect, useMemo, useState } from "react";
 import { Tab, TabItem } from "../tab/Tab";
 import { SvgGlyph } from "./SvgGlyph";
+
+/** 添加方式：粘贴源码 / 上传 .svg 文件 / 导入导出的 JSON */
+type AddMode = "paste" | "upload" | "import";
 
 /** 重名处理策略（仅在检测到重名时才呈现给用户） */
 export type DuplicateStrategy = "skip" | "rename" | "overwrite";
@@ -14,6 +19,8 @@ const STRATEGIES: DuplicateStrategy[] = ["skip", "rename", "overwrite"];
 export interface PendingIcon {
 	id: string;
 	content: string;
+	/** 导入时可能自带（保留原始添加时间）；否则由写入方补当前时间 */
+	addedAt?: number;
 }
 
 /** 写入结果，用于如实告知用户实际发生了什么 */
@@ -35,13 +42,15 @@ interface AddSvgProps {
 	onReady?: (submit: () => Promise<boolean>) => void;
 }
 
-/** 单个待上传文件的校验结果 */
+/** 单个待写入条目的校验结果（上传文件与导入 JSON 共用） */
 interface FileEntry {
 	name: string;
 	id: string;
 	/** 用户原文；null = 无法解析为合法 SVG */
 	content: string | null;
 	duplicate: boolean;
+	/** 导入时自带的原始添加时间 */
+	addedAt?: number;
 }
 
 /** 把结果拼成一条人话 Notice：只列出发生了的部分 */
@@ -65,11 +74,12 @@ export const AddSvg: React.FC<AddSvgProps> = ({
 	onSubmit,
 	onReady,
 }) => {
-	const [activeTab, setActiveTab] = useState<"paste" | "upload">("paste");
+	const [activeTab, setActiveTab] = useState<AddMode>("paste");
 	const [iconId, setIconId] = useState("");
 	const [iconContent, setIconContent] = useState("");
 	const [files, setFiles] = useState<FileEntry[] | null>(null);
 	const [reading, setReading] = useState(false);
+	const [dragging, setDragging] = useState(false);
 	const [strategy, setStrategy] = useState<DuplicateStrategy>("skip");
 	const [error, setError] = useState<string | null>(null);
 
@@ -87,18 +97,23 @@ export const AddSvg: React.FC<AddSvgProps> = ({
 	);
 	const pasteInvalid = trimmedContent !== "" && pastePreview === null;
 
-	// ---------- 上传模式 ----------
-	const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+	// ---------- 上传 / 导入模式（共用同一份条目列表与重名策略）----------
+	/** 读 .svg 文件：文件名去扩展名即图标 id */
+	const readSvgFiles = async (picked: File[]) => {
 		setError(null);
-		const picked = Array.from(e.target.files ?? []);
-		if (picked.length === 0) {
+		const svgs = picked.filter((file) => /\.svg$/i.test(file.name));
+		if (svgs.length === 0) {
 			setFiles(null);
+			// 拖进来的全是非 .svg：明确说一声，而不是静默什么都不发生
+			if (picked.length > 0) {
+				setError(modal.allInvalid());
+			}
 			return;
 		}
 		setReading(true);
 		try {
 			const entries: FileEntry[] = [];
-			for (const file of picked) {
+			for (const file of svgs) {
 				const raw = await file.text();
 				const id = file.name.replace(/\.svg$/i, "");
 				entries.push({
@@ -116,6 +131,53 @@ export const AddSvg: React.FC<AddSvgProps> = ({
 		} finally {
 			setReading(false);
 		}
+	};
+
+	/** 读导出的 JSON：一个文件里带出多个图标 */
+	const readLibraryFile = async (file: File) => {
+		setError(null);
+		setReading(true);
+		try {
+			const parsed = parseSvgLibrary(await file.text());
+			if (!parsed) {
+				setFiles(null);
+				setError(modal.importInvalid());
+				return;
+			}
+			if (parsed.length === 0) {
+				setFiles(null);
+				setError(modal.importEmpty());
+				return;
+			}
+			setFiles(
+				parsed.map((icon) => ({
+					name: icon.id,
+					id: icon.id,
+					content: validateSvgContent(icon.content)
+						? icon.content
+						: null,
+					duplicate: existing.has(icon.id),
+					addedAt: icon.addedAt,
+				})),
+			);
+		} catch (e) {
+			console.error("Failed to read icon library file:", e);
+			setFiles(null);
+			setError(modal.importInvalid());
+		} finally {
+			setReading(false);
+		}
+	};
+
+	const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+		const picked = Array.from(e.target.files ?? []);
+		if (activeTab === "import") {
+			if (picked[0]) {
+				await readLibraryFile(picked[0]);
+			}
+			return;
+		}
+		await readSvgFiles(picked);
 	};
 
 	const usableFiles = (files ?? []).filter((f) => f.content !== null);
@@ -163,7 +225,11 @@ export const AddSvg: React.FC<AddSvgProps> = ({
 		}
 
 		if (!files || files.length === 0) {
-			setError(modal.filesRequired());
+			setError(
+				activeTab === "import"
+					? modal.importEmpty()
+					: modal.filesRequired(),
+			);
 			return false;
 		}
 		if (usableFiles.length === 0) {
@@ -179,6 +245,8 @@ export const AddSvg: React.FC<AddSvgProps> = ({
 				usableFiles.map((f) => ({
 					id: f.id,
 					content: f.content as string,
+					// 导入时保留原始添加时间，让「最近添加」排序仍然可信
+					...(f.addedAt !== undefined ? { addedAt: f.addedAt } : {}),
 				})),
 				strategy,
 			),
@@ -254,17 +322,9 @@ export const AddSvg: React.FC<AddSvgProps> = ({
 		</div>
 	);
 
-	const uploadTab = (
-		<div className="ci-lib__form">
-			<span className="ci-lib__form-label">{modal.selectFiles()}</span>
-			<input
-				className="ci-lib__form__input"
-				type="file"
-				accept=".svg"
-				multiple
-				onChange={(e) => void handleFileChange(e)}
-			/>
-			<span className="ci-lib__form-hint">{modal.selectFilesDesc()}</span>
+	/** 上传 / 导入共用的条目清单（逐条 ✓ / 重名 / 无法解析） */
+	const fileList = (
+		<>
 			{reading && (
 				<div className="ci-lib__form-hint">{modal.reading()}</div>
 			)}
@@ -302,6 +362,52 @@ export const AddSvg: React.FC<AddSvgProps> = ({
 					</ul>
 				</>
 			)}
+		</>
+	);
+
+	const uploadTab = (
+		<div className="ci-lib__form">
+			{/* 拖放区：把 .svg 直接拖进来，比先点开文件选择器少一步 */}
+			<div
+				className={`ci-lib__dropzone${dragging ? " is-active" : ""}`}
+				onDragOver={(e) => {
+					e.preventDefault();
+					setDragging(true);
+				}}
+				onDragLeave={() => setDragging(false)}
+				onDrop={(e) => {
+					e.preventDefault();
+					setDragging(false);
+					void readSvgFiles(Array.from(e.dataTransfer.files));
+				}}
+			>
+				<Upload className="svg-icon" />
+				<span>{dragging ? modal.dropActive() : modal.dropHint()}</span>
+			</div>
+			<input
+				className="ci-lib__form__input"
+				type="file"
+				accept=".svg"
+				multiple
+				onChange={(e) => void handleFileChange(e)}
+			/>
+			<span className="ci-lib__form-hint">{modal.selectFilesDesc()}</span>
+			{fileList}
+			{conflictPicker}
+		</div>
+	);
+
+	const importTab = (
+		<div className="ci-lib__form">
+			<span className="ci-lib__form-label">{modal.importPick()}</span>
+			<input
+				className="ci-lib__form__input"
+				type="file"
+				accept=".json,application/json"
+				onChange={(e) => void handleFileChange(e)}
+			/>
+			<span className="ci-lib__form-hint">{modal.importDesc()}</span>
+			{fileList}
 			{conflictPicker}
 		</div>
 	);
@@ -309,6 +415,7 @@ export const AddSvg: React.FC<AddSvgProps> = ({
 	const tabItems: TabItem[] = [
 		{ id: "paste", title: modal.pasteMode(), content: pasteTab },
 		{ id: "upload", title: modal.uploadMode(), content: uploadTab },
+		{ id: "import", title: modal.importMode(), content: importTab },
 	];
 
 	return (
@@ -317,7 +424,9 @@ export const AddSvg: React.FC<AddSvgProps> = ({
 				items={tabItems}
 				defaultValue="paste"
 				onChange={(value) => {
-					setActiveTab(value as "paste" | "upload");
+					setActiveTab(value as AddMode);
+					// 换模式清空上一模式读进来的条目，避免"看着是 JSON 却提交了 svg 文件"
+					setFiles(null);
 					setError(null);
 				}}
 			/>

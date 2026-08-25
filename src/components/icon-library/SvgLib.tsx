@@ -7,10 +7,29 @@ import { LL } from "@src/i18n/i18n";
 import { ICustomSVGIcon } from "@src/types/types";
 import { cardGridMetrics } from "@src/util/iconGridDensity";
 import { IconRef } from "@src/util/iconRef";
+import {
+	applySelectionClick,
+	emptySelection,
+} from "@src/util/iconSelection";
+import {
+	SvgSortMode,
+	nextSvgSortMode,
+	serializeSvgLibrary,
+	sortSvgIcons,
+	svgLibraryExportName,
+} from "@src/util/svgLibrary";
 import { uniqueIconId } from "@src/util/svgUtils";
-import { CirclePlus, Code, Shapes } from "lucide-react";
-import { Notice, setIcon } from "obsidian";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+	ArrowDownAZ,
+	ArrowUpAZ,
+	CirclePlus,
+	Clock,
+	Code,
+	Download,
+	Shapes,
+} from "lucide-react";
+import { Notice } from "obsidian";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { CustomAction, IconCard } from "../icon-card/IconCard";
 import { ConfirmDialog } from "../modal/ConfirmDialog";
 import {
@@ -42,8 +61,9 @@ export const SvgLib: React.FC<SvgLibProps> = ({ handoff, onNavigate }) => {
 
 	// Local State
 	const [searchQuery, setSearchQuery] = useState(handoff?.query ?? "");
-	const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
-	const sortButtonRef = useRef<HTMLButtonElement>(null);
+	const [sortMode, setSortMode] = useState<SvgSortMode>("name-asc");
+	const [selection, setSelection] = useState(emptySelection);
+	const selected = selection.selected;
 	const searchRef = useRef<HTMLInputElement>(null);
 	const clearSearch = useCallback(() => setSearchQuery(""), []);
 	const handleShortcuts = useLibShortcuts(searchRef, clearSearch);
@@ -51,6 +71,7 @@ export const SvgLib: React.FC<SvgLibProps> = ({ handoff, onNavigate }) => {
 	const svgIcons = settings.customIconLib.svg;
 	const existingIds = useMemo(() => svgIcons.map((i) => i.id), [svgIcons]);
 	const metrics = cardGridMetrics(density);
+	const svgLL = LL.view.CustomIconLib.svg;
 
 	// 本页的收藏 = 类型为 svg 且确实是用户导入的图标（排除图标包的 CI-* 项）
 	const ownFavorites = useMemo(() => {
@@ -62,37 +83,39 @@ export const SvgLib: React.FC<SvgLibProps> = ({ handoff, onNavigate }) => {
 
 	// Filter and Sort Icons
 	const filteredIcons = useMemo(() => {
-		const icons = [...svgIcons]; // Shallow copy
-
-		const result = icons.filter(
-			(icon) =>
-				!searchQuery ||
-				icon.id.toLowerCase().includes(searchQuery.toLowerCase()),
+		const query = searchQuery.toLowerCase();
+		const matched = svgIcons.filter(
+			(icon) => !query || icon.id.toLowerCase().includes(query),
 		);
-
-		result.sort((a, b) => {
-			return sortOrder === "asc"
-				? a.id.localeCompare(b.id)
-				: b.id.localeCompare(a.id);
-		});
-
-		return result;
-	}, [svgIcons, searchQuery, sortOrder]);
-
-	// Update sort button icon when sortOrder changes
-	useEffect(() => {
-		if (sortButtonRef.current) {
-			sortButtonRef.current.empty();
-			const iconName =
-				sortOrder === "asc" ? "arrow-up-az" : "arrow-up-za";
-			setIcon(sortButtonRef.current, iconName);
-		}
-	}, [sortOrder]);
+		return sortSvgIcons(matched, sortMode);
+	}, [svgIcons, searchQuery, sortMode]);
 
 	// Handlers
 	const handleToggleSort = () => {
-		setSortOrder((prev) => (prev === "asc" ? "desc" : "asc"));
+		setSortMode((prev) => nextSvgSortMode(prev));
 	};
+
+	/**
+	 * 多选：Ctrl/Cmd 加选单个，Shift 从锚点连选一段。
+	 *
+	 * 选区与锚点合并成一个 state：先前把锚点放在 useRef 里、在 `setSelected`
+	 * 的更新函数里读它——而更新函数是稍后才执行的，那时锚点已被本次点击改写，
+	 * 于是连选永远退化成"只选中一个"。逻辑现已抽到 util/iconSelection.ts 并有测试。
+	 *
+	 * 无修饰键的普通点击仍然是「复制名称」——不因为进入了选择状态就改变主动作，
+	 * 否则用户点一下想复制、结果只是选中，会很别扭。
+	 */
+	const handleModifierClick = useCallback(
+		(id: string, mods: { toggle: boolean; range: boolean }) => {
+			const ids = filteredIcons.map((icon) => icon.id);
+			setSelection((prev) => applySelectionClick(prev, ids, id, mods));
+		},
+		[filteredIcons],
+	);
+
+	const clearSelection = useCallback(() => {
+		setSelection(emptySelection());
+	}, []);
 
 	/**
 	 * 按冲突策略合并写入，并如实回报发生了什么。
@@ -107,23 +130,29 @@ export const SvgLib: React.FC<SvgLibProps> = ({ handoff, onNavigate }) => {
 		const next: ICustomSVGIcon[] = [...current];
 		const taken = new Set(current.map((icon) => icon.id));
 		const result: AddSvgResult = { added: 0, overwritten: 0, skipped: [] };
+		const now = Date.now();
+		// 导入自带 addedAt 时保留原值，其余补当前时间（供「最近添加」排序）
+		const stamp = (icon: PendingIcon): ICustomSVGIcon => ({
+			...icon,
+			addedAt: icon.addedAt ?? now,
+		});
 
 		for (const icon of icons) {
 			if (!taken.has(icon.id)) {
-				next.push(icon);
+				next.push(stamp(icon));
 				taken.add(icon.id);
 				result.added++;
 				continue;
 			}
 			if (strategy === "overwrite") {
 				const index = next.findIndex((i) => i.id === icon.id);
-				next[index] = icon;
+				next[index] = stamp(icon);
 				result.overwritten++;
 				continue;
 			}
 			if (strategy === "rename") {
 				const id = uniqueIconId(icon.id, taken);
-				next.push({ ...icon, id });
+				next.push({ ...stamp(icon), id });
 				taken.add(id);
 				result.added++;
 				continue;
@@ -199,6 +228,7 @@ export const SvgLib: React.FC<SvgLibProps> = ({ handoff, onNavigate }) => {
 
 		const newSvgIcons = [...currentSvgIcons];
 		newSvgIcons[iconIndex] = {
+			...currentSvgIcons[iconIndex],
 			id: newIconId,
 			content: newIconContent,
 		};
@@ -265,6 +295,57 @@ export const SvgLib: React.FC<SvgLibProps> = ({ handoff, onNavigate }) => {
 		},
 		[settings.customIconLib.svg],
 	);
+
+	const handleDeleteSelected = () => {
+		const ids = Array.from(selected);
+		if (ids.length === 0) {
+			return;
+		}
+		new ConfirmDialog(store.plugin, {
+			title: svgLL.selection.deleteConfirm({ count: ids.length }),
+			confirmLL: LL.common.delete(),
+			onConfirm: async () => {
+				const drop = new Set(ids);
+				await store.updateSettingByPath(
+					"customIconLib.svg",
+					settings.customIconLib.svg.filter(
+						(icon) => !drop.has(icon.id),
+					),
+				);
+				clearSelection();
+			},
+		}).open();
+	};
+
+	/**
+	 * 导出为 JSON 落到 vault 根目录。
+	 *
+	 * 不走 `<a download>`：Obsidian 的沙箱里由页面自己发起的下载会被拦掉，
+	 * 写进 vault 再把路径告诉用户，是这里唯一稳妥的做法。
+	 */
+	const handleExport = async (onlySelected: boolean) => {
+		const source = settings.customIconLib.svg;
+		const icons = onlySelected
+			? source.filter((icon) => selected.has(icon.id))
+			: source;
+		if (icons.length === 0) {
+			new Notice(svgLL.exportLib.empty());
+			return;
+		}
+		const path = svgLibraryExportName(new Date());
+		try {
+			await store.app.vault.adapter.write(
+				path,
+				serializeSvgLibrary(icons),
+			);
+			new Notice(
+				svgLL.exportLib.done({ count: icons.length, path }),
+			);
+		} catch (error) {
+			console.error("Failed to export icon library:", error);
+			new Notice(svgLL.exportLib.failed());
+		}
+	};
 
 	// 稳定的 props 引用：配合 IconCard 的 memo，避免网格重渲时全量重执行
 	const copyAction = useMemo<CustomAction[]>(
@@ -348,15 +429,58 @@ export const SvgLib: React.FC<SvgLibProps> = ({ handoff, onNavigate }) => {
 				<DensityToggle value={density} onChange={setDensity} />
 
 				<button
-					ref={sortButtonRef}
 					onClick={handleToggleSort}
-					aria-label={sortOrder === "asc" ? "A-Z" : "Z-A"}
-				/>
+					aria-label={`${svgLL.sort.label()}: ${svgLL.sort[sortMode]()}`}
+					title={`${svgLL.sort.label()}: ${svgLL.sort[sortMode]()}`}
+				>
+					{sortMode === "name-asc" ? (
+						<ArrowUpAZ className="svg-icon" />
+					) : sortMode === "name-desc" ? (
+						<ArrowDownAZ className="svg-icon" />
+					) : (
+						<Clock className="svg-icon" />
+					)}
+				</button>
+
+				<button
+					onClick={() => void handleExport(false)}
+					aria-label={svgLL.exportLib.tooltip()}
+					title={svgLL.exportLib.tooltip()}
+				>
+					<Download className="svg-icon" />
+				</button>
 
 				<button onClick={(e) => handleOpenAddModal(e.currentTarget)}>
 					<CirclePlus className="svg-icon" />
 				</button>
 			</div>
+
+			{/* 批量条：有选中项时出现，不挤占工具栏，搜索仍可用 */}
+			{selected.size > 0 && (
+				<div className="ci-lib__batch">
+					<span className="ci-lib__batch-count">
+						{svgLL.selection.count({ count: selected.size })}
+					</span>
+					<button onClick={handleDeleteSelected}>
+						{svgLL.selection.deleteSelected()}
+					</button>
+					<button onClick={() => void handleExport(true)}>
+						{svgLL.selection.exportSelected()}
+					</button>
+					<button onClick={clearSelection}>
+						{svgLL.selection.clear()}
+					</button>
+				</div>
+			)}
+
+			{/* 多选手势不写出来就没人知道：常驻一行淡提示 */}
+			{filteredIcons.length > 0 && (
+				<div className="ci-lib__hint">
+					<span className="ci-lib__hint-desc">
+						{svgLL.selection.hint()}
+					</span>
+				</div>
+			)}
 
 			{/* 收藏置顶（搜索时收起，避免与结果混淆） */}
 			{!searchQuery && (
@@ -385,6 +509,8 @@ export const SvgLib: React.FC<SvgLibProps> = ({ handoff, onNavigate }) => {
 							id: icon.id,
 						})}
 						onToggleFavorite={handleToggleFavorite}
+						selected={selected.has(icon.id)}
+						onModifierClick={handleModifierClick}
 					/>
 				)}
 				minColumnWidth={metrics.minColumnWidth}

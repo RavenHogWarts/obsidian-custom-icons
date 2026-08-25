@@ -29,6 +29,16 @@ interface IconCardProps {
 	/** 是否已收藏；与 onToggleFavorite 同时传入才显示星标 */
 	favorite?: boolean;
 	onToggleFavorite?: (id: string, type: IconType) => void;
+	/** 多选态描边（未传表示该页不支持多选） */
+	selected?: boolean;
+	/**
+	 * 带修饰键的点击：Ctrl/Cmd 加选、Shift 连选。
+	 * 无修饰键的普通点击仍然是「复制名称」——不因为进入选择状态就改变主动作。
+	 */
+	onModifierClick?: (
+		id: string,
+		mods: { toggle: boolean; range: boolean },
+	) => void;
 }
 
 // memo：虚拟网格滚动/搜索时跳过 props 未变卡片的重渲（含 setIcon DOM 副作用）
@@ -40,6 +50,8 @@ export const IconCard = memo(function IconCard({
 	customActions = [],
 	favorite,
 	onToggleFavorite,
+	selected,
+	onModifierClick,
 }: IconCardProps) {
 	const iconRef = useRef<HTMLDivElement>(null);
 	const timerRef = useRef<number | null>(null);
@@ -93,6 +105,54 @@ export const IconCard = memo(function IconCard({
 	const copyName = useCallback(() => {
 		void copy(id, card.copyNameFailed());
 	}, [copy, id, card]);
+
+	/**
+	 * 主动作分流：带修饰键 → 多选；否则 → 复制名称。
+	 *
+	 * 鼠标路径由卡片根节点在**捕获阶段**拦下（见 handleRootCapture），
+	 * 这里主要服务键盘路径（字形聚焦后按 Enter / 空格）。
+	 */
+	const handleActivate = useCallback(
+		(e: React.MouseEvent | React.KeyboardEvent) => {
+			const toggle = e.ctrlKey || e.metaKey;
+			const range = e.shiftKey;
+			if ((toggle || range) && onModifierClick) {
+				e.preventDefault();
+				onModifierClick(id, { toggle, range });
+				return;
+			}
+			copyName();
+		},
+		[copyName, id, onModifierClick],
+	);
+
+	/**
+	 * 修饰键点击在卡片**任意位置**都生效——包括字形与名称之外的留白。
+	 *
+	 * 走捕获阶段并 stopPropagation：这样内部的字形 / 名称点击处理不会再跑一遍
+	 * （否则同一次点击会先选中、又复制名称）。操作按钮区排除在外，
+	 * 免得 Ctrl+点击星标变成了选中卡片。
+	 */
+	const handleRootCapture = useCallback(
+		(e: React.MouseEvent) => {
+			if (!onModifierClick) {
+				return;
+			}
+			const toggle = e.ctrlKey || e.metaKey;
+			const range = e.shiftKey;
+			if (!toggle && !range) {
+				return;
+			}
+			const target = e.target as HTMLElement | null;
+			if (target?.closest(".ci-lib-icon__card-actions")) {
+				return;
+			}
+			e.preventDefault();
+			e.stopPropagation();
+			onModifierClick(id, { toggle, range });
+		},
+		[id, onModifierClick],
+	);
 
 	// 用户导入的 SVG 存的是裸 id，实际注册 id 带 CI- 前缀；
 	// 包图标的 id 本身已是 CI-{packId}-{name}，lucide 的名字即 id
@@ -166,7 +226,8 @@ export const IconCard = memo(function IconCard({
 
 	return (
 		<div
-			className={`ci-lib-icon__card${hasActions ? "" : " ci-lib-icon__card--readonly"}${copied ? " is-copied" : ""}`}
+			className={`ci-lib-icon__card${hasActions ? "" : " ci-lib-icon__card--readonly"}${copied ? " is-copied" : ""}${selected ? " is-selected" : ""}${onModifierClick ? " is-selectable" : ""}`}
+			onClickCapture={handleRootCapture}
 			onContextMenu={handleContextMenu}
 		>
 			{hasActions && (
@@ -213,21 +274,22 @@ export const IconCard = memo(function IconCard({
 			<div
 				ref={iconRef}
 				className="ci-lib-icon__card-icon clickable-icon"
-				onClick={copyName}
+				onClick={handleActivate}
 				onKeyDown={(e) => {
 					if (e.key === "Enter" || e.key === " ") {
 						e.preventDefault();
-						copyName();
+						handleActivate(e);
 					}
 				}}
 				title={card.copyNameTooltip()}
 				role="button"
 				tabIndex={0}
 				aria-label={id}
+				aria-selected={selected}
 			></div>
 			<button
 				className="ci-lib-icon__card-name clickable-icon"
-				onClick={copyName}
+				onClick={handleActivate}
 				title={id}
 				aria-label={id}
 			>

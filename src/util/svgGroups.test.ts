@@ -4,8 +4,11 @@ import {
 	UNGROUPED,
 	assignGroup,
 	countUngrouped,
+	deleteGroupWithIcons,
+	dissolveGroup,
 	encodeSvgGroupPref,
 	filterByGroup,
+	groupMemberIds,
 	iconGroup,
 	listSvgGroups,
 	normalizeGroupName,
@@ -232,6 +235,85 @@ describe("renameGroup", () => {
 
 	test("不改动入参", () => {
 		renameGroup(LIB, "weather", "climate");
+		expect(LIB).toEqual(makeLib());
+	});
+});
+
+describe("groupMemberIds", () => {
+	test("列出该组全部成员", () => {
+		expect(groupMemberIds(LIB, "weather")).toEqual(
+			new Set(["sun", "rain"]),
+		);
+	});
+
+	test("组不存在时为空集", () => {
+		expect(groupMemberIds(LIB, "nope")).toEqual(new Set());
+	});
+
+	test("空组名为空集（未分组不是一个可操作的组）", () => {
+		expect(groupMemberIds(LIB, "")).toEqual(new Set());
+		expect(groupMemberIds(LIB, "   ")).toEqual(new Set());
+	});
+
+	test("区分大小写", () => {
+		const lib = [icon("a", "Weather"), icon("b", "weather")];
+		expect(groupMemberIds(lib, "weather")).toEqual(new Set(["b"]));
+	});
+});
+
+describe("dissolveGroup", () => {
+	test("成员留下、变成未分组", () => {
+		const next = dissolveGroup(LIB, "weather");
+		expect(next).toHaveLength(LIB.length);
+		expect(listSvgGroups(next)).toEqual([{ name: "brands", count: 1 }]);
+		// 原本 1 个未分组 + 解散进来的 2 个
+		expect(countUngrouped(next)).toBe(3);
+	});
+
+	test("组不存在时无影响", () => {
+		expect(dissolveGroup(LIB, "nope")).toEqual(LIB);
+	});
+
+	test("空组名什么都不做", () => {
+		expect(dissolveGroup(LIB, "")).toEqual(LIB);
+	});
+
+	test("不改动入参", () => {
+		dissolveGroup(LIB, "weather");
+		expect(LIB).toEqual(makeLib());
+	});
+});
+
+describe("deleteGroupWithIcons", () => {
+	test("连图标一起删掉", () => {
+		const next = deleteGroupWithIcons(LIB, "weather");
+		expect(next.map((i) => i.id)).toEqual(["github", "loose"]);
+	});
+
+	test("不碰其它组与未分组", () => {
+		const next = deleteGroupWithIcons(LIB, "weather");
+		expect(listSvgGroups(next)).toEqual([{ name: "brands", count: 1 }]);
+		expect(countUngrouped(next)).toBe(1);
+	});
+
+	test("组不存在时无影响", () => {
+		expect(deleteGroupWithIcons(LIB, "nope")).toEqual(LIB);
+	});
+
+	test("空组名不删任何东西（不能误伤全部未分组图标）", () => {
+		expect(deleteGroupWithIcons(LIB, "")).toEqual(LIB);
+		expect(deleteGroupWithIcons(LIB, "   ")).toEqual(LIB);
+	});
+
+	test("区分大小写：删 weather 不动 Weather", () => {
+		const lib = [icon("a", "Weather"), icon("b", "weather")];
+		expect(deleteGroupWithIcons(lib, "weather").map((i) => i.id)).toEqual([
+			"a",
+		]);
+	});
+
+	test("不改动入参", () => {
+		deleteGroupWithIcons(LIB, "weather");
 		expect(LIB).toEqual(makeLib());
 	});
 });

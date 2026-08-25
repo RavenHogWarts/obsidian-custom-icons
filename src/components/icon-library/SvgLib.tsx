@@ -26,12 +26,16 @@ import {
 	UNGROUPED,
 	assignGroup,
 	countUngrouped,
+	deleteGroupWithIcons,
+	dissolveGroup,
 	encodeSvgGroupPref,
 	filterByGroup,
+	groupMemberIds,
 	iconGroup,
 	listSvgGroups,
 	normalizeGroupName,
 	normalizeSvgGroup,
+	renameGroup,
 } from "@src/util/svgGroups";
 import { uniqueIconId } from "@src/util/svgUtils";
 import {
@@ -42,7 +46,7 @@ import {
 	Download,
 	Shapes,
 } from "lucide-react";
-import { Notice } from "obsidian";
+import { Menu, Notice } from "obsidian";
 import { useCallback, useMemo, useRef, useState } from "react";
 import { CustomAction, IconCard } from "../icon-card/IconCard";
 import { ConfirmDialog } from "../modal/ConfirmDialog";
@@ -59,6 +63,7 @@ import { GroupStrip } from "./GroupStrip";
 import { LibEmptyState } from "./LibEmptyState";
 import { LibHandoff, LibNavigate } from "./libNav";
 import { MoveToGroup } from "./MoveToGroup";
+import { RenameGroup } from "./RenameGroup";
 import { VirtualIconGrid } from "./VirtualIconGrid";
 import "./IconLib.css";
 
@@ -464,6 +469,203 @@ export const SvgLib: React.FC<SvgLibProps> = ({ handoff, onNavigate }) => {
 		[store, settings.customIconLib.svg, groupNames, svgLL],
 	);
 
+	/**
+	 * 分组管理的三个动作共用的前置检查。
+	 *
+	 * 一律重新从 `store.plugin.settings` 取当前库，而不是用闭包里的 `settings`：
+	 * 菜单开着的这段时间里组可能已经没了（另一个窗口删空了它、或本窗口刚批量移走
+	 * 了最后一个成员）。组不在了就说一句退出——静默无事发生是最难排查的那种失败。
+	 */
+	const takeGroup = useCallback(
+		(group: string): Set<string> | null => {
+			const ids = groupMemberIds(
+				store.plugin.settings.customIconLib.svg,
+				group,
+			);
+			if (ids.size === 0) {
+				new Notice(svgLL.group.gone({ group }));
+				return null;
+			}
+			return ids;
+		},
+		[store, svgLL],
+	);
+
+	/** 重命名分组：改名到已有组名即合并，由弹窗提前告知 */
+	const handleRenameGroup = useCallback(
+		(group: string) => {
+			const ids = takeGroup(group);
+			if (!ids) {
+				return;
+			}
+			let submitFn: (() => Promise<boolean>) | null = null;
+
+			new ConfirmDialog(store.plugin, {
+				title: svgLL.group.renameTitle({ group }),
+				confirmLL: LL.common.save(),
+				children: (
+					<RenameGroup
+						group={group}
+						count={ids.size}
+						groups={groupNames}
+						onSubmit={async (next) => {
+							await store.updateSettingByPath(
+								"customIconLib.svg",
+								renameGroup(
+									store.plugin.settings.customIconLib.svg,
+									group,
+									next,
+								),
+							);
+							// 正停在这个组上就跟着走到新名字，否则筛选会莫名回落到「全部」
+							setGroupFilter((prev) =>
+								prev === group ? next : prev,
+							);
+							new Notice(
+								svgLL.group.renamed({ from: group, to: next }),
+							);
+						}}
+						onReady={(submit) => {
+							submitFn = submit;
+						}}
+					/>
+				),
+				onConfirm: async () => (submitFn ? await submitFn() : false),
+			}).open();
+		},
+		[store, takeGroup, groupNames, svgLL],
+	);
+
+	/**
+	 * 解散分组：图标留下、变成未分组。
+	 *
+	 * 也要确认——它改的是**整组**的归属，不是当前选区，撤销只能靠手动重建。
+	 * 但不必危言耸听：图标本体、收藏、最近使用都没动，文案就照这么说。
+	 */
+	const handleDissolveGroup = useCallback(
+		(group: string) => {
+			const ids = takeGroup(group);
+			if (!ids) {
+				return;
+			}
+			const count = ids.size;
+			new ConfirmDialog(store.plugin, {
+				title: svgLL.group.dissolveTitle({ group }),
+				confirmLL: svgLL.group.dissolveConfirm(),
+				children: (
+					<div className="ci-lib__form">
+						<span className="ci-lib__form-hint">
+							{svgLL.group.dissolveBody({ count })}
+						</span>
+					</div>
+				),
+				onConfirm: async () => {
+					await store.updateSettingByPath(
+						"customIconLib.svg",
+						dissolveGroup(
+							store.plugin.settings.customIconLib.svg,
+							group,
+						),
+					);
+					// 这个组没了，正停在它上面就落到刚接收这批图标的「未分组」，
+					// 比弹回「全部」更贴用户此刻的意图（他要看的就是这批图标）
+					setGroupFilter((prev) =>
+						prev === group ? UNGROUPED : prev,
+					);
+					new Notice(svgLL.group.dissolved({ group, count }));
+				},
+			}).open();
+		},
+		[store, takeGroup, svgLL],
+	);
+
+	/**
+	 * 删除分组连同其中的图标：本页破坏性最强的动作。
+	 *
+	 * 善后与单个 / 批量删除完全一致——清收藏与最近的键、剔掉选区里的项，
+	 * 少任何一步都会在界面上留下点不动的空格。
+	 */
+	const handleDeleteGroup = useCallback(
+		(group: string) => {
+			const members = takeGroup(group);
+			if (!members) {
+				return;
+			}
+			const ids = Array.from(members);
+			const count = ids.length;
+			new ConfirmDialog(store.plugin, {
+				title: svgLL.group.purgeTitle({ group }),
+				confirmLL: svgLL.group.purgeConfirm(),
+				children: (
+					<div className="ci-lib__form">
+						<span className="ci-lib__form-warning">
+							{svgLL.group.purgeBody({ count })}
+						</span>
+					</div>
+				),
+				onConfirm: async () => {
+					await store.updateSettingByPath(
+						"customIconLib.svg",
+						deleteGroupWithIcons(
+							store.plugin.settings.customIconLib.svg,
+							group,
+						),
+					);
+					await forgetIcons(
+						store,
+						ids.map((id) => ({ type: "svg" as const, id })),
+					);
+					setSelection((prev) =>
+						ids.reduce(
+							(acc, id) => dropFromSelection(acc, id),
+							prev,
+						),
+					);
+					// 组与成员一起没了，没有"接收方"可去，回落到「全部」
+					setGroupFilter((prev) => (prev === group ? null : prev));
+					new Notice(svgLL.group.purged({ group, count }));
+				},
+			}).open();
+		},
+		[store, takeGroup, svgLL],
+	);
+
+	/**
+	 * 分组 tab 的右键菜单。
+	 *
+	 * 三个动作按破坏性递增排列，删除那一项标红（`setWarning`）——它是唯一会
+	 * 真的丢数据的。「移到分组」不在这里：那是针对选中图标的动作，入口在批量条
+	 * 与图标自己的右键菜单上，混进来会让"这个菜单管的是分组"这件事变糊。
+	 */
+	const handleGroupMenu = useCallback(
+		(group: string, event: React.MouseEvent) => {
+			event.preventDefault();
+			const menu = new Menu();
+			menu.addItem((item) =>
+				item
+					.setTitle(svgLL.group.renameAction())
+					.setIcon("pencil")
+					.onClick(() => handleRenameGroup(group)),
+			);
+			menu.addItem((item) =>
+				item
+					.setTitle(svgLL.group.dissolveAction())
+					.setIcon("folder-minus")
+					.onClick(() => handleDissolveGroup(group)),
+			);
+			menu.addItem((item) => {
+				item.setTitle(svgLL.group.purgeAction())
+					.setIcon("trash-2")
+					.onClick(() => handleDeleteGroup(group));
+				// 唯一会真的删数据的一项：标红，让它在菜单里与上面两项拉开分量。
+				// 另两项都是可自己手动重建的（改回名字、把图标再移回去）
+				item.setWarning(true);
+			});
+			menu.showAtMouseEvent(event.nativeEvent);
+		},
+		[handleRenameGroup, handleDissolveGroup, handleDeleteGroup, svgLL],
+	);
+
 	const handleDeleteSelected = () => {
 		const ids = Array.from(selected);
 		if (ids.length === 0) {
@@ -705,15 +907,24 @@ export const SvgLib: React.FC<SvgLibProps> = ({ handoff, onNavigate }) => {
 					totalCount={svgIcons.length}
 					value={effectiveGroup}
 					onChange={handleGroupChange}
+					onGroupMenu={handleGroupMenu}
 				/>
 			)}
 
-			{/* 多选手势不写出来就没人知道：常驻一行淡提示 */}
+			{/*
+			 * 多选手势与分组右键都不写出来就没人知道：常驻一行淡提示。
+			 * 分组那条只在真的有分组时出现——没有组时它指向一个不存在的东西。
+			 */}
 			{filteredIcons.length > 0 && (
 				<div className="ci-lib__hint">
 					<span className="ci-lib__hint-desc">
 						{svgLL.selection.hint()}
 					</span>
+					{groups.length > 0 && (
+						<span className="ci-lib__hint-desc">
+							{svgLL.group.menuHint()}
+						</span>
+					)}
 				</div>
 			)}
 

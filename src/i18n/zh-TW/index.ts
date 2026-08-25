@@ -268,6 +268,27 @@ const zh_TW = {
 					noResultsUngrouped:
 						"未分組的圖示中沒有符合「{query:string}」的",
 					searchAllGroups: "搜尋全部分組",
+					menuHint: "在分組標籤上按右鍵可重新命名或刪除",
+					renameAction: "重新命名分組",
+					renameTitle: "重新命名「{group:string}」",
+					renameCount: "此分組中有 {count:number} 個圖示。",
+					renameEmpty:
+						"請輸入分組名稱。若只想取消分組但保留圖示，請用「刪除分組，保留圖示」。",
+					renamed: "已將「{from:string}」重新命名為「{to:string}」",
+					dissolveAction: "刪除分組，保留圖示",
+					dissolveTitle: "刪除「{group:string}」？",
+					dissolveBody:
+						"分組中的 {count:number} 個圖示會保留下來，變成未分組。",
+					dissolveConfirm: "刪除分組",
+					dissolved:
+						"已刪除「{group:string}」，{count:number} 個圖示變成未分組",
+					purgeAction: "刪除分組與其中的圖示",
+					purgeTitle: "刪除「{group:string}」與其中的圖示？",
+					purgeBody:
+						"這會永久刪除 {count:number} 個圖示。所有已指派它們的地方都會退回預設圖示。",
+					purgeConfirm: "刪除圖示",
+					purged: "已刪除「{group:string}」與其中的 {count:number} 個圖示",
+					gone: "「{group:string}」已不存在",
 				},
 				exportLib: {
 					tooltip: "匯出為 JSON",

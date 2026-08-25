@@ -123,10 +123,60 @@ export function renameGroup(
 	if (!source) {
 		return [...icons];
 	}
-	const ids = new Set(
-		icons.filter((icon) => iconGroup(icon) === source).map((i) => i.id),
+	return assignGroup(icons, groupMemberIds(icons, source), to);
+}
+
+/**
+ * 取一个分组的全部成员 id。
+ *
+ * 删除分组要么改这批图标的字段、要么把它们整个删掉，两条路都得先知道是谁；
+ * 调用方还要拿它去清收藏 / 最近的键，所以返回 id 而不是图标本体。
+ */
+export function groupMemberIds(
+	icons: readonly ICustomSVGIcon[],
+	group: string,
+): Set<string> {
+	const target = normalizeGroupName(group);
+	if (!target) {
+		return new Set();
+	}
+	return new Set(
+		icons.filter((icon) => iconGroup(icon) === target).map((i) => i.id),
 	);
-	return assignGroup(icons, ids, to);
+}
+
+/**
+ * 解散分组：成员留下、变成未分组，不改动入参。
+ *
+ * 就是 `renameGroup(icons, group, "")`，起个名字是因为这在界面上是一个独立动作，
+ * 让调用处读起来是「解散」而不是「改名到空字符串」。
+ */
+export function dissolveGroup(
+	icons: readonly ICustomSVGIcon[],
+	group: string,
+): ICustomSVGIcon[] {
+	return renameGroup(icons, group, "");
+}
+
+/**
+ * 删除分组连同其中的图标，不改动入参。
+ *
+ * 与「解散」是两个动作而不是一个带选项的动作：这个会真的删数据，
+ * 调用方必须另外清掉收藏 / 最近里的键（`forgetIcons`），
+ * 否则那些位置会留下点不动的空格——与单个 / 批量删除同一套善后。
+ *
+ * 空组名返回原样拷贝：`""` 在本模块里是「未分组」这一筛选档而非真实的组，
+ * 让它删掉所有未分组图标太危险，只会是上游传错了值。
+ */
+export function deleteGroupWithIcons(
+	icons: readonly ICustomSVGIcon[],
+	group: string,
+): ICustomSVGIcon[] {
+	const drop = groupMemberIds(icons, group);
+	if (drop.size === 0) {
+		return [...icons];
+	}
+	return icons.filter((icon) => !drop.has(icon.id));
 }
 
 /**

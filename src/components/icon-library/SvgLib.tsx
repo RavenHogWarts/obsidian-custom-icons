@@ -287,13 +287,15 @@ export const SvgLib: React.FC<SvgLibProps> = ({ handoff, onNavigate }) => {
 
 			try {
 				await navigator.clipboard.writeText(icon.content);
-				new Notice(`Copied SVG code: ${iconId}`);
+				new Notice(svgLL.copiedCode({ id: iconId }));
 			} catch (err) {
 				console.error("Failed to copy SVG code:", err);
-				new Notice("Failed to copy SVG code");
+				new Notice(
+					LL.view.CustomIconLib.card.copySvgCodeFailed(),
+				);
 			}
 		},
-		[settings.customIconLib.svg],
+		[settings.customIconLib.svg, svgLL],
 	);
 
 	const handleDeleteSelected = () => {

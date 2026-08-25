@@ -236,6 +236,7 @@ const zh = {
 			svg: {
 				tabName: "SVG（实验性）",
 				copyAction: "复制 SVG 代码",
+				copiedCode: "已复制 SVG 代码：{id:string}",
 				emptyTitle: "还没有自定义图标",
 				emptyDesc:
 					"粘贴 SVG 源码或上传 .svg 文件即可添加，添加后可在插件各处使用。",
@@ -305,6 +306,7 @@ const zh = {
 				progress: "正在下载图标 {done:number}/{total:number}…",
 				installed: "已安装 {count:number} 个图标，立即生效",
 				installFailed: "图标库安装失败",
+				installCancelled: "已取消下载",
 				iconCount: "图标数",
 				licenseLabel: "许可证",
 				idLabel: "图标 ID 前缀",
@@ -329,6 +331,7 @@ const zh = {
 				uninstallHint:
 					"将删除 {count:number} 个图标（本地文件与设置清单），已使用该图标的界面将回退为空白。",
 				uninstallFailed: "图标库卸载失败",
+				uninstalled: "已卸载「{name:string}」",
 				redownload: "重新下载",
 				redownloadTooltip: "从来源重新下载",
 				redownloadHint:
@@ -346,6 +349,9 @@ const zh = {
 				catalogOnline: "在线",
 				catalogLoadFailed: "图标集目录加载失败（网络不可用且无缓存）",
 				catalogLoading: "正在加载图标集目录…",
+				catalogFilter: { group: "按安装状态筛选", all: "全部", installed: "已安装", notInstalled: "未安装" },
+				catalogSort: { label: "排序", name: "按名称", count: "按图标数" },
+				noMatch: "没有匹配的图标包",
 				presetsSection: "常用 npm 图标包（一键安装）",
 				alreadyInstalled: "已安装",
 				backTooltip: "返回",
@@ -361,6 +367,7 @@ const zh = {
 				tabName: "Lucide",
 				count: "共 {count:number} 个图标",
 				emptyFilter: "当前筛选下没有图标",
+				sort: { label: "排序", asc: "名称 A→Z", desc: "名称 Z→A" },
 				showAll: "显示全部",
 				descHints: {
 					all: "插件内置的全部 Lucide 图标（已去重），点击图标可复制名称。",

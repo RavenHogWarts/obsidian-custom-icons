@@ -595,10 +595,94 @@
 	color: var(--text-faint);
 }
 
+/* 搜索时附在标题后的命中数：目录 (12) */
+.ci-pack__section-hits {
+	color: var(--text-accent);
+	font-weight: var(--font-normal);
+}
+
 .ci-pack__section-meta {
 	margin-inline-start: auto;
 	color: var(--text-faint);
 	font-size: var(--font-ui-smaller);
+}
+
+/* 区块内的筛选 / 排序行（目录：按安装状态筛选 + 按名称/图标数排序） */
+.ci-pack__section-tools {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: var(--size-4-2);
+	padding-bottom: var(--size-4-1);
+}
+
+/*
+ * 行内安装进度 + 取消。
+ *
+ * 不用 Controls.tsx 的 ProgressBar——那一套依赖 SettingSlotContext，只有设置页里有；
+ * 这里是普通 React 树，一条 CSS 进度条就够，且能同时表达"总数未知"的不定态
+ * （Iconify 单包是一次性大 JSON，拿不到逐个进度）。
+ */
+.ci-pack__progress {
+	display: flex;
+	flex: none;
+	align-items: center;
+	gap: var(--size-4-2);
+	padding: var(--size-4-1) var(--size-4-2);
+	border: 1px solid var(--interactive-accent);
+	border-radius: var(--radius-s);
+	background-color: var(--background-secondary-alt);
+	font-size: var(--font-ui-small);
+}
+
+.ci-pack__progress-label {
+	flex: none;
+	color: var(--text-muted);
+}
+
+.ci-pack__progress-track {
+	flex: 1;
+	min-width: 60px;
+	height: 6px;
+	overflow: hidden;
+	border-radius: var(--radius-s);
+	background-color: var(--background-modifier-border);
+}
+
+.ci-pack__progress-fill {
+	height: 100%;
+	width: 0;
+	border-radius: var(--radius-s);
+	background-color: var(--interactive-accent);
+	transition: width 0.2s ease;
+}
+
+/* 总数未知时来回滑动，表示"在动，但不知道还剩多少" */
+.ci-pack__progress-fill.is-indeterminate {
+	width: 35%;
+	animation: ci-pack-progress-slide 1.2s ease-in-out infinite;
+}
+
+@keyframes ci-pack-progress-slide {
+	0% {
+		transform: translateX(-100%);
+	}
+	100% {
+		transform: translateX(286%);
+	}
+}
+
+/* 原生开关的挂载容器（ToggleComponent 自己带 .checkbox-container 外观） */
+.ci-pack__toggle {
+	display: inline-flex;
+	align-items: center;
+}
+
+/* 卸载成功通知里的「重新下载」快捷动作 */
+.ci-pack__notice-action {
+	color: var(--text-accent);
+	cursor: pointer;
+	text-decoration: underline;
 }
 
 .ci-pack__empty {
@@ -637,15 +721,19 @@
 
 .ci-pack__item-main {
 	display: flex;
-	flex-direction: row;
+	flex-direction: column;
+	align-items: flex-start;
 	justify-content: center;
-	align-items: center;
 	gap: 2px;
 	flex: 1;
 	min-width: 0;
 }
 
 .ci-pack__item-name {
+	max-width: 100%;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
 	text-align: start;
 	font-weight: var(--font-medium);
 	color: var(--text-normal);
@@ -793,7 +881,7 @@
 	font-size: var(--font-ui-smaller);
 }
 
-/* 包详情「显示更多」 */
+/* 目录分批铺开的「显示更多」 */
 .ci-pack__show-more {
 	display: flex;
 	justify-content: center;

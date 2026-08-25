@@ -705,6 +705,11 @@ type RootTranslation = {
 				 */
 				copyAction: string
 				/**
+				 * 已​复​制​ ​S​V​G​ ​代​码​：​{​i​d​}
+				 * @param {string} id
+				 */
+				copiedCode: RequiredParams<'id'>
+				/**
 				 * 还​没​有​自​定​义​图​标
 				 */
 				emptyTitle: string
@@ -951,6 +956,10 @@ type RootTranslation = {
 				 */
 				installFailed: string
 				/**
+				 * 已​取​消​下​载
+				 */
+				installCancelled: string
+				/**
 				 * 图​标​数
 				 */
 				iconCount: string
@@ -1027,6 +1036,11 @@ type RootTranslation = {
 				 */
 				uninstallFailed: string
 				/**
+				 * 已​卸​载​「​{​n​a​m​e​}​」
+				 * @param {string} name
+				 */
+				uninstalled: RequiredParams<'name'>
+				/**
 				 * 重​新​下​载
 				 */
 				redownload: string
@@ -1092,6 +1106,42 @@ type RootTranslation = {
 				 * 正​在​加​载​图​标​集​目​录​…
 				 */
 				catalogLoading: string
+				catalogFilter: {
+					/**
+					 * 按​安​装​状​态​筛​选
+					 */
+					group: string
+					/**
+					 * 全​部
+					 */
+					all: string
+					/**
+					 * 已​安​装
+					 */
+					installed: string
+					/**
+					 * 未​安​装
+					 */
+					notInstalled: string
+				}
+				catalogSort: {
+					/**
+					 * 排​序
+					 */
+					label: string
+					/**
+					 * 按​名​称
+					 */
+					name: string
+					/**
+					 * 按​图​标​数
+					 */
+					count: string
+				}
+				/**
+				 * 没​有​匹​配​的​图​标​包
+				 */
+				noMatch: string
 				/**
 				 * 常​用​ ​n​p​m​ ​图​标​包​（​一​键​安​装​）
 				 */
@@ -1149,6 +1199,20 @@ type RootTranslation = {
 				 * 当​前​筛​选​下​没​有​图​标
 				 */
 				emptyFilter: string
+				sort: {
+					/**
+					 * 排​序
+					 */
+					label: string
+					/**
+					 * 名​称​ ​A​→​Z
+					 */
+					asc: string
+					/**
+					 * 名​称​ ​Z​→​A
+					 */
+					desc: string
+				}
 				/**
 				 * 显​示​全​部
 				 */
@@ -1873,6 +1937,10 @@ export type TranslationFunctions = {
 				 */
 				copyAction: () => LocalizedString
 				/**
+				 * 已复制 SVG 代码：{id}
+				 */
+				copiedCode: (arg: { id: string }) => LocalizedString
+				/**
 				 * 还没有自定义图标
 				 */
 				emptyTitle: () => LocalizedString
@@ -2107,6 +2175,10 @@ export type TranslationFunctions = {
 				 */
 				installFailed: () => LocalizedString
 				/**
+				 * 已取消下载
+				 */
+				installCancelled: () => LocalizedString
+				/**
 				 * 图标数
 				 */
 				iconCount: () => LocalizedString
@@ -2181,6 +2253,10 @@ export type TranslationFunctions = {
 				 */
 				uninstallFailed: () => LocalizedString
 				/**
+				 * 已卸载「{name}」
+				 */
+				uninstalled: (arg: { name: string }) => LocalizedString
+				/**
 				 * 重新下载
 				 */
 				redownload: () => LocalizedString
@@ -2244,6 +2320,42 @@ export type TranslationFunctions = {
 				 * 正在加载图标集目录…
 				 */
 				catalogLoading: () => LocalizedString
+				catalogFilter: {
+					/**
+					 * 按安装状态筛选
+					 */
+					group: () => LocalizedString
+					/**
+					 * 全部
+					 */
+					all: () => LocalizedString
+					/**
+					 * 已安装
+					 */
+					installed: () => LocalizedString
+					/**
+					 * 未安装
+					 */
+					notInstalled: () => LocalizedString
+				}
+				catalogSort: {
+					/**
+					 * 排序
+					 */
+					label: () => LocalizedString
+					/**
+					 * 按名称
+					 */
+					name: () => LocalizedString
+					/**
+					 * 按图标数
+					 */
+					count: () => LocalizedString
+				}
+				/**
+				 * 没有匹配的图标包
+				 */
+				noMatch: () => LocalizedString
 				/**
 				 * 常用 npm 图标包（一键安装）
 				 */
@@ -2298,6 +2410,20 @@ export type TranslationFunctions = {
 				 * 当前筛选下没有图标
 				 */
 				emptyFilter: () => LocalizedString
+				sort: {
+					/**
+					 * 排序
+					 */
+					label: () => LocalizedString
+					/**
+					 * 名称 A→Z
+					 */
+					asc: () => LocalizedString
+					/**
+					 * 名称 Z→A
+					 */
+					desc: () => LocalizedString
+				}
 				/**
 				 * 显示全部
 				 */

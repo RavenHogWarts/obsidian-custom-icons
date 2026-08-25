@@ -87,6 +87,11 @@ export default class IconPackService {
 		}
 
 		const iconSet = await this.getSource(config).fetch(config, options);
+		// 取消检查：Iconify 单包是一次性大 JSON，无法中途中断，但可在写盘前拦下——
+		// 保证"点了取消就不留半个包"（npm-svg 源在 mapWithConcurrency 里已协作式提前返回）
+		if (options.signal?.aborted) {
+			throw new DOMException("Aborted", "AbortError");
+		}
 		const finalSet: IIconSet = {
 			...iconSet,
 			id: packId,

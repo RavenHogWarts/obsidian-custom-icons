@@ -1,3 +1,4 @@
+import { AllLib } from "@src/components/icon-library/AllLib";
 import { LibNavigate, LibTabId } from "@src/components/icon-library/libNav";
 import { LucideLib } from "@src/components/icon-library/LucideLib";
 import { PackLib } from "@src/components/icon-library/PackLib";
@@ -16,34 +17,43 @@ export const VIEW_TYPE_CUSTOM_ICON_LIB = "custom-icon-lib-view";
 interface Handoff {
 	tab: LibTabId;
 	query: string;
+	/** 目标是 pack 页时要直接打开的图标包 */
+	packId?: string;
 	nonce: number;
 }
 
 /**
- * 图标库三页外壳。
+ * 图标库四页外壳。
  *
- * 持有当前页签，并在页之间传递「搜索交接」——某页搜索无结果时，
- * 可以带着查询词跳到另一页继续找（Radix 会卸载非活动页，
- * 目标页重新挂载时把 handoff.query 当作初始查询词）。
+ * 持有当前页签，并在页之间传递「搜索交接」——「全部」页里某个来源点
+ * 「查看全部」，或某页搜索无结果想换页再找，都带着查询词跳过去
+ * （Radix 会卸载非活动页，目标页重新挂载时把 handoff 当作初始状态）。
  */
 const IconLibShell: React.FC = () => {
-	const [tab, setTab] = useState<LibTabId>("pack");
+	const [tab, setTab] = useState<LibTabId>("all");
 	const [handoff, setHandoff] = useState<Handoff | null>(null);
 
-	const navigate: LibNavigate = (target, query) => {
-		setHandoff({ tab: target, query, nonce: Date.now() });
+	const navigate: LibNavigate = (target, query, packId) => {
+		setHandoff({ tab: target, query, packId, nonce: Date.now() });
 		setTab(target);
 	};
 
 	/** 只有交接目标页才拿到查询词 */
 	const seed = (id: LibTabId) =>
-		handoff?.tab === id ? { query: handoff.query } : undefined;
+		handoff?.tab === id
+			? { query: handoff.query, packId: handoff.packId }
+			: undefined;
 
 	const items: TabItem[] = [
 		{
+			id: "all",
+			title: LL.view.CustomIconLib.all.tabName(),
+			content: <AllLib onNavigate={navigate} />,
+		},
+		{
 			id: "pack",
 			title: LL.view.CustomIconLib.pack.tabName(),
-			content: <PackLib />,
+			content: <PackLib handoff={seed("pack")} />,
 		},
 		{
 			id: "svg",

@@ -172,6 +172,31 @@ const en = {
 			reapplyCommand: "Reapply all icons",
 			reapplyNotice: "All custom icons reapplied",
 			searchPlaceholder: "Search icons...",
+			searchHint: "Press / to focus search, Esc to clear",
+			density: {
+				label: "Grid density",
+				compact: "Compact",
+				normal: "Normal",
+				large: "Large",
+			},
+			favorites: {
+				section: "Favorites",
+				hint: "Star an icon or right-click it to manage favorites",
+			},
+			card: {
+				copyNameTooltip: "Click to copy the icon name",
+				copyName: "Copy name",
+				copyFullId: "Copy full ID",
+				copyNameFailed: "Failed to copy the icon name",
+				copySvgCodeFailed: "Failed to copy the SVG code",
+				copied: "Copied",
+			},
+			all: {
+				tabName: "All",
+				prompt: "Type a keyword to search Lucide, your SVG icons and every installed icon pack at once.",
+				hint: "Results are grouped by source. Click an icon to copy its name.",
+				showAll: "See all {count:number} →",
+			},
 			empty: {
 				noResults: "No icons match \"{query:string}\"",
 				clearSearch: "Clear search",
@@ -197,7 +222,7 @@ const en = {
 				emptyFavorites: "No favorites yet. Star the icons you use often and they will be waiting here next time.",
 				emptyRecent: "No recently used icons yet — the ones you pick show up here automatically.",
 				emptySegment: "No icons in this group",
-				noResults: 'No icons in this group match "{query:string}"',
+				noResults: "No icons in this group match \"{query:string}\"",
 				hint: {
 					navigate: "Navigate",
 					select: "Select",

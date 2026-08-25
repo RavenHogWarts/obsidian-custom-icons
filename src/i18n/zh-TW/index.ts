@@ -172,6 +172,31 @@ const zh_TW = {
 			reapplyCommand: "重新套用所有圖示",
 			reapplyNotice: "已重新套用所有自訂圖示",
 			searchPlaceholder: "搜索圖示...",
+			searchHint: "按 / 聚焦搜尋，Esc 清空",
+			density: {
+				label: "網格密度",
+				compact: "緊湊",
+				normal: "標準",
+				large: "大",
+			},
+			favorites: {
+				section: "收藏",
+				hint: "點圖示右上角的 ★ 或右鍵管理收藏",
+			},
+			card: {
+				copyNameTooltip: "點擊複製圖示名稱",
+				copyName: "複製名稱",
+				copyFullId: "複製完整 ID",
+				copyNameFailed: "複製圖示名稱失敗",
+				copySvgCodeFailed: "複製 SVG 代碼失敗",
+				copied: "已複製",
+			},
+			all: {
+				tabName: "全部",
+				prompt: "輸入關鍵詞，跨 Lucide、我的 SVG 與已安裝圖示庫一起搜尋。",
+				hint: "跨來源搜尋結果按來源分組；點擊圖示可複製名稱。",
+				showAll: "查看全部 {count:number} 個 →",
+			},
 			empty: {
 				noResults: "沒有符合「{query:string}」的圖示",
 				clearSearch: "清除搜尋",

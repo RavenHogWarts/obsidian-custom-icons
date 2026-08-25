@@ -41,17 +41,153 @@
 	box-shadow: none;
 }
 
+/* 密度切换：图标按钮，字形略小于筛选文字按钮的行高 */
+.ci-lib__density-btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+
+	svg {
+		width: 14px;
+		height: 14px;
+	}
+}
+
+/* ------------------------------ 收藏置顶 ------------------------------ */
+/*
+ * 钉在虚拟化网格上方的一小片收藏，与图标选择器共享同一份 favorites 数据。
+ * 数量以十计，用普通 auto-fill 网格换行即可，不参与虚拟化、也不抢滚动。
+ */
+.ci-lib__favorites {
+	display: flex;
+	flex: none;
+	flex-direction: column;
+	gap: var(--size-4-2);
+	padding-bottom: var(--size-4-2);
+	border-bottom: 1px solid var(--background-modifier-border);
+}
+
+.ci-lib__favorites-title {
+	display: flex;
+	align-items: center;
+	gap: var(--size-4-1);
+	font-size: var(--font-ui-small);
+	font-weight: var(--font-medium);
+	color: var(--text-muted);
+
+	svg {
+		width: 14px;
+		height: 14px;
+		color: var(--color-yellow);
+	}
+}
+
+.ci-lib__favorites-count {
+	color: var(--text-faint);
+	font-weight: var(--font-normal);
+}
+
+.ci-lib__favorites-hint {
+	margin-inline-start: auto;
+	color: var(--text-faint);
+	font-size: var(--font-ui-smaller);
+	font-weight: var(--font-normal);
+}
+
+.ci-lib__favorites-grid {
+	display: grid;
+	gap: var(--size-4-2);
+	/* 收藏多了也不无限长：超出后自己滚，主网格照旧占据剩余空间 */
+	max-height: 30vh;
+	overflow-y: auto;
+}
+
+/* ------------------------------ 「全部」页 ------------------------------ */
+/*
+ * 跨来源搜索：结果按来源分组，每组只给前 N 个 + 「查看全部」跳到对应页。
+ * 整页一个滚动体（分组数量有限、每组封顶），不需要虚拟化。
+ */
+.ci-lib__scroll {
+	flex: 1;
+	min-height: 0;
+	overflow-y: auto;
+	display: flex;
+	flex-direction: column;
+	gap: var(--size-4-3);
+	padding-right: var(--size-4-1);
+}
+
+.ci-lib__group {
+	display: flex;
+	flex-direction: column;
+	gap: var(--size-4-2);
+	flex: none;
+}
+
+.ci-lib__group-title {
+	display: flex;
+	align-items: center;
+	gap: var(--size-4-2);
+	padding-bottom: var(--size-4-1);
+	border-bottom: 1px solid var(--background-modifier-border);
+	font-size: var(--font-ui-small);
+}
+
+.ci-lib__group-label {
+	font-weight: var(--font-medium);
+	color: var(--text-normal);
+}
+
+.ci-lib__group-count {
+	color: var(--text-faint);
+	font-size: var(--font-ui-smaller);
+}
+
+.ci-lib__group-more {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	margin-inline-start: auto;
+	height: auto;
+	padding: var(--size-4-1) var(--size-4-2);
+	font-size: var(--font-ui-smaller);
+	background-color: transparent;
+	box-shadow: none;
+	color: var(--text-accent);
+	cursor: pointer;
+
+	svg {
+		width: 12px;
+		height: 12px;
+	}
+
+	&:hover {
+		background-color: var(--background-modifier-hover);
+		color: var(--text-accent-hover);
+	}
+}
+
+.ci-lib__group-grid {
+	display: grid;
+	gap: var(--size-4-2);
+}
+
 /*
  * Lucide / 包详情只读网格（ci-vgrid--compact）：这是「浏览 + 复制名称」的图标墙。
  * 统一卡片结构：固定高度图标区 + 自然换行的名称区——名称完整显示不截断；
  * 包裹层 flex + 卡片 flex:1 撑满行高，行内所有卡片严格等高，
  * 图标处于同一水平线，名称区顶部对齐。
+ *
+ * 收藏置顶条（.ci-lib__favorites-grid）与「全部」页的分组网格
+ * （.ci-lib__group-grid）沿用同一套紧凑图块外观，四个页面观感一致。
  */
 .ci-vgrid--compact .ci-vgrid__row > div {
 	display: flex;
 }
 
-.ci-vgrid--compact .ci-lib-icon__card {
+.ci-vgrid--compact .ci-lib-icon__card,
+.ci-lib__favorites-grid .ci-lib-icon__card,
+.ci-lib__group-grid .ci-lib-icon__card {
 	flex: 1;
 	content-visibility: auto;
 	contain-intrinsic-size: auto 88px;
@@ -61,7 +197,9 @@
 	padding: var(--size-4-2);
 }
 
-.ci-vgrid--compact .ci-lib-icon__card-icon {
+.ci-vgrid--compact .ci-lib-icon__card-icon,
+.ci-lib__favorites-grid .ci-lib-icon__card-icon,
+.ci-lib__group-grid .ci-lib-icon__card-icon {
 	flex: none;
 	height: 2.25rem; /* 固定高度图标区：行内所有卡片的图标同处一水平线 */
 	max-height: none;
@@ -74,12 +212,16 @@
 }
 
 /* 悬停时整块上浮（沿用基础卡片），字形点亮为强调色 */
-.ci-vgrid--compact .ci-lib-icon__card:hover .ci-lib-icon__card-icon svg {
+.ci-vgrid--compact .ci-lib-icon__card:hover .ci-lib-icon__card-icon svg,
+.ci-lib__favorites-grid .ci-lib-icon__card:hover .ci-lib-icon__card-icon svg,
+.ci-lib__group-grid .ci-lib-icon__card:hover .ci-lib-icon__card-icon svg {
 	color: var(--interactive-accent);
 }
 
 /* 名称作为副标题：更小更淡，自然换行完整显示（kebab 名在连字符处断行） */
-.ci-vgrid--compact .ci-lib-icon__card-name {
+.ci-vgrid--compact .ci-lib-icon__card-name,
+.ci-lib__favorites-grid .ci-lib-icon__card-name,
+.ci-lib__group-grid .ci-lib-icon__card-name {
 	flex: none;
 	margin-top: 0;
 	padding: 2px var(--size-4-1);

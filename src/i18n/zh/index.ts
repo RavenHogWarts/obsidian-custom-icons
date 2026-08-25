@@ -172,6 +172,31 @@ const zh = {
 			reapplyCommand: "重新应用所有图标",
 			reapplyNotice: "已重新应用所有自定义图标",
 			searchPlaceholder: "搜索图标...",
+			searchHint: "按 / 聚焦搜索，Esc 清空",
+			density: {
+				label: "网格密度",
+				compact: "紧凑",
+				normal: "标准",
+				large: "大",
+			},
+			favorites: {
+				section: "收藏",
+				hint: "点图标右上角的 ★ 或右键管理收藏",
+			},
+			card: {
+				copyNameTooltip: "点击复制图标名称",
+				copyName: "复制名称",
+				copyFullId: "复制完整 ID",
+				copyNameFailed: "复制图标名称失败",
+				copySvgCodeFailed: "复制 SVG 代码失败",
+				copied: "已复制",
+			},
+			all: {
+				tabName: "全部",
+				prompt: "输入关键词，跨 Lucide、我的 SVG 与已安装图标包一起搜索。",
+				hint: "跨来源搜索结果按来源分组；点击图标可复制名称。",
+				showAll: "查看全部 {count:number} 个 →",
+			},
 			empty: {
 				noResults: "没有匹配「{query:string}」的图标",
 				clearSearch: "清空搜索",

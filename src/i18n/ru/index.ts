@@ -233,7 +233,7 @@ const ru = {
 				},
 			},
 			svg: {
-				tabName: "SVG (экспериментально)",
+				tabName: "Мои SVG",
 				copyAction: "Копировать код SVG",
 				copiedCode: "Код SVG скопирован: {id:string}",
 				emptyTitle: "Пользовательских иконок пока нет",
@@ -260,6 +260,8 @@ const ru = {
 					deleteConfirm: "Удалить выбранные иконки ({count:number})?",
 				},
 				modal: {
+					addTitle: "Добавить иконку",
+					editTitle: "Изменить иконку",
 					pasteMode: "Вставить код",
 					uploadMode: "Загрузить файлы",
 					importMode: "Импорт JSON",

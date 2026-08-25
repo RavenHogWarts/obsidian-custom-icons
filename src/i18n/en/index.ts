@@ -233,7 +233,7 @@ const en = {
 				},
 			},
 			svg: {
-				tabName: "SVG (Experimental)",
+				tabName: "My SVG",
 				copyAction: "Copy SVG code",
 				copiedCode: "Copied SVG code: {id:string}",
 				emptyTitle: "No custom icons yet",
@@ -260,6 +260,8 @@ const en = {
 					deleteConfirm: "Delete the {count:number} selected icon(s)?",
 				},
 				modal: {
+					addTitle: "Add icon",
+					editTitle: "Edit icon",
 					pasteMode: "Paste Code",
 					uploadMode: "Upload Files",
 					importMode: "Import JSON",

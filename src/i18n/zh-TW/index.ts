@@ -233,7 +233,7 @@ const zh_TW = {
 				},
 			},
 			svg: {
-				tabName: "SVG（實驗性）",
+				tabName: "我的 SVG",
 				copyAction: "複製 SVG 代碼",
 				copiedCode: "已複製 SVG 代碼：{id:string}",
 				emptyTitle: "還沒有自訂圖示",
@@ -260,6 +260,8 @@ const zh_TW = {
 					deleteConfirm: "刪除所選的 {count:number} 個圖示？",
 				},
 				modal: {
+					addTitle: "新增圖示",
+					editTitle: "編輯圖示",
 					pasteMode: "粘貼源碼",
 					uploadMode: "上傳檔案",
 					importMode: "匯入 JSON",

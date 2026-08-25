@@ -234,7 +234,7 @@ const zh = {
 				},
 			},
 			svg: {
-				tabName: "SVG（实验性）",
+				tabName: "我的 SVG",
 				copyAction: "复制 SVG 代码",
 				copiedCode: "已复制 SVG 代码：{id:string}",
 				emptyTitle: "还没有自定义图标",
@@ -262,6 +262,8 @@ const zh = {
 					deleteConfirm: "删除所选的 {count:number} 个图标？",
 				},
 				modal: {
+					addTitle: "添加图标",
+					editTitle: "编辑图标",
 					pasteMode: "粘贴源码",
 					uploadMode: "上传文件",
 					importMode: "导入 JSON",

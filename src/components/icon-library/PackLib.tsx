@@ -78,6 +78,8 @@ const presetToConfig = (preset: INpmSvgPreset): IconSourceConfig => ({
  *
  * 标题栏是真 `<button>`（原先是 `div` + `aria-expanded` + `onClick`），
  * 于是键盘聚焦、Enter / 空格展开、读屏播报全部白拿，不用自己补 role/tabIndex/onKeyDown。
+ * 再叠一个 `clickable-icon`：Obsidian 用它表达「扁平可点」——去掉默认按钮的凸起与
+ * 阴影、给出 hover 底色，比在自己的 CSS 里逐条手动复位干净（与包行的按钮同一套）。
  */
 const CollapsibleSection: React.FC<{
 	icon: React.ReactNode;
@@ -107,7 +109,7 @@ const CollapsibleSection: React.FC<{
 		<div className="ci-pack__section">
 			<button
 				type="button"
-				className="ci-pack__section-title"
+				className="ci-pack__section-title clickable-icon"
 				aria-expanded={open}
 				onClick={() => setUserOpen((v) => !v)}
 			>
@@ -682,6 +684,7 @@ export const PackLib: React.FC<PackLibProps> = ({ handoff }) => {
 					/>
 				</div>
 				<button
+					className="clickable-icon"
 					onClick={() => void loadCatalog(true)}
 					disabled={installing}
 					aria-label={LL.view.CustomIconLib.pack.refreshTooltip()}
@@ -690,6 +693,7 @@ export const PackLib: React.FC<PackLibProps> = ({ handoff }) => {
 					<RefreshCw className="svg-icon" />
 				</button>
 				<button
+					className="clickable-icon"
 					onClick={(e) => handleOpenNpmForm(e.currentTarget)}
 					disabled={installing}
 					aria-label={LL.view.CustomIconLib.pack.npmModal.title()}

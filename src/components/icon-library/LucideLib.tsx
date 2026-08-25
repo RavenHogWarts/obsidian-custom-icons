@@ -181,6 +181,7 @@ export const LucideLib: React.FC<LucideLibProps> = ({
 				<DensityToggle value={density} onChange={setDensity} />
 
 				<button
+					className="clickable-icon"
 					onClick={handleToggleSort}
 					aria-label={sortLabel}
 					title={sortLabel}

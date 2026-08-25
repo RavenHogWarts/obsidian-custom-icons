@@ -389,6 +389,7 @@ export const AddSvg: React.FC<AddSvgProps> = ({
 				type="file"
 				accept=".svg"
 				multiple
+				aria-label={modal.selectFiles()}
 				onChange={(e) => void handleFileChange(e)}
 			/>
 			<span className="ci-lib__form-hint">{modal.selectFilesDesc()}</span>
@@ -404,6 +405,7 @@ export const AddSvg: React.FC<AddSvgProps> = ({
 				className="ci-lib__form__input"
 				type="file"
 				accept=".json,application/json"
+				aria-label={modal.importPick()}
 				onChange={(e) => void handleFileChange(e)}
 			/>
 			<span className="ci-lib__form-hint">{modal.importDesc()}</span>

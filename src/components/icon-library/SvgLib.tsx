@@ -172,8 +172,7 @@ export const SvgLib: React.FC<SvgLibProps> = ({ handoff, onNavigate }) => {
 		new ConfirmDialog(
 			store.plugin,
 			{
-				title:
-					LL.common.add() + " " + LL.view.CustomIconLib.svg.tabName(),
+				title: svgLL.modal.addTitle(),
 				confirmLL: LL.common.add(),
 				children: (
 					<AddSvg
@@ -249,10 +248,7 @@ export const SvgLib: React.FC<SvgLibProps> = ({ handoff, onNavigate }) => {
 			let submitFn: (() => Promise<boolean>) | null = null;
 
 			new ConfirmDialog(store.plugin, {
-				title:
-					LL.common.edit() +
-					" " +
-					LL.view.CustomIconLib.svg.tabName(),
+				title: svgLL.modal.editTitle(),
 				confirmLL: LL.common.save(),
 				children: (
 					<EditSvg

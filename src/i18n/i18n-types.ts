@@ -697,7 +697,7 @@ type RootTranslation = {
 			}
 			svg: {
 				/**
-				 * S​V​G​（​实​验​性​）
+				 * 我​的​ ​S​V​G
 				 */
 				tabName: string
 				/**
@@ -788,6 +788,14 @@ type RootTranslation = {
 					deleteConfirm: RequiredParams<'count'>
 				}
 				modal: {
+					/**
+					 * 添​加​图​标
+					 */
+					addTitle: string
+					/**
+					 * 编​辑​图​标
+					 */
+					editTitle: string
 					/**
 					 * 粘​贴​源​码
 					 */
@@ -1929,7 +1937,7 @@ export type TranslationFunctions = {
 			}
 			svg: {
 				/**
-				 * SVG（实验性）
+				 * 我的 SVG
 				 */
 				tabName: () => LocalizedString
 				/**
@@ -2015,6 +2023,14 @@ export type TranslationFunctions = {
 					deleteConfirm: (arg: { count: number }) => LocalizedString
 				}
 				modal: {
+					/**
+					 * 添加图标
+					 */
+					addTitle: () => LocalizedString
+					/**
+					 * 编辑图标
+					 */
+					editTitle: () => LocalizedString
 					/**
 					 * 粘贴源码
 					 */

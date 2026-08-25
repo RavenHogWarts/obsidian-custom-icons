@@ -47,18 +47,12 @@
 	flex: none;
 }
 
-/* 分组条：横向滚动，条目多（每个图标包一段）时不挤压网格 */
+/* 分组条：横向滚动，条目多（每个图标包一段）时不挤压网格。
+   滚动、隐藏滚动条、淡出边缘都在 .ci-strip（见 useStripAutoScroll.css） */
 .ci-picker__segments {
-	display: flex;
 	flex: none;
 	gap: var(--size-4-1);
-	overflow-x: auto;
 	padding-bottom: 2px;
-	scrollbar-width: none;
-}
-
-.ci-picker__segments::-webkit-scrollbar {
-	display: none;
 }
 
 .ci-picker__segment {

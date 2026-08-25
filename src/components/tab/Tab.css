@@ -12,19 +12,13 @@
 	flex-direction: row;
 }
 
+/* 横向滚动、隐藏滚动条、激活页签自动对位都在 .ci-strip
+   （见 useStripAutoScroll.css，与 hook 同进同出） */
 .ci-tab__list {
-	display: flex;
 	background-color: transparent;
 	color: var(--text-normal);
 	border-bottom: 1px solid var(--background-modifier-border);
-	overflow-x: auto;
-	-webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
-	scrollbar-width: none; /* Firefox */
 	min-height: 32px; /* Slightly taller for better touch targets */
-}
-
-.ci-tab__list::-webkit-scrollbar {
-	display: none; /* Chrome, Safari, Edge */
 }
 
 .ci-tab__list[data-orientation="vertical"] {

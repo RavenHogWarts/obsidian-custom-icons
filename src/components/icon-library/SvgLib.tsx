@@ -97,6 +97,15 @@ export const SvgLib: React.FC<SvgLibProps> = ({ handoff, onNavigate }) => {
 			),
 		),
 	);
+	/**
+	 * `groupFilter` 的镜像，供延迟执行的回调读当前值。
+	 *
+	 * 分组管理的三个动作是在弹窗确认时才回调的，此时 `useCallback` 闭包里的
+	 * `groupFilter` 可能已经过期（用户在弹窗开着的时候又切了档）。
+	 */
+	const groupFilterRef = useRef(groupFilter);
+	groupFilterRef.current = groupFilter;
+
 	const [selection, setSelection] = useState(emptySelection);
 	const selected = selection.selected;
 	const searchRef = useRef<HTMLInputElement>(null);
@@ -491,49 +500,83 @@ export const SvgLib: React.FC<SvgLibProps> = ({ handoff, onNavigate }) => {
 		[store, svgLL],
 	);
 
+	/**
+	 * 管理动作结束后把当前筛选挪到 `next`（仅当它正停在 `from` 这个组上）。
+	 *
+	 * 光调 `setGroupFilter` 不够：那只改界面，落盘值还指着那个已经改名 / 已经没了的
+	 * 组。视图一关一开，`normalizeSvgGroup` 发现它不在了就收敛回「全部」——用户看到
+	 * 的是筛选莫名其妙被重置。落盘与界面必须一起动，所以两件事绑在这一个函数里。
+	 */
+	const relocateFilter = useCallback(
+		(from: string, next: SvgGroupFilter) => {
+			// 读 ref 而不是 setGroupFilter 的更新函数：写盘是副作用，塞进更新函数里
+			// 会在 StrictMode 下跑两遍。ref 也顺带避开了闭包快照——这个回调是在弹窗
+			// 确认时才执行的，那时闭包里的 groupFilter 可能已经是几次切换之前的值了
+			if (groupFilterRef.current !== from) {
+				// 这期间用户已经自己切到别处了，别踩掉他的选择
+				return;
+			}
+			setGroupFilter(next);
+			void store
+				.updateSettingByPath(
+					"customIconLib.ui.svgGroup",
+					encodeSvgGroupPref(next),
+				)
+				.catch((error: unknown) => {
+					console.error("Failed to save svg group filter:", error);
+				});
+		},
+		[store],
+	);
+
 	/** 重命名分组：改名到已有组名即合并，由弹窗提前告知 */
 	const handleRenameGroup = useCallback(
-		(group: string) => {
+		(group: string, sourceEl?: HTMLElement) => {
 			const ids = takeGroup(group);
 			if (!ids) {
 				return;
 			}
 			let submitFn: (() => Promise<boolean>) | null = null;
 
-			new ConfirmDialog(store.plugin, {
-				title: svgLL.group.renameTitle({ group }),
-				confirmLL: LL.common.save(),
-				children: (
-					<RenameGroup
-						group={group}
-						count={ids.size}
-						groups={groupNames}
-						onSubmit={async (next) => {
-							await store.updateSettingByPath(
-								"customIconLib.svg",
-								renameGroup(
-									store.plugin.settings.customIconLib.svg,
-									group,
-									next,
-								),
-							);
-							// 正停在这个组上就跟着走到新名字，否则筛选会莫名回落到「全部」
-							setGroupFilter((prev) =>
-								prev === group ? next : prev,
-							);
-							new Notice(
-								svgLL.group.renamed({ from: group, to: next }),
-							);
-						}}
-						onReady={(submit) => {
-							submitFn = submit;
-						}}
-					/>
-				),
-				onConfirm: async () => (submitFn ? await submitFn() : false),
-			}).open();
+			new ConfirmDialog(
+				store.plugin,
+				{
+					title: svgLL.group.renameTitle({ group }),
+					confirmLL: LL.common.save(),
+					children: (
+						<RenameGroup
+							group={group}
+							count={ids.size}
+							groups={groupNames}
+							onSubmit={async (next) => {
+								await store.updateSettingByPath(
+									"customIconLib.svg",
+									renameGroup(
+										store.plugin.settings.customIconLib.svg,
+										group,
+										next,
+									),
+								);
+								// 正停在这个组上就跟着走到新名字，否则筛选会莫名回落到「全部」
+								relocateFilter(group, next);
+								new Notice(
+									svgLL.group.renamed({
+										from: group,
+										to: next,
+									}),
+								);
+							}}
+							onReady={(submit) => {
+								submitFn = submit;
+							}}
+						/>
+					),
+					onConfirm: async () => (submitFn ? await submitFn() : false),
+				},
+				{ sourceEl },
+			).open();
 		},
-		[store, takeGroup, groupNames, svgLL],
+		[store, takeGroup, relocateFilter, groupNames, svgLL],
 	);
 
 	/**
@@ -543,40 +586,42 @@ export const SvgLib: React.FC<SvgLibProps> = ({ handoff, onNavigate }) => {
 	 * 但不必危言耸听：图标本体、收藏、最近使用都没动，文案就照这么说。
 	 */
 	const handleDissolveGroup = useCallback(
-		(group: string) => {
+		(group: string, sourceEl?: HTMLElement) => {
 			const ids = takeGroup(group);
 			if (!ids) {
 				return;
 			}
 			const count = ids.size;
-			new ConfirmDialog(store.plugin, {
-				title: svgLL.group.dissolveTitle({ group }),
-				confirmLL: svgLL.group.dissolveConfirm(),
-				children: (
-					<div className="ci-lib__form">
-						<span className="ci-lib__form-hint">
-							{svgLL.group.dissolveBody({ count })}
-						</span>
-					</div>
-				),
-				onConfirm: async () => {
-					await store.updateSettingByPath(
-						"customIconLib.svg",
-						dissolveGroup(
-							store.plugin.settings.customIconLib.svg,
-							group,
-						),
-					);
-					// 这个组没了，正停在它上面就落到刚接收这批图标的「未分组」，
-					// 比弹回「全部」更贴用户此刻的意图（他要看的就是这批图标）
-					setGroupFilter((prev) =>
-						prev === group ? UNGROUPED : prev,
-					);
-					new Notice(svgLL.group.dissolved({ group, count }));
+			new ConfirmDialog(
+				store.plugin,
+				{
+					title: svgLL.group.dissolveTitle({ group }),
+					confirmLL: svgLL.group.dissolveConfirm(),
+					children: (
+						<div className="ci-lib__form">
+							<span className="ci-lib__form-hint">
+								{svgLL.group.dissolveBody({ count })}
+							</span>
+						</div>
+					),
+					onConfirm: async () => {
+						await store.updateSettingByPath(
+							"customIconLib.svg",
+							dissolveGroup(
+								store.plugin.settings.customIconLib.svg,
+								group,
+							),
+						);
+						// 这个组没了，正停在它上面就落到刚接收这批图标的「未分组」，
+						// 比弹回「全部」更贴用户此刻的意图（他要看的就是这批图标）
+						relocateFilter(group, UNGROUPED);
+						new Notice(svgLL.group.dissolved({ group, count }));
+					},
 				},
-			}).open();
+				{ sourceEl },
+			).open();
 		},
-		[store, takeGroup, svgLL],
+		[store, takeGroup, relocateFilter, svgLL],
 	);
 
 	/**
@@ -586,48 +631,52 @@ export const SvgLib: React.FC<SvgLibProps> = ({ handoff, onNavigate }) => {
 	 * 少任何一步都会在界面上留下点不动的空格。
 	 */
 	const handleDeleteGroup = useCallback(
-		(group: string) => {
+		(group: string, sourceEl?: HTMLElement) => {
 			const members = takeGroup(group);
 			if (!members) {
 				return;
 			}
 			const ids = Array.from(members);
 			const count = ids.length;
-			new ConfirmDialog(store.plugin, {
-				title: svgLL.group.purgeTitle({ group }),
-				confirmLL: svgLL.group.purgeConfirm(),
-				children: (
-					<div className="ci-lib__form">
-						<span className="ci-lib__form-warning">
-							{svgLL.group.purgeBody({ count })}
-						</span>
-					</div>
-				),
-				onConfirm: async () => {
-					await store.updateSettingByPath(
-						"customIconLib.svg",
-						deleteGroupWithIcons(
-							store.plugin.settings.customIconLib.svg,
-							group,
-						),
-					);
-					await forgetIcons(
-						store,
-						ids.map((id) => ({ type: "svg" as const, id })),
-					);
-					setSelection((prev) =>
-						ids.reduce(
-							(acc, id) => dropFromSelection(acc, id),
-							prev,
-						),
-					);
-					// 组与成员一起没了，没有"接收方"可去，回落到「全部」
-					setGroupFilter((prev) => (prev === group ? null : prev));
-					new Notice(svgLL.group.purged({ group, count }));
+			new ConfirmDialog(
+				store.plugin,
+				{
+					title: svgLL.group.purgeTitle({ group }),
+					confirmLL: svgLL.group.purgeConfirm(),
+					children: (
+						<div className="ci-lib__form">
+							<span className="ci-lib__form-warning">
+								{svgLL.group.purgeBody({ count })}
+							</span>
+						</div>
+					),
+					onConfirm: async () => {
+						await store.updateSettingByPath(
+							"customIconLib.svg",
+							deleteGroupWithIcons(
+								store.plugin.settings.customIconLib.svg,
+								group,
+							),
+						);
+						await forgetIcons(
+							store,
+							ids.map((id) => ({ type: "svg" as const, id })),
+						);
+						setSelection((prev) =>
+							ids.reduce(
+								(acc, id) => dropFromSelection(acc, id),
+								prev,
+							),
+						);
+						// 组与成员一起没了，没有"接收方"可去，回落到「全部」
+						relocateFilter(group, null);
+						new Notice(svgLL.group.purged({ group, count }));
+					},
 				},
-			}).open();
+				{ sourceEl },
+			).open();
 		},
-		[store, takeGroup, svgLL],
+		[store, takeGroup, relocateFilter, svgLL],
 	);
 
 	/**
@@ -640,23 +689,27 @@ export const SvgLib: React.FC<SvgLibProps> = ({ handoff, onNavigate }) => {
 	const handleGroupMenu = useCallback(
 		(group: string, event: React.MouseEvent) => {
 			event.preventDefault();
+			// 现在取住触发它的 tab：菜单项的 onClick 是稍后才跑的，那时 React 的
+			// 合成事件已被回收，`event.currentTarget` 会是 null。弹窗靠它挂到用户
+			// 实际操作的那个窗口（popout 里 activeDocument 不可靠，见 BaseModal）
+			const tabEl = event.currentTarget as HTMLElement;
 			const menu = new Menu();
 			menu.addItem((item) =>
 				item
 					.setTitle(svgLL.group.renameAction())
 					.setIcon("pencil")
-					.onClick(() => handleRenameGroup(group)),
+					.onClick(() => handleRenameGroup(group, tabEl)),
 			);
 			menu.addItem((item) =>
 				item
 					.setTitle(svgLL.group.dissolveAction())
 					.setIcon("folder-minus")
-					.onClick(() => handleDissolveGroup(group)),
+					.onClick(() => handleDissolveGroup(group, tabEl)),
 			);
 			menu.addItem((item) => {
 				item.setTitle(svgLL.group.purgeAction())
 					.setIcon("trash-2")
-					.onClick(() => handleDeleteGroup(group));
+					.onClick(() => handleDeleteGroup(group, tabEl));
 				// 唯一会真的删数据的一项：标红，让它在菜单里与上面两项拉开分量。
 				// 另两项都是可自己手动重建的（改回名字、把图标再移回去）
 				item.setWarning(true);
@@ -731,7 +784,8 @@ export const SvgLib: React.FC<SvgLibProps> = ({ handoff, onNavigate }) => {
 			},
 			{
 				icon: "folder-input",
-				title: svgLL.group.moveTitle(),
+				// 菜单项用 moveAction（带省略号 = 会开弹窗），弹窗标题才用 moveTitle
+				title: svgLL.group.moveAction(),
 				// CustomAction 只透传 id，拿不到触发元素——弹窗因此没有 sourceEl，
 				// 跨窗口挂载回落到 activeDocument（右键菜单本就开在当前窗口，够用）
 				onClick: (id: string) => openMoveToGroup([id]),
@@ -882,7 +936,7 @@ export const SvgLib: React.FC<SvgLibProps> = ({ handoff, onNavigate }) => {
 							)
 						}
 					>
-						{svgLL.group.moveTitle()}
+						{svgLL.group.moveSelected()}
 					</button>
 					<button onClick={handleDeleteSelected}>
 						{svgLL.selection.deleteSelected()}

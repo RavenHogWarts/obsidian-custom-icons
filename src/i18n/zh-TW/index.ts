@@ -162,6 +162,8 @@ const zh_TW = {
 				expandAllTooltip: "展開全部分組",
 				collapseAllTooltip: "收起全部分組",
 				expandLockedTooltip: "篩選時一律展開，清空篩選詞後可收起",
+				matchedByName: "組名符合「{query:string}」，已列出全組",
+				diceGroupNote: "為整組 {count:number} 個副檔名擲同一個圖示",
 			},
 			presets: {
 				image: "圖片",
@@ -201,7 +203,7 @@ const zh_TW = {
 				addTooltip: "新增對應",
 				fetchTooltip: "從目前開啟的側邊欄工具分頁擷取類型",
 				noneFound: "尚未設定類型對應",
-				resetTooltip: "刪除",
+				deleteTooltip: "刪除",
 			},
 			tabs: {
 				name: "單分頁覆蓋",
@@ -213,7 +215,7 @@ const zh_TW = {
 				filterPlaceholder: "篩選分頁...",
 				noneMatched: "沒有符合的分頁",
 				invalidKey: "鍵格式無法識別，此項不生效（建議刪除後重新新增）",
-				resetTooltip: "刪除",
+				deleteTooltip: "刪除",
 			},
 			menu: {
 				setIcon: "設定圖示",
@@ -228,6 +230,7 @@ const zh_TW = {
 			},
 			types: {
 				name: "按類型",
+				resetTooltip: "重置為原生圖示",
 				desc: "為每種書籤類型設定預設圖示，作用於該類型的全部書籤；任意書籤還可右鍵單獨覆蓋。",
 				file: "檔案",
 				folder: "資料夾",

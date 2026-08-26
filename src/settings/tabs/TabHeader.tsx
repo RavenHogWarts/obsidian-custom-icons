@@ -346,7 +346,7 @@ export const TabHeader: FC = () => {
 									/>
 									<ExtraButton
 										icon="trash-2"
-										tooltip={LL.settings.tabHeader.mapping.resetTooltip()}
+										tooltip={LL.settings.tabHeader.mapping.deleteTooltip()}
 										onClick={async () => {
 											await writeOverride(dataType);
 										}}
@@ -485,7 +485,7 @@ export const TabHeader: FC = () => {
 									/>
 									<ExtraButton
 										icon="trash-2"
-										tooltip={LL.settings.tabHeader.tabs.resetTooltip()}
+										tooltip={LL.settings.tabHeader.tabs.deleteTooltip()}
 										onClick={async () => {
 											await writeTabOverride(tabKey);
 										}}

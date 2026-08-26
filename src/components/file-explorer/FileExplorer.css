@@ -81,6 +81,28 @@
 	font-family: var(--font-interface);
 }
 
+/* ------------------------------ 添加规则那一行 ---------------------------- */
+/*
+ * 这一行往 `control` 槽里塞了 5 个控件（扩展名输入、分组输入、图标、添加、预设）。
+ * Obsidian 原生的 `.setting-item-control` 是不换行的横向 flex，在窄侧栏里两个输入框
+ * 会被挤到几乎没有可用宽度。
+ *
+ * 允许换行 + 给输入框一个可收缩的弹性基准：宽的时候一行放完，窄的时候输入框
+ * 整行、按钮落到下一行，而不是所有东西一起变窄。
+ */
+
+.ci-fe__add-row .setting-item-control {
+	flex-wrap: wrap;
+	justify-content: flex-start;
+	gap: var(--size-4-1);
+}
+
+.ci-fe__add-row .setting-item-control input[type="text"] {
+	flex: 1 1 14ch;
+	/* 不给 min-width: 0 的话 flex 项不会收缩到内容宽度以下 */
+	min-width: 0;
+}
+
 /* ------------------------------ 分组行与组内行 ---------------------------- */
 /*
  * 分组行是一整组的操作入口（展开收起 / 改整组图标 / ⋮ 菜单），组内成员紧跟在

@@ -24,6 +24,14 @@ export interface RandomIconButtonProps {
 	 * `applyAll`，中间那一拍还是「新 icon 配旧 type」的错配状态。
 	 */
 	onPick: (icon: string, type: IconType) => void | Promise<void>;
+
+	/**
+	 * 附加在 tooltip 前面的一句说明，用来交代**这一下会动多少行**。
+	 *
+	 * 分组行上的骰子是「给整组掷同一个」，成员行上的是「只掷这一行」——同一页面、
+	 * 同一个图标、两种行为。默认单行是符合直觉的那种，所以只有反直觉的那处需要说。
+	 */
+	note?: string;
 }
 
 /**
@@ -38,6 +46,7 @@ export const RandomIconButton: FC<RandomIconButtonProps> = ({
 	value,
 	type,
 	onPick,
+	note,
 }) => {
 	const settingsStore = useSettingsStore();
 	const plugin = settingsStore.plugin;
@@ -45,11 +54,12 @@ export const RandomIconButton: FC<RandomIconButtonProps> = ({
 	const current = iconRefOf(value, type);
 	// 只查一次数组 + 已启用包的前缀，不枚举任何包的图标内容，渲染期调用是安全的
 	const scope = resolveRandomScope(plugin, current);
+	const scopeText = describeRandomScope(plugin, scope);
 
 	return (
 		<ExtraButton
 			icon="dices"
-			tooltip={describeRandomScope(plugin, scope)}
+			tooltip={note ? `${note} · ${scopeText}` : scopeText}
 			onClick={async () => {
 				const picked = randomIconFor(plugin, current);
 				// 无可掷（池子空，或池子里只剩当前图标）：什么都不写

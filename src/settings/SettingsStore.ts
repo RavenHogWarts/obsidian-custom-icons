@@ -1,4 +1,6 @@
-import CIPlugin from "@src/main";
+// `import type`：这里只把 CIPlugin 当类型用。写成值导入会把 main.ts（连带
+// obsidian 运行时）拖进模块图，本文件就没法在 jest 的 node 环境里单测了。
+import type CIPlugin from "@src/main";
 import {
 	DEFAULT_SETTINGS,
 	IBookmarkIconOverride,
@@ -41,7 +43,13 @@ export default class SettingsStore {
 	}
 
 	get store() {
-		return Object.assign({}, this.#store);
+		/*
+		 * 直接返回同一个对象，不再 `Object.assign({}, ...)` 复制。
+		 *
+		 * 复制会让 `usePluginSettings` 每次渲染拿到**新的** `subscribe` 函数，
+		 * 而 `useSyncExternalStore` 把它当依赖——于是每渲染一次就退订再订阅一次。
+		 */
+		return this.#store;
 	}
 
 	get plugin() {
@@ -116,12 +124,17 @@ export default class SettingsStore {
 		return saved as T;
 	}
 
-	#normalizeCommunityPluginSettings(
-		settings: IPluginSettings,
-	): IPluginSettings {
-		const normalizedSettings = JSON.parse(
-			JSON.stringify(settings),
-		) as IPluginSettings;
+	/**
+	 * 以下五个 `#normalize*` **就地改写传入的对象**，不自己拷贝。
+	 *
+	 * 之前每个都各做一次 `JSON.parse(JSON.stringify(settings))`，加上
+	 * `updateSettingByPath` 自己那一次，**每改一个颜色就是六趟全量深拷贝**。
+	 * 现在深拷贝只在 `#normalizeSettings` 做一次，它们拿到的已经是私有草稿。
+	 *
+	 * 因此它们只应从 `#normalizeSettings` 调用——传进去的对象会被改。
+	 */
+	#normalizeCommunityPluginSettings(settings: IPluginSettings): void {
+		const normalizedSettings = settings;
 		const defaultIcon = normalizedSettings.communityPlugins.default;
 		defaultIcon.color = normalizeIconColor(defaultIcon.color) ?? "";
 
@@ -143,13 +156,10 @@ export default class SettingsStore {
 		);
 
 		normalizedSettings.communityPlugins.data = normalizedData;
-		return normalizedSettings;
 	}
 
-	#normalizeRibbonSettings(settings: IPluginSettings): IPluginSettings {
-		const normalizedSettings = JSON.parse(
-			JSON.stringify(settings),
-		) as IPluginSettings;
+	#normalizeRibbonSettings(settings: IPluginSettings): void {
+		const normalizedSettings = settings;
 		const normalizedData: Record<string, IRibbonIconOverride> = {};
 
 		Object.entries(normalizedSettings.ribbon?.data ?? {}).forEach(
@@ -175,15 +185,10 @@ export default class SettingsStore {
 		);
 
 		normalizedSettings.ribbon.data = normalizedData;
-		return normalizedSettings;
 	}
 
-	#normalizeFileExplorerSettings(
-		settings: IPluginSettings,
-	): IPluginSettings {
-		const normalizedSettings = JSON.parse(
-			JSON.stringify(settings),
-		) as IPluginSettings;
+	#normalizeFileExplorerSettings(settings: IPluginSettings): void {
+		const normalizedSettings = settings;
 		const fe = normalizedSettings.fileExplorer;
 
 		// 默认图标颜色归一
@@ -255,14 +260,10 @@ export default class SettingsStore {
 			true,
 			isValidExtensionKey,
 		);
-
-		return normalizedSettings;
 	}
 
-	#normalizeTabHeaderSettings(settings: IPluginSettings): IPluginSettings {
-		const normalizedSettings = JSON.parse(
-			JSON.stringify(settings),
-		) as IPluginSettings;
+	#normalizeTabHeaderSettings(settings: IPluginSettings): void {
+		const normalizedSettings = settings;
 		const normalizedData: Record<string, ITabHeaderIconOverride> = {};
 
 		Object.entries(normalizedSettings.tabHeader?.data ?? {}).forEach(
@@ -317,25 +318,31 @@ export default class SettingsStore {
 
 		normalizedSettings.tabHeader.data = normalizedData;
 		normalizedSettings.tabHeader.tabs = normalizedTabs;
-		return normalizedSettings;
 	}
 
+	/**
+	 * 归一化的唯一入口，也是**唯一一次深拷贝**的地方。
+	 *
+	 * 五个分归一化器就地改写这份草稿。它们各自都会重建自己那几张表，但也有
+	 * 就地改字段的地方（如 `fe.folderDefault.color`），所以必须先拿到一份与调用方
+	 * 无关的私有对象——否则会改到别人手里还在用的那个。
+	 *
+	 * 仍用 JSON 往返而不是 `structuredClone`：设置本来就要序列化进 data.json，
+	 * 而 JSON 会顺手丢掉 `undefined`，与落盘后的形状一致。换成 structuredClone
+	 * 会让 `{ icon: undefined }` 这类脏值活下来，是行为变化。
+	 */
 	#normalizeSettings(settings: IPluginSettings): IPluginSettings {
-		return this.#normalizeBookmarksSettings(
-			this.#normalizeTabHeaderSettings(
-				this.#normalizeFileExplorerSettings(
-					this.#normalizeRibbonSettings(
-						this.#normalizeCommunityPluginSettings(settings),
-					),
-				),
-			),
-		);
+		const draft = JSON.parse(JSON.stringify(settings)) as IPluginSettings;
+		this.#normalizeCommunityPluginSettings(draft);
+		this.#normalizeRibbonSettings(draft);
+		this.#normalizeFileExplorerSettings(draft);
+		this.#normalizeTabHeaderSettings(draft);
+		this.#normalizeBookmarksSettings(draft);
+		return draft;
 	}
 
-	#normalizeBookmarksSettings(settings: IPluginSettings): IPluginSettings {
-		const normalizedSettings = JSON.parse(
-			JSON.stringify(settings),
-		) as IPluginSettings;
+	#normalizeBookmarksSettings(settings: IPluginSettings): void {
+		const normalizedSettings = settings;
 
 		const normalizeMap = (
 			source: Record<string, IBookmarkIconOverride>,
@@ -375,7 +382,6 @@ export default class SettingsStore {
 			normalizedSettings.bookmarks?.types,
 			isBookmarkKind,
 		);
-		return normalizedSettings;
 	}
 
 	async loadSettings() {
@@ -389,11 +395,56 @@ export default class SettingsStore {
 	}
 
 	async updateSettings(settings: IPluginSettings) {
-		this.#plugin.settings = this.#normalizeSettings(
-			Object.assign({}, settings),
-		);
+		// `#normalizeSettings` 自己会深拷贝，这里不必再 Object.assign 一层
+		this.#plugin.settings = this.#normalizeSettings(settings);
 		await this.#plugin.saveSettings();
 		this.#notifyStoreSubscribers();
+	}
+
+	/**
+	 * 按路径浅拷贝出一份可写草稿：只克隆路径经过的那几层，其余分支与原对象共享。
+	 *
+	 * 用来替代原先的 `JSON.parse(JSON.stringify(整份设置))`。共享未改动的分支是
+	 * 安全的——`#normalizeSettings` 随后还会做一次真正的深拷贝，落盘与 React 快照
+	 * 拿到的都是那份新对象；这里只是为了能把值写到指定位置而不动到当前状态。
+	 */
+	#draftAlongPath(pathParts: string[]): {
+		draft: IPluginSettings;
+		parent: Record<string, unknown>;
+	} {
+		const draft = { ...this.#plugin.settings };
+		let current = draft as unknown as Record<string, unknown>;
+		for (let i = 0; i < pathParts.length - 1; i++) {
+			const part = pathParts[i];
+			const child = current[part];
+			if (Array.isArray(child)) {
+				current[part] = [...(child as unknown[])];
+			} else if (typeof child === "object" && child !== null) {
+				current[part] = { ...child };
+			} else if (!Object.prototype.hasOwnProperty.call(current, part)) {
+				// 路径不存在就补一个空对象（沿用原先的行为）
+				current[part] = {};
+			} else {
+				throw new Error(`Invalid setting path: ${pathParts.join(".")}`);
+			}
+			current = current[part] as Record<string, unknown>;
+		}
+		return { draft, parent: current };
+	}
+
+	/** 路径里不能出现这些，否则可污染原型 */
+	#assertSafePath(path: string, pathParts: string[]) {
+		for (const part of pathParts) {
+			if (
+				part === "__proto__" ||
+				part === "constructor" ||
+				part === "prototype"
+			) {
+				throw new Error(
+					`Invalid setting path: ${path} - contains dangerous property`,
+				);
+			}
+		}
 	}
 
 	/**
@@ -402,54 +453,11 @@ export default class SettingsStore {
 	 * @param value 新的设置值
 	 */
 	async updateSettingByPath<T>(path: string, value: T) {
-		// 创建设置的深拷贝
-		const newSettings = JSON.parse(
-			JSON.stringify(this.#plugin.settings),
-		) as IPluginSettings;
 		const pathParts = path.split(".");
-
-		// 防止原型污染：验证路径中不包含危险属性
-		for (const part of pathParts) {
-			if (
-				part === "__proto__" ||
-				part === "constructor" ||
-				part === "prototype"
-			) {
-				throw new Error(
-					`Invalid setting path: ${path} - contains dangerous property`,
-				);
-			}
-		}
-
-		let current: unknown = newSettings;
-
-		// 遍历路径，找到父对象，如果不存在则创建
-		for (let i = 0; i < pathParts.length - 1; i++) {
-			const part = pathParts[i];
-			if (typeof current === "object" && current !== null) {
-				const currentRecord = current as Record<string, unknown>;
-				// 如果路径不存在，创建一个空对象
-				if (
-					!Object.prototype.hasOwnProperty.call(currentRecord, part)
-				) {
-					currentRecord[part] = {};
-				}
-				current = currentRecord[part];
-			} else {
-				throw new Error(`Invalid setting path: ${path}`);
-			}
-		}
-
-		// 设置最终值
-		const finalPart = pathParts[pathParts.length - 1];
-		if (typeof current === "object" && current !== null) {
-			(current as Record<string, unknown>)[finalPart] = value;
-		} else {
-			throw new Error(`Invalid setting path: ${path}`);
-		}
-
-		// 使用 updateSettings 方法更新设置
-		await this.updateSettings(newSettings);
+		this.#assertSafePath(path, pathParts);
+		const { draft, parent } = this.#draftAlongPath(pathParts);
+		parent[pathParts[pathParts.length - 1]] = value;
+		await this.updateSettings(draft);
 	}
 
 	/**
@@ -457,53 +465,39 @@ export default class SettingsStore {
 	 * @param path 设置路径
 	 */
 	async deleteSettingByPath(path: string) {
-		// 创建设置的深拷贝
-		const newSettings = JSON.parse(
-			JSON.stringify(this.#plugin.settings),
-		) as IPluginSettings;
 		const pathParts = path.split(".");
+		this.#assertSafePath(path, pathParts);
 
-		// 防止原型污染：验证路径中不包含危险属性
-		for (const part of pathParts) {
-			if (
-				part === "__proto__" ||
-				part === "constructor" ||
-				part === "prototype"
-			) {
-				throw new Error(
-					`Invalid setting path: ${path} - contains dangerous property`,
-				);
-			}
-		}
-
-		let current: unknown = newSettings;
-
-		// 遍历路径，找到父对象
+		/*
+		 * 先在**当前**设置上确认这条路径真的存在，再动手做草稿。
+		 *
+		 * 顺序很重要：`#draftAlongPath` 会给缺失的中间层补空对象，如果先做草稿
+		 * 再判断，就会为一条根本不存在的路径白建一份草稿。而 delete 的既有语义是
+		 * 「路径不存在就什么都不做、也不落盘」——不落盘这一点尤其要保住，
+		 * 每次落盘都是一遍写盘 + 全量 applyAll。
+		 */
+		let probe: unknown = this.#plugin.settings;
 		for (let i = 0; i < pathParts.length - 1; i++) {
-			const part = pathParts[i];
 			if (
-				typeof current === "object" &&
-				current !== null &&
-				Object.prototype.hasOwnProperty.call(current, part)
+				typeof probe !== "object" ||
+				probe === null ||
+				!Object.prototype.hasOwnProperty.call(probe, pathParts[i])
 			) {
-				current = (current as Record<string, unknown>)[part];
-			} else {
-				// 路径不存在，无需删除，直接返回
 				return;
 			}
+			probe = (probe as Record<string, unknown>)[pathParts[i]];
 		}
-
-		// 删除最终属性
 		const finalPart = pathParts[pathParts.length - 1];
 		if (
-			typeof current === "object" &&
-			current !== null &&
-			Object.prototype.hasOwnProperty.call(current, finalPart)
+			typeof probe !== "object" ||
+			probe === null ||
+			!Object.prototype.hasOwnProperty.call(probe, finalPart)
 		) {
-			delete (current as Record<string, unknown>)[finalPart];
-			// 使用 updateSettings 方法更新设置
-			await this.updateSettings(newSettings);
+			return;
 		}
-		// 如果路径不存在，无需删除，直接返回
+
+		const { draft, parent } = this.#draftAlongPath(pathParts);
+		delete parent[finalPart];
+		await this.updateSettings(draft);
 	}
 }

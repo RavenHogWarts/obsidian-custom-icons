@@ -99,11 +99,45 @@ export function buildRandomPool(
 	scope: RandomScope,
 ): IconRef[] {
 	const sources = buildIconSources(plugin);
-	const entries = sources.find((source) => source.id === scope)?.entries ?? [];
+	const entries = renderable(
+		plugin,
+		scope,
+		sources.find((source) => source.id === scope)?.entries ?? [],
+	);
 	if (entries.length > 0) {
 		return entries;
 	}
 	return sources.find((source) => source.id === LUCIDE_SCOPE)?.entries ?? [];
+}
+
+/**
+ * 剔掉「我的 SVG」段里**内容为空**的条目。
+ *
+ * `CustomIconLibHandler` 的注册条件是 `icon.id && icon.content`，内容为空的条目
+ * 压根没进注册表——掷中它就是一格空白，而且会被写进设置。`buildIconSources`
+ * 不做这层过滤（选择器里那是一格看得见的空白，用户自己不会去点），但随机是替
+ * 用户选，必须只在能渲染的东西里挑。
+ *
+ * **只有 `svg` 段需要这层过滤**：`lucide` 段来自 `getLucideIconNames()`（按定义
+ * 可渲染），`pack:*` 段的条目本就是从包内容枚举出来的，都是注册过的。
+ *
+ * 空内容只可能来自手改 `data.json`（`AddSvg` 与 `parseSvgLibrary` 都拒收空内容），
+ * 所以这里是防御而非常见路径——但代价只是一次 `filter`。
+ */
+function renderable(
+	plugin: CIPlugin,
+	scope: RandomScope,
+	entries: IconRef[],
+): IconRef[] {
+	if (scope !== "svg") {
+		return entries;
+	}
+	const withContent = new Set(
+		plugin.settings.customIconLib.svg
+			.filter((icon) => icon.content)
+			.map((icon) => icon.id),
+	);
+	return entries.filter((entry) => withContent.has(entry.id));
 }
 
 /**

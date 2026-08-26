@@ -1,7 +1,22 @@
-import { SettingContainerContext } from "@src/context/SettingContext";
+import {
+	SettingContainerContext,
+	SettingSlotContext,
+} from "@src/context/SettingContext";
 import { useSettingContainer } from "@src/hooks/useSettingContext";
-import { SettingGroup as ObsidianSettingGroup } from "obsidian";
-import { FC, ReactNode, useEffect, useId, useMemo, useState } from "react";
+import {
+	SearchComponent,
+	SettingGroup as ObsidianSettingGroup,
+} from "obsidian";
+import {
+	FC,
+	ReactNode,
+	useEffect,
+	useId,
+	useMemo,
+	useRef,
+	useState,
+} from "react";
+import { createPortal } from "react-dom";
 import "./Setting.css";
 
 export interface SettingGroupProps {
@@ -35,6 +50,28 @@ export interface SettingGroupProps {
 	disabled?: boolean;
 
 	/**
+	 * 分组标题上的筛选框，走 Obsidian 原生的 `SettingGroup.addSearch()`。
+	 *
+	 * 在此之前各 tab 都是把 `<Search>` 塞进某个 `SettingItem` 的 `name` 槽里假装
+	 * 成一行筛选器——白占一整行，而且筛选框落在「设置项名称」那一列，位置不对。
+	 * 原生 API 从 1.11.0 就提供了这个位置（与 `SettingGroup` 同版本引入，
+	 * 不引入新的版本下限）。
+	 */
+	search?: {
+		value: string;
+		placeholder?: string;
+		onChange: (value: string) => void;
+	};
+
+	/**
+	 * 分组标题右侧的操作按钮（排序 / 骰子 / 批量清空 / 全部展开收起…）。
+	 *
+	 * 传 `<ExtraButton>` 即可：这里把原生标题区的容器作为 slot 提供出去，
+	 * 与 `SettingItem` 的 `control` 槽同一套机制。
+	 */
+	actions?: ReactNode;
+
+	/**
 	 * Manual container element (overrides context)
 	 */
 	containerEl?: HTMLElement;
@@ -61,6 +98,8 @@ export const SettingGroup: FC<SettingGroupProps> = ({
 	title,
 	children,
 	disabled = false,
+	search,
+	actions,
 	containerEl: providedContainer,
 	className,
 }) => {
@@ -69,6 +108,14 @@ export const SettingGroup: FC<SettingGroupProps> = ({
 
 	// 生成唯一 ID 来标识这个 SettingGroup
 	const groupId = useId();
+
+	/*
+	 * 只看「有没有传」而不看内容：这两个槽位的存在与否在每个调用点都是静态的
+	 * （某张列表要么有筛选要么没有），而 `search` 是每次渲染新建的对象字面量，
+	 * 直接进 deps 会让整个分组反复重建。
+	 */
+	const hasSearch = Boolean(search);
+	const hasActions = Boolean(actions);
 
 	const [settingItemsContainer, setSettingItemsContainer] =
 		useState<HTMLElement | null>(null);
@@ -113,19 +160,48 @@ export const SettingGroup: FC<SettingGroupProps> = ({
 		settingGroupEl.setAttribute("data-group-id", groupId);
 
 		// Find the setting-items container inside it
-		const itemsContainer = settingGroupEl.querySelector(
-			".setting-items",
-		) as HTMLElement;
+		const itemsContainer =
+			(settingGroupEl.querySelector(".setting-items") as HTMLElement) ??
+			settingGroupEl.createDiv("setting-items");
 
-		if (!itemsContainer) {
-			// If setting-items doesn't exist, create it
-			// This might happen in older Obsidian versions
-			const items = settingGroupEl.createDiv("setting-items");
-			return { group, settingGroupEl, itemsContainer: items };
+		/*
+		 * 原生筛选框与操作按钮的容器。
+		 *
+		 * `addSearch` / `addExtraButton` 自己决定往哪儿插，文档只说搜索在
+		 * 「分组开头」。所以不去猜 DOM 结构：先让它真的建一个组件，取其元素的
+		 * **父节点**当作 slot，再把这个探路用的元素删掉。这样 Obsidian 以后改
+		 * 结构也不会把这里改坏。
+		 */
+		/*
+		 * 用一个可变容器接住回调里拿到的东西，而不是两个 `let`：
+		 * 回调是同步执行的，但 TS 的控制流分析看不出来，会把 `let` 收窄成 `never`。
+		 */
+		const captured: {
+			search: SearchComponent | null;
+			actions: HTMLElement | null;
+		} = { search: null, actions: null };
+
+		if (hasSearch) {
+			group.addSearch((component) => {
+				captured.search = component;
+			});
 		}
 
-		return { group, settingGroupEl, itemsContainer };
-	}, [parentContainer, className, title, groupId]);
+		if (hasActions) {
+			group.addExtraButton((component) => {
+				captured.actions = component.extraSettingsEl.parentElement;
+				component.extraSettingsEl.remove();
+			});
+		}
+
+		return {
+			group,
+			settingGroupEl,
+			itemsContainer,
+			searchComponent: captured.search,
+			actionsSlot: captured.actions,
+		};
+	}, [parentContainer, className, title, groupId, hasSearch, hasActions]);
 
 	useEffect(() => {
 		// Set the correct container for children (the .setting-items div)
@@ -137,12 +213,48 @@ export const SettingGroup: FC<SettingGroupProps> = ({
 		};
 	}, [settingGroupData]);
 
-	// 置灰 + 真正不可交互（inert 连键盘聚焦一起挡掉）
+	/*
+	 * 置灰 + 真正不可交互（inert 连键盘聚焦一起挡掉）。
+	 *
+	 * 标题区的筛选框与操作按钮**也要一起挡住**：它们在 `.setting-items` 之外，
+	 * 不跟着走的话，功能关着的时候骰子和批量清空照样能点，写出一堆当下不生效的
+	 * 配置——那正是 S1 想消掉的那种「看着能操作，其实没意义」。
+	 * 只有标题文字本身留着不灰，否则「为什么全灰了」连个抬头都没有。
+	 */
 	useEffect(() => {
-		const el = settingGroupData.itemsContainer;
-		el.toggleClass("ci-setting-items--disabled", disabled);
-		el.toggleAttribute("inert", disabled);
+		const targets = [
+			settingGroupData.itemsContainer,
+			settingGroupData.actionsSlot,
+			settingGroupData.searchComponent?.containerEl ?? null,
+		];
+		for (const el of targets) {
+			if (!el) {
+				continue;
+			}
+			el.toggleClass("ci-setting-items--disabled", disabled);
+			el.toggleAttribute("inert", disabled);
+		}
 	}, [settingGroupData, disabled]);
+
+	// 原生筛选框：回调只注册一次（与 Controls 里的做法一致，见 useStableCallback）
+	const searchRef = useRef(search);
+	searchRef.current = search;
+	const { searchComponent } = settingGroupData;
+	useEffect(() => {
+		if (!searchComponent) {
+			return;
+		}
+		searchComponent.onChange((value) => searchRef.current?.onChange(value));
+	}, [searchComponent]);
+	useEffect(() => {
+		if (!searchComponent || !search) {
+			return;
+		}
+		searchComponent.setValue(search.value);
+		if (search.placeholder) {
+			searchComponent.setPlaceholder(search.placeholder);
+		}
+	}, [searchComponent, search]);
 
 	if (!settingItemsContainer) {
 		return null;
@@ -151,6 +263,14 @@ export const SettingGroup: FC<SettingGroupProps> = ({
 	// Provide the .setting-items container as the context for child SettingItems
 	return (
 		<SettingContainerContext.Provider value={settingItemsContainer}>
+			{/* 标题区的操作按钮：与 SettingItem 的 control 槽同一套 slot 机制 */}
+			{actions && settingGroupData.actionsSlot && (
+				<SettingSlotContext.Provider
+					value={{ slotEl: settingGroupData.actionsSlot }}
+				>
+					{createPortal(actions, settingGroupData.actionsSlot)}
+				</SettingSlotContext.Provider>
+			)}
 			{children}
 		</SettingContainerContext.Provider>
 	);

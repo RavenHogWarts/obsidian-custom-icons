@@ -20,7 +20,14 @@ const zh_TW = {
 			search: {
 				placeholder: "輸入外掛程式名稱或ID...",
 				noneFound: "未找到符合條件的外掛程式",
+				listEmpty: "沒有需要設定的外掛程式（已安裝的都自帶圖示）",
 				resetTooltip: "重置所有為預設圖示",
+				resetTitle: "把 {count:number} 個外掛程式還原為預設圖示？",
+				resetBody:
+					"這會刪掉它們各自的圖示與顏色設定，之後統一沿用上面的「預設圖示」。",
+				resetConfirm: "還原",
+				resetDone: "已還原 {count:number} 個外掛程式",
+				resetNothing: "篩選出的外掛程式都還沒單獨設定過，無需還原",
 				dicesTooltip: "隨機所有圖示",
 			},
 			pluginList: {
@@ -149,6 +156,12 @@ const zh_TW = {
 				presetExisting: "「{group:string}」已存在，將併入該分組",
 				presetCount:
 					"共 {total:number} 個副檔名，將新增 {count:number} 個",
+				needIconCount: "{count:number} 個未配圖示",
+				expandTooltip: "展開這個分組",
+				collapseTooltip: "收起這個分組",
+				expandAllTooltip: "展開全部分組",
+				collapseAllTooltip: "收起全部分組",
+				expandLockedTooltip: "篩選時一律展開，清空篩選詞後可收起",
 			},
 			presets: {
 				image: "圖片",
@@ -197,6 +210,8 @@ const zh_TW = {
 				addTooltip: "新增覆蓋",
 				fetchTooltip: "從目前開啟的分頁擷取",
 				noneFound: "尚未設定單分頁覆蓋",
+				filterPlaceholder: "篩選分頁...",
+				noneMatched: "沒有符合的分頁",
 				invalidKey: "鍵格式無法識別，此項不生效（建議刪除後重新新增）",
 				resetTooltip: "刪除",
 			},
@@ -225,6 +240,8 @@ const zh_TW = {
 				name: "單項覆蓋",
 				desc: "在書籤面板中右鍵任意書籤「設定圖示」可單獨指定（六種類型均支援）；此處列出已設定項。",
 				noneFound: "尚未設定單項覆蓋",
+				filterPlaceholder: "篩選書籤...",
+				noneMatched: "沒有符合的書籤",
 				invalid: "已失效（書籤不存在）",
 				coreDisabled: "書籤核心外掛未啟用，暫時無法顯示書籤名稱",
 				coreDisabledDesc:

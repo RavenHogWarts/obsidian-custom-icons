@@ -66,6 +66,7 @@ export const TabHeader: FC = () => {
 	const [selectedTab, setSelectedTab] = useState("");
 	const [tabIcon, setTabIcon] = useState("");
 	const [tabIconType, setTabIconType] = useState<IconType>("lucide");
+	const [tabFilter, setTabFilter] = useState("");
 
 	// 整 map 写入：data-type 虽为连字符标识，仍与 Ribbon/文件浏览器保持一致
 	const writeOverride = async (
@@ -232,7 +233,22 @@ export const TabHeader: FC = () => {
 	};
 
 	const entries = Object.entries(configured);
-	const tabEntries = Object.entries(configuredTabs);
+
+	/**
+	 * 单标签覆盖靠「打开过的标签」累积、无上限，所以这里必须有筛选。
+	 * 按**用户看到的那串字**匹配（标签名 + 类型），不只按内部复合键。
+	 */
+	const allTabs = Object.entries(configuredTabs);
+	const tabQuery = tabFilter.trim().toLowerCase();
+	const tabEntries = tabQuery
+		? allTabs.filter(([key]) => {
+				const parsed = parseTabKey(key);
+				const label = parsed
+					? `${parsed.label} ${parsed.dataType}`
+					: key;
+				return label.toLowerCase().includes(tabQuery);
+			})
+		: allTabs;
 
 	return (
 		<>
@@ -378,6 +394,16 @@ export const TabHeader: FC = () => {
 			<SettingGroup
 				title={LL.settings.tabHeader.tabs.name()}
 				disabled={!th.enable}
+				search={
+					allTabs.length > 0
+						? {
+								value: tabFilter,
+								placeholder:
+									LL.settings.tabHeader.tabs.filterPlaceholder(),
+								onChange: setTabFilter,
+							}
+						: undefined
+				}
 			>
 				<SettingItem
 					desc={LL.settings.tabHeader.tabs.desc()}
@@ -417,9 +443,12 @@ export const TabHeader: FC = () => {
 						</>
 					}
 				/>
-				{tabEntries.length === 0 && (
+				{allTabs.length === 0 && (
+					<SettingItem name={LL.settings.tabHeader.tabs.noneFound()} />
+				)}
+				{allTabs.length > 0 && tabEntries.length === 0 && (
 					<SettingItem
-						name={LL.settings.tabHeader.tabs.noneFound()}
+						name={LL.settings.tabHeader.tabs.noneMatched()}
 					/>
 				)}
 				{tabEntries.map(([tabKey, override]) => {

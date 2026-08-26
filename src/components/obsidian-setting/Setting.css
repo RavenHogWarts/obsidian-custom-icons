@@ -7,11 +7,16 @@
  */
 
 /*
- * 功能总开关关闭时，下面整组配置置灰。
+ * 功能总开关关闭时置灰。
  *
- * 真正的「不可交互」由 `SettingGroup` 打在同一元素上的 `inert` 负责（它连 Tab 键
- * 聚焦一起挡掉）；这里只管「看起来就不生效」。不用 `pointer-events: none`：
- * 与 inert 重复，而且会顺手把 tooltip 也挡掉——灰着的时候 tooltip 仍然有用。
+ * 打在三处：分组的 `.setting-items`、标题区的操作按钮容器、原生筛选框容器
+ * ——后两者在 `.setting-items` 之外，不一起挡住的话，功能关着时骰子与批量清空
+ * 照样能点。
+ *
+ * 真正的「不可交互」由 `SettingGroup` 在同一批元素上打的 `inert` 负责（它连
+ * Tab 键聚焦一起挡掉）；这里只管「看起来就不生效」。不用
+ * `pointer-events: none`：与 inert 重复，而且会顺手把 tooltip 也挡掉——灰着的
+ * 时候 tooltip 仍然有用。
  */
 .ci-setting-items--disabled {
 	opacity: 0.5;

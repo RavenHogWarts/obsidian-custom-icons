@@ -66,9 +66,35 @@ type RootTranslation = {
 				 */
 				noneFound: string
 				/**
+				 * 没​有​需​要​配​置​的​插​件​（​已​装​插​件​都​自​带​图​标​）
+				 */
+				listEmpty: string
+				/**
 				 * 重​置​所​有​为​默​认​图​标
 				 */
 				resetTooltip: string
+				/**
+				 * 把​ ​{​c​o​u​n​t​}​ ​个​插​件​还​原​为​默​认​图​标​？
+				 * @param {number} count
+				 */
+				resetTitle: RequiredParams<'count'>
+				/**
+				 * 这​会​删​掉​它​们​各​自​的​图​标​与​颜​色​配​置​，​之​后​统​一​沿​用​上​面​的​「​默​认​图​标​」​。
+				 */
+				resetBody: string
+				/**
+				 * 还​原
+				 */
+				resetConfirm: string
+				/**
+				 * 已​还​原​ ​{​c​o​u​n​t​}​ ​个​插​件
+				 * @param {number} count
+				 */
+				resetDone: RequiredParams<'count'>
+				/**
+				 * 筛​选​出​的​插​件​都​还​没​单​独​配​过​，​无​需​还​原
+				 */
+				resetNothing: string
 				/**
 				 * 随​机​所​有​图​标
 				 */
@@ -507,6 +533,31 @@ type RootTranslation = {
 				 * @param {number} total
 				 */
 				presetCount: RequiredParams<'count' | 'total'>
+				/**
+				 * {​c​o​u​n​t​}​ ​个​未​配​图​标
+				 * @param {number} count
+				 */
+				needIconCount: RequiredParams<'count'>
+				/**
+				 * 展​开​这​个​分​组
+				 */
+				expandTooltip: string
+				/**
+				 * 收​起​这​个​分​组
+				 */
+				collapseTooltip: string
+				/**
+				 * 展​开​全​部​分​组
+				 */
+				expandAllTooltip: string
+				/**
+				 * 收​起​全​部​分​组
+				 */
+				collapseAllTooltip: string
+				/**
+				 * 筛​选​时​一​律​展​开​，​清​空​筛​选​词​后​可​收​起
+				 */
+				expandLockedTooltip: string
 			}
 			presets: {
 				/**
@@ -658,6 +709,14 @@ type RootTranslation = {
 				 */
 				noneFound: string
 				/**
+				 * 筛​选​标​签​.​.​.
+				 */
+				filterPlaceholder: string
+				/**
+				 * 没​有​匹​配​的​标​签
+				 */
+				noneMatched: string
+				/**
 				 * 键​格​式​无​法​识​别​，​此​项​不​生​效​（​建​议​删​除​后​重​新​添​加​）
 				 */
 				invalidKey: string
@@ -739,6 +798,14 @@ type RootTranslation = {
 				 * 暂​无​单​项​覆​盖
 				 */
 				noneFound: string
+				/**
+				 * 筛​选​书​签​.​.​.
+				 */
+				filterPlaceholder: string
+				/**
+				 * 没​有​匹​配​的​书​签
+				 */
+				noneMatched: string
 				/**
 				 * 已​失​效​（​书​签​不​存​在​）
 				 */
@@ -1827,9 +1894,33 @@ export type TranslationFunctions = {
 				 */
 				noneFound: () => LocalizedString
 				/**
+				 * 没有需要配置的插件（已装插件都自带图标）
+				 */
+				listEmpty: () => LocalizedString
+				/**
 				 * 重置所有为默认图标
 				 */
 				resetTooltip: () => LocalizedString
+				/**
+				 * 把 {count} 个插件还原为默认图标？
+				 */
+				resetTitle: (arg: { count: number }) => LocalizedString
+				/**
+				 * 这会删掉它们各自的图标与颜色配置，之后统一沿用上面的「默认图标」。
+				 */
+				resetBody: () => LocalizedString
+				/**
+				 * 还原
+				 */
+				resetConfirm: () => LocalizedString
+				/**
+				 * 已还原 {count} 个插件
+				 */
+				resetDone: (arg: { count: number }) => LocalizedString
+				/**
+				 * 筛选出的插件都还没单独配过，无需还原
+				 */
+				resetNothing: () => LocalizedString
 				/**
 				 * 随机所有图标
 				 */
@@ -2228,6 +2319,30 @@ export type TranslationFunctions = {
 				 * 共 {total} 个扩展名，将新增 {count} 个
 				 */
 				presetCount: (arg: { count: number, total: number }) => LocalizedString
+				/**
+				 * {count} 个未配图标
+				 */
+				needIconCount: (arg: { count: number }) => LocalizedString
+				/**
+				 * 展开这个分组
+				 */
+				expandTooltip: () => LocalizedString
+				/**
+				 * 收起这个分组
+				 */
+				collapseTooltip: () => LocalizedString
+				/**
+				 * 展开全部分组
+				 */
+				expandAllTooltip: () => LocalizedString
+				/**
+				 * 收起全部分组
+				 */
+				collapseAllTooltip: () => LocalizedString
+				/**
+				 * 筛选时一律展开，清空筛选词后可收起
+				 */
+				expandLockedTooltip: () => LocalizedString
 			}
 			presets: {
 				/**
@@ -2379,6 +2494,14 @@ export type TranslationFunctions = {
 				 */
 				noneFound: () => LocalizedString
 				/**
+				 * 筛选标签...
+				 */
+				filterPlaceholder: () => LocalizedString
+				/**
+				 * 没有匹配的标签
+				 */
+				noneMatched: () => LocalizedString
+				/**
 				 * 键格式无法识别，此项不生效（建议删除后重新添加）
 				 */
 				invalidKey: () => LocalizedString
@@ -2460,6 +2583,14 @@ export type TranslationFunctions = {
 				 * 暂无单项覆盖
 				 */
 				noneFound: () => LocalizedString
+				/**
+				 * 筛选书签...
+				 */
+				filterPlaceholder: () => LocalizedString
+				/**
+				 * 没有匹配的书签
+				 */
+				noneMatched: () => LocalizedString
 				/**
 				 * 已失效（书签不存在）
 				 */

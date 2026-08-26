@@ -14,7 +14,7 @@ import { LL } from "@src/i18n/i18n";
 import { BookmarkKind, IBookmarkIconOverride } from "@src/types/types";
 import { BOOKMARK_KINDS } from "@src/util/bookmarkIcon";
 import { normalizeIconColor } from "@src/util/communityPluginIcon";
-import { FC } from "react";
+import { FC, useState } from "react";
 
 /** 书签内部插件最小形态（仅用于设置页把 ctime 键回显为标题 / 类型） */
 interface BmItemLike {
@@ -37,6 +37,7 @@ export const Bookmarks: FC = () => {
 	const settingsStore = useSettingsStore();
 	const settings = usePluginSettings(settingsStore);
 	const bm = settings.bookmarks;
+	const [itemFilter, setItemFilter] = useState("");
 
 	// 整 map 写入：ctime / 类型键含点号风险低，但沿用整 map 写入与其它处理器一致
 	const writeMap = async (
@@ -176,7 +177,31 @@ export const Bookmarks: FC = () => {
 	};
 
 	const titleIndex = buildTitleIndex();
-	const itemEntries = Object.entries(bm.items);
+
+	/**
+	 * 单项覆盖的显示名：核心插件可用时是「标题（类型）」，否则只有内部键。
+	 * 抽出来是因为筛选要按**用户看到的那串字**匹配，而不是按内部键。
+	 */
+	const overrideLabel = (key: string): string => {
+		if (titleIndex === null) {
+			return key;
+		}
+		return (
+			titleIndex[key] ??
+			`${key} — ${LL.settings.bookmarks.overrides.invalid()}`
+		);
+	};
+
+	const allItems = Object.entries(bm.items);
+	const itemQuery = itemFilter.trim().toLowerCase();
+	// 单项覆盖靠右键累积、无上限，所以这里必须有筛选
+	const itemEntries = itemQuery
+		? allItems.filter(
+				([key]) =>
+					key.toLowerCase().includes(itemQuery) ||
+					overrideLabel(key).toLowerCase().includes(itemQuery),
+			)
+		: allItems;
 
 	return (
 		<>
@@ -222,11 +247,26 @@ export const Bookmarks: FC = () => {
 			<SettingGroup
 				title={LL.settings.bookmarks.overrides.name()}
 				disabled={!bm.enable}
+				search={
+					allItems.length > 0
+						? {
+								value: itemFilter,
+								placeholder:
+									LL.settings.bookmarks.overrides.filterPlaceholder(),
+								onChange: setItemFilter,
+							}
+						: undefined
+				}
 			>
 				<SettingItem desc={LL.settings.bookmarks.overrides.desc()} />
-				{itemEntries.length === 0 && (
+				{allItems.length === 0 && (
 					<SettingItem
 						name={LL.settings.bookmarks.overrides.noneFound()}
+					/>
+				)}
+				{allItems.length > 0 && itemEntries.length === 0 && (
+					<SettingItem
+						name={LL.settings.bookmarks.overrides.noneMatched()}
 					/>
 				)}
 				{/*
@@ -242,16 +282,7 @@ export const Bookmarks: FC = () => {
 					/>
 				)}
 				{itemEntries.map(([key, override]) =>
-					renderOverrideRow(
-						"items",
-						key,
-						override,
-						// 索引不可用时只显示裸键，不冒充「已失效」
-						titleIndex === null
-							? key
-							: (titleIndex[key] ??
-									`${key} — ${LL.settings.bookmarks.overrides.invalid()}`),
-					),
+					renderOverrideRow("items", key, override, overrideLabel(key)),
 				)}
 			</SettingGroup>
 		</>

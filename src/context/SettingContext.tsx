@@ -17,7 +17,13 @@ export const SettingContainerContext = createContext<HTMLElement | undefined>(
  * Context for accessing specific slots of a Setting
  */
 export interface SettingSlotContextValue {
-	setting: Setting;
+	/**
+	 * 该槽位所属的 `Setting`。
+	 *
+	 * 可选：分组标题上的搜索框 / 操作按钮槽位由 `SettingGroup` 直接提供，
+	 * 那里根本没有 `Setting` 实例。目前所有控件只用 `slotEl`。
+	 */
+	setting?: Setting;
 	slotEl: HTMLElement;
 }
 

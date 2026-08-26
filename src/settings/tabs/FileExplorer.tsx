@@ -9,7 +9,6 @@ import {
 	ExtraButton,
 	FeatureOffNotice,
 	RandomIconButton,
-	Search,
 	SettingGroup,
 	SettingItem,
 	Text,
@@ -53,6 +52,9 @@ import { FC, Fragment, useCallback, useMemo, useState } from "react";
 /** 候选芯片最多显示几个：够用来一键补齐常见类型，又不至于铺满一屏 */
 const CANDIDATE_LIMIT = 12;
 
+/** 分组收起时，组行上预览几个成员名；其余折成「+N」 */
+const MEMBER_PREVIEW_LIMIT = 10;
+
 /** 扩展名列表的排序方式 */
 type ExtSort = "count" | "name";
 
@@ -71,6 +73,21 @@ export const FileExplorer: FC = () => {
 	// 默认按文件数：库里有 200 个 png 和 1 个 xyz 时，前者才是用户来这里要配的东西
 	const [extSort, setExtSort] = useState<ExtSort>("count");
 	const [overrideFilter, setOverrideFilter] = useState("");
+
+	/**
+	 * 分组的展开 / 收起，**只存用户显式改过的那些**。
+	 *
+	 * 不落盘：它是 UI 偏好而不是配置，而且落盘就要处理「组被改名 / 删除后残留的
+	 * 折叠记录」。用 `Map` 而不是普通对象——组名是用户输入的自由字符串，
+	 * `__proto__` 当键会污染对象。
+	 *
+	 * 没有显式记录的组走默认值：**组内有未配图标的成员就默认展开**（那是还没干完的
+	 * 活，藏起来等于藏掉待办），其余默认收起。这样升级上来的用户第一眼就能看到
+	 * 需要处理的组，而不是「我的规则都不见了」。
+	 */
+	const [expandOverride, setExpandOverride] = useState<Map<string, boolean>>(
+		() => new Map(),
+	);
 
 	/**
 	 * 库中各扩展名的文件数，**挂载时统计一次**。
@@ -165,16 +182,19 @@ export const FileExplorer: FC = () => {
 	const visibleGroups = useMemo(
 		() =>
 			groups
-				.map((group) => ({
-					...group,
-					members: groupMembers(extMap, group.name)
-						.filter(matches)
-						.sort(compareExt),
-					files: groupMembers(extMap, group.name).reduce(
-						(sum, ext) => sum + (tally.get(ext) ?? 0),
-						0,
-					),
-				}))
+				.map((group) => {
+					const all = groupMembers(extMap, group.name);
+					return {
+						...group,
+						members: all.filter(matches).sort(compareExt),
+						files: all.reduce(
+							(sum, ext) => sum + (tally.get(ext) ?? 0),
+							0,
+						),
+						// 未配图标的成员数：决定这一组默认是否展开（有活要干就摊开）
+						iconless: all.filter((ext) => !extMap[ext]?.icon).length,
+					};
+				})
 				.filter((group) => group.members.length > 0),
 		[groups, extMap, matches, compareExt, tally],
 	);
@@ -191,6 +211,43 @@ export const FileExplorer: FC = () => {
 			...visibleUngrouped,
 		],
 		[visibleGroups, visibleUngrouped],
+	);
+
+	/**
+	 * 这一组现在是否展开。
+	 *
+	 * 筛选期一律展开：筛出来了却看不见是最糟的一种「没反应」。此时也不接受收起
+	 * ——先清掉筛选词再说。
+	 */
+	const isExpanded = (group: string, iconless: number): boolean => {
+		if (filterQuery) {
+			return true;
+		}
+		return expandOverride.get(group) ?? iconless > 0;
+	};
+
+	const setExpanded = (group: string, next: boolean) => {
+		setExpandOverride((prev) => {
+			const map = new Map(prev);
+			map.set(group, next);
+			return map;
+		});
+	};
+
+	/** 全部展开 / 全部收起：给当前所有可见组写显式值，覆盖各自的默认 */
+	const setAllExpanded = (next: boolean) => {
+		setExpandOverride((prev) => {
+			const map = new Map(prev);
+			for (const group of visibleGroups) {
+				map.set(group.name, next);
+			}
+			return map;
+		});
+	};
+
+	/** 有任意一组处于收起状态时，「全部」按钮就该是展开；否则是收起 */
+	const anyCollapsed = visibleGroups.some(
+		(group) => !isExpanded(group.name, group.iconless),
 	);
 
 	/**
@@ -854,11 +911,17 @@ export const FileExplorer: FC = () => {
 	 *
 	 * 组内图标不一致时如实显示「混合」而不是假装一致——组的图标不是单一真相
 	 * （每个成员各存一份），藏起来会让「我明明单独改过 .svg」凭空消失。
+	 *
+	 * 收起时组行要**自己交代组里有什么**（成员芯片预览 + 未配图标的条数），
+	 * 否则「要不要展开」只能靠展开来回答，收起就白收了。
 	 */
 	const renderGroupRow = (
 		group: string,
 		memberCount: number,
 		fileCount: number,
+		iconless: number,
+		expanded: boolean,
+		previewMembers: string[],
 	) => {
 		const uniform = uniformIcon(extMap, group);
 		if (!uniform) {
@@ -866,16 +929,66 @@ export const FileExplorer: FC = () => {
 		}
 		const notes = [
 			groupLL.summary({ exts: memberCount, files: fileCount }),
+			iconless > 0 ? groupLL.needIconCount({ count: iconless }) : "",
 			uniform.mixed ? groupLL.mixed() : "",
 		].filter(Boolean);
+		const shown = previewMembers.slice(0, MEMBER_PREVIEW_LIMIT);
+		const rest = previewMembers.slice(MEMBER_PREVIEW_LIMIT);
 		return (
 			<SettingItem
 				key={`group-${group}`}
 				name={group}
-				desc={notes.join(" · ")}
-				className="ci-fe__group-row"
+				desc={
+					<>
+						<div>{notes.join(" · ")}</div>
+						{/* 收起时才预览：展开着的话下面每个成员都在，芯片是重复信息 */}
+						{!expanded && shown.length > 0 && (
+							<div className="ci-fe__chips ci-fe__chips--preview">
+								{shown.map((ext) => (
+									<span
+										key={ext}
+										className={
+											extMap[ext]?.icon
+												? "ci-fe__chip ci-fe__chip--static"
+												: "ci-fe__chip ci-fe__chip--static is-iconless"
+										}
+									>
+										.{ext}
+									</span>
+								))}
+								{rest.length > 0 && (
+									<span
+										className="ci-fe__chip ci-fe__chip--static ci-fe__chip--more"
+										aria-label={rest
+											.map((ext) => `.${ext}`)
+											.join(" ")}
+									>
+										+{rest.length}
+									</span>
+								)}
+							</div>
+						)}
+					</>
+				}
+				className={
+					expanded
+						? "ci-fe__group-row"
+						: "ci-fe__group-row ci-fe__group-row--collapsed"
+				}
 				control={
 					<>
+						<ExtraButton
+							icon={expanded ? "chevron-down" : "chevron-right"}
+							disabled={Boolean(filterQuery)}
+							tooltip={
+								filterQuery
+									? groupLL.expandLockedTooltip()
+									: expanded
+										? groupLL.collapseTooltip()
+										: groupLL.expandTooltip()
+							}
+							onClick={() => setExpanded(group, !expanded)}
+						/>
 						{/*
 						 * 用原生 button 而不是 ExtraButton：Obsidian 的
 						 * ExtraButtonComponent 只给 `() => void`，拿不到事件，
@@ -1078,7 +1191,72 @@ export const FileExplorer: FC = () => {
 				/>
 			</SettingGroup>
 
-			<SettingGroup title={extLL.name()} disabled={!fe.enable}>
+			<SettingGroup
+				title={extLL.name()}
+				disabled={!fe.enable}
+				search={
+					extCount > 0
+						? {
+								value: extFilter,
+								placeholder: extLL.filterPlaceholder(),
+								onChange: setExtFilter,
+							}
+						: undefined
+				}
+				actions={
+					extCount > 0 ? (
+						<>
+							<ExtraButton
+								icon={
+									extSort === "count"
+										? "arrow-down-0-1"
+										: "arrow-down-a-z"
+								}
+								tooltip={extLL.sortTooltip({
+									mode:
+										extSort === "count"
+											? extLL.sortByCount()
+											: extLL.sortByName(),
+								})}
+								onClick={() => {
+									setExtSort((prev) =>
+										prev === "count" ? "name" : "count",
+									);
+								}}
+							/>
+							<ExtraButton
+								icon="dices"
+								tooltip={extLL.dicesTooltip()}
+								onClick={randomizeFiltered}
+							/>
+							<ExtraButton
+								icon="eraser"
+								tooltip={extLL.clearTooltip()}
+								onClick={clearFiltered}
+							/>
+							{/* 只有存在分组时才有意义；筛选期一律展开，此时按钮无用 */}
+							{visibleGroups.length > 0 && (
+								<ExtraButton
+									icon={
+										anyCollapsed
+											? "chevrons-up-down"
+											: "chevrons-down-up"
+									}
+									disabled={Boolean(filterQuery)}
+									tooltip={
+										filterQuery
+											? groupLL.expandLockedTooltip()
+											: anyCollapsed
+												? groupLL.expandAllTooltip()
+												: groupLL.collapseAllTooltip()
+									}
+									onClick={() => setAllExpanded(anyCollapsed)}
+								/>
+							)}
+						</>
+					) : undefined
+				}
+			>
 				<SettingItem desc={extLL.desc()} />
 
 				{/* 添加行：扩展名 + 图标 + 可选分组 */}
@@ -1149,64 +1327,30 @@ export const FileExplorer: FC = () => {
 
 				{extCount === 0 && <SettingItem name={extLL.noneFound()} />}
 
-				{/* 筛选 + 排序 + 批量：批量动作作用于当前筛选出的全部规则 */}
-				{extCount > 0 && (
-					<SettingItem
-						name={
-							<Search
-								value={extFilter}
-								onChange={(value) => setExtFilter(value)}
-								placeholder={extLL.filterPlaceholder()}
-							/>
-						}
-						control={
-							<>
-								<ExtraButton
-									icon={
-										extSort === "count"
-											? "arrow-down-0-1"
-											: "arrow-down-a-z"
-									}
-									tooltip={extLL.sortTooltip({
-										mode:
-											extSort === "count"
-												? extLL.sortByCount()
-												: extLL.sortByName(),
-									})}
-									onClick={() => {
-										setExtSort((prev) =>
-											prev === "count" ? "name" : "count",
-										);
-									}}
-								/>
-								<ExtraButton
-									icon="dices"
-									tooltip={extLL.dicesTooltip()}
-									onClick={randomizeFiltered}
-								/>
-								<ExtraButton
-									icon="eraser"
-									tooltip={extLL.clearTooltip()}
-									onClick={clearFiltered}
-								/>
-							</>
-						}
-					/>
-				)}
-
 				{extCount > 0 && filteredExts.length === 0 && (
 					<SettingItem name={extLL.noneMatched()} />
 				)}
 
-				{/* 分组行 + 组内成员 */}
-				{visibleGroups.map((group) => (
-					<Fragment key={`group-block-${group.name}`}>
-						{renderGroupRow(group.name, group.count, group.files)}
-						{group.members.map((ext) =>
-							renderExtRow(ext, group.name),
-						)}
-					</Fragment>
-				))}
+				{/* 分组行 + 组内成员（收起时只留组行，成员靠组行上的芯片预览） */}
+				{visibleGroups.map((group) => {
+					const expanded = isExpanded(group.name, group.iconless);
+					return (
+						<Fragment key={`group-block-${group.name}`}>
+							{renderGroupRow(
+								group.name,
+								group.count,
+								group.files,
+								group.iconless,
+								expanded,
+								group.members,
+							)}
+							{expanded &&
+								group.members.map((ext) =>
+									renderExtRow(ext, group.name),
+								)}
+						</Fragment>
+					);
+				})}
 
 				{/* 未分组：只有在同时存在分组时才需要这条分隔标题 */}
 				{visibleGroups.length > 0 && visibleUngrouped.length > 0 && (
@@ -1218,22 +1362,21 @@ export const FileExplorer: FC = () => {
 			<SettingGroup
 				title={LL.settings.fileExplorer.overrides.name()}
 				disabled={!fe.enable}
+				search={
+					hasAnyOverride
+						? {
+								value: overrideFilter,
+								placeholder:
+									LL.settings.fileExplorer.overrides.filterPlaceholder(),
+								onChange: setOverrideFilter,
+							}
+						: undefined
+				}
 			>
 				<SettingItem desc={LL.settings.fileExplorer.overrides.desc()} />
 				{!hasAnyOverride && (
 					<SettingItem
 						name={LL.settings.fileExplorer.overrides.noneFound()}
-					/>
-				)}
-				{hasAnyOverride && (
-					<SettingItem
-						name={
-							<Search
-								value={overrideFilter}
-								onChange={(value) => setOverrideFilter(value)}
-								placeholder={LL.settings.fileExplorer.overrides.filterPlaceholder()}
-							/>
-						}
 					/>
 				)}
 				{hasAnyOverride &&
@@ -1246,6 +1389,7 @@ export const FileExplorer: FC = () => {
 				{folderEntries.length > 0 && (
 					<SettingItem
 						name={LL.settings.fileExplorer.overrides.folderSection()}
+						heading
 					/>
 				)}
 				{folderEntries.map(([path, override]) =>
@@ -1254,6 +1398,7 @@ export const FileExplorer: FC = () => {
 				{fileEntries.length > 0 && (
 					<SettingItem
 						name={LL.settings.fileExplorer.overrides.fileSection()}
+						heading
 					/>
 				)}
 				{fileEntries.map(([path, override]) =>

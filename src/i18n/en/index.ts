@@ -20,7 +20,16 @@ const en = {
 			search: {
 				placeholder: "Enter plugin name or ID...",
 				noneFound: "No matching plugins found",
+				listEmpty:
+					"Nothing to configure here — every installed plugin already has its own icon",
 				resetTooltip: "Reset all to default icon",
+				resetTitle: "Reset {count:number} plugins to the default icon?",
+				resetBody:
+					"This deletes their individual icon and colour settings; they will fall back to the \"Default icon\" above.",
+				resetConfirm: "Reset",
+				resetDone: "Reset {count:number} plugins",
+				resetNothing:
+					"None of the filtered plugins has its own icon yet, nothing to reset",
 				dicesTooltip: "Random all icons",
 			},
 			pluginList: {
@@ -155,6 +164,13 @@ const en = {
 					"\"{group:string}\" already exists; entries will be merged into it",
 				presetCount:
 					"{total:number} extensions, {count:number} to be added",
+				needIconCount: "{count:number} without an icon",
+				expandTooltip: "Expand this group",
+				collapseTooltip: "Collapse this group",
+				expandAllTooltip: "Expand all groups",
+				collapseAllTooltip: "Collapse all groups",
+				expandLockedTooltip:
+					"Groups stay expanded while filtering — clear the filter to collapse",
 			},
 			presets: {
 				image: "Images",
@@ -203,6 +219,8 @@ const en = {
 				addTooltip: "Add override",
 				fetchTooltip: "Fetch from currently open tabs",
 				noneFound: "No per-tab overrides configured yet",
+				filterPlaceholder: "Filter tabs...",
+				noneMatched: "No matching tabs",
 				invalidKey: "Unrecognised key format — this entry has no effect (delete it and add it again)",
 				resetTooltip: "Delete",
 			},
@@ -231,6 +249,8 @@ const en = {
 				name: "Per-item overrides",
 				desc: "Right-click any bookmark in the bookmarks pane and choose 'Set icon' to assign one individually (all six types are supported). Configured items are listed here.",
 				noneFound: "No per-item overrides configured yet",
+				filterPlaceholder: "Filter bookmarks...",
+				noneMatched: "No matching bookmarks",
 				invalid: "No longer valid (bookmark does not exist)",
 				coreDisabled: "The Bookmarks core plugin is off — names cannot be shown",
 				coreDisabledDesc:

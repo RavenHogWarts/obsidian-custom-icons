@@ -20,7 +20,14 @@ const zh = {
 			search: {
 				placeholder: "输入插件名称...",
 				noneFound: "未找到匹配的插件",
+				listEmpty: "没有需要配置的插件（已装插件都自带图标）",
 				resetTooltip: "重置所有为默认图标",
+				resetTitle: "把 {count:number} 个插件还原为默认图标？",
+				resetBody:
+					"这会删掉它们各自的图标与颜色配置，之后统一沿用上面的「默认图标」。",
+				resetConfirm: "还原",
+				resetDone: "已还原 {count:number} 个插件",
+				resetNothing: "筛选出的插件都还没单独配过，无需还原",
 				dicesTooltip: "随机所有图标",
 			},
 			pluginList: {
@@ -150,6 +157,12 @@ const zh = {
 					"跳过 {count:number} 个（已属于其它分组）：{exts:string}",
 				presetExisting: "「{group:string}」已存在，将并入该分组",
 				presetCount: "共 {total:number} 个扩展名，将新增 {count:number} 个",
+				needIconCount: "{count:number} 个未配图标",
+				expandTooltip: "展开这个分组",
+				collapseTooltip: "收起这个分组",
+				expandAllTooltip: "展开全部分组",
+				collapseAllTooltip: "收起全部分组",
+				expandLockedTooltip: "筛选时一律展开，清空筛选词后可收起",
 			},
 			presets: {
 				image: "图片",
@@ -198,6 +211,8 @@ const zh = {
 				addTooltip: "添加覆盖",
 				fetchTooltip: "从当前打开的标签页抓取",
 				noneFound: "尚未配置单标签覆盖",
+				filterPlaceholder: "筛选标签...",
+				noneMatched: "没有匹配的标签",
 				invalidKey: "键格式无法识别，此项不生效（建议删除后重新添加）",
 				resetTooltip: "删除",
 			},
@@ -226,6 +241,8 @@ const zh = {
 				name: "单项覆盖",
 				desc: "在书签面板中右键任意书签「设置图标」可单独指定（六种类型均支持）；此处列出已配置项。",
 				noneFound: "暂无单项覆盖",
+				filterPlaceholder: "筛选书签...",
+				noneMatched: "没有匹配的书签",
 				invalid: "已失效（书签不存在）",
 				coreDisabled: "书签核心插件未启用，暂时无法显示书签名称",
 				coreDisabledDesc:

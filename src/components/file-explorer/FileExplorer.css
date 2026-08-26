@@ -83,18 +83,29 @@
 
 /* ------------------------------ 分组行与组内行 ---------------------------- */
 /*
- * 分组行是一整组的操作入口（改整组图标 / ⋮ 菜单），组内成员紧跟在它下面缩进。
+ * 分组行是一整组的操作入口（展开收起 / 改整组图标 / ⋮ 菜单），组内成员紧跟在
+ * 它下面缩进。
  *
- * 靠缩进 + 左侧竖线表达归属，而不是把成员折叠成芯片：每个扩展名都还要能单独
- * 调图标和颜色（组图标只是扇出的起点，不是单一真相），折叠掉就没地方放控件了。
+ * 默认收起，此时组行自己用只读芯片交代组里有什么——收起却看不出内容，等于
+ * 「要不要展开」只能靠展开来回答。展开后每个成员是完整一行，各自还能单独调
+ * 图标和颜色（组图标只是扇出的起点，不是单一真相）。
+ *
+ * 归属靠「组行浅背景 + 成员左侧竖线」表达，而不是包一层 div：`SettingItem`
+ * 各自 portal 到 `.setting-items` 里，是平铺的兄弟节点，包不起来。
  */
 
 .ci-fe__group-row {
+	background-color: var(--background-secondary);
 	border-top: 1px solid var(--background-modifier-border);
 }
 
 .ci-fe__group-row .setting-item-name {
 	font-weight: var(--font-semibold);
+}
+
+/* 收起态：整组压成一行，视觉上要能看出「这里还有东西」 */
+.ci-fe__group-row--collapsed {
+	background-color: var(--background-secondary-alt);
 }
 
 .ci-fe__group-menu {
@@ -104,4 +115,33 @@
 .ci-fe__ext-row--grouped {
 	padding-left: var(--size-4-4);
 	border-left: 2px solid var(--background-modifier-border);
+}
+
+/* ------------------------------ 成员预览芯片 ------------------------------ */
+/*
+ * 收起时挂在组行 desc 下面的只读芯片。与候选芯片同一形状但**不可点**：
+ * 它只回答「组里有什么」，操作一律走展开后的成员行。
+ */
+
+.ci-fe__chips--preview {
+	margin-top: var(--size-2-2);
+}
+
+.ci-fe__chip--static {
+	border-style: solid;
+	border-color: var(--background-modifier-border);
+	color: var(--text-muted);
+	cursor: default;
+}
+
+/* 没配图标的成员：这条规则当下完全不生效，收起时也要看得见 */
+.ci-fe__chip--static.is-iconless {
+	border-color: var(--text-warning);
+	color: var(--text-warning);
+}
+
+/* 「+N」：剩下的成员数，aria-label 里列出具体是哪些 */
+.ci-fe__chip--more {
+	border-style: dashed;
+	font-family: var(--font-interface);
 }

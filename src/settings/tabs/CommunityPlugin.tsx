@@ -1,10 +1,10 @@
 import { IconPicker } from "@src/components/icon-picker/IconPicker";
+import { ConfirmDialog } from "@src/components/modal/ConfirmDialog";
 import {
 	Color,
 	ExtraButton,
 	FeatureOffNotice,
 	RandomIconButton,
-	Search,
 	SettingGroup,
 	SettingItem,
 	Toggle,
@@ -22,6 +22,7 @@ import {
 } from "@src/util/communityPluginIcon";
 import { encodeIconRef, iconRefOf } from "@src/util/iconRef";
 import { randomIconsFor } from "@src/util/randomIcon";
+import { Notice } from "obsidian";
 import { FC, useMemo, useState } from "react";
 
 export const CommunityPlugin: FC = () => {
@@ -29,6 +30,7 @@ export const CommunityPlugin: FC = () => {
 	const settings = usePluginSettings(settingsStore);
 	const [searchQuery, setSearchQuery] = useState("");
 	const defaultIcon = settings.communityPlugins.default;
+	const searchLL = LL.settings.communityPlugin.search;
 
 	const getEffectivePluginIcon = (pluginId: string) => {
 		return resolveCommunityPluginIcon(
@@ -158,6 +160,9 @@ export const CommunityPlugin: FC = () => {
 		return plugins.sort((a, b) => a.name.localeCompare(b.name));
 	}, [settingsStore.app.plugins.manifests]);
 
+	/** 列表本身有多少候选（用于区分「真·空」与「筛选不中」） */
+	const allPlugins = installedPlugins.length;
+
 	// 根据搜索查询过滤插件
 	const filteredPlugins = useMemo(() => {
 		if (!searchQuery.trim()) {
@@ -238,6 +243,54 @@ export const CommunityPlugin: FC = () => {
 		});
 
 		await settingsStore.updateSettingByPath("communityPlugins.data", next);
+	};
+
+	/**
+	 * 把筛选出的这些插件全部还原为「默认图标」（即删掉各自的 override）。
+	 *
+	 * 两处必须改的地方：
+	 *
+	 * 1. **一次落盘**。原来是 `for` 循环里逐个 `await deleteSettingByPath`，而每次
+	 *    删除都是一遍 `saveSettings` → 写盘 + `iconManager.applyAll()`
+	 *    （`main.ts:62`）。装了 100 个插件就是 100 次写盘 + 100 次全量重应用，
+	 *    是全插件最贵的一次点击。
+	 * 2. **要确认、要回执**。一次删掉 N 条配置且没有撤销，却既没有确认弹窗也没有
+	 *    Notice；而隔壁文件浏览器的「清空」破坏性同级，有确认有 Notice。
+	 */
+	const resetFiltered = () => {
+		const targets = filteredPlugins.filter(
+			(plugin) => settings.communityPlugins.data[plugin.id],
+		);
+		if (targets.length === 0) {
+			new Notice(searchLL.resetNothing());
+			return;
+		}
+		const count = targets.length;
+		new ConfirmDialog(settingsStore.plugin, {
+			title: searchLL.resetTitle({ count }),
+			confirmLL: searchLL.resetConfirm(),
+			children: (
+				<div className="ci-lib__form">
+					<span className="ci-lib__form-warning">
+						{searchLL.resetBody()}
+					</span>
+				</div>
+			),
+			onConfirm: async () => {
+				// 重新取当前表：弹窗开着的这段时间里可能已经变了
+				const next = {
+					...settingsStore.plugin.settings.communityPlugins.data,
+				};
+				for (const plugin of targets) {
+					delete next[plugin.id];
+				}
+				await settingsStore.updateSettingByPath(
+					"communityPlugins.data",
+					next,
+				);
+				new Notice(searchLL.resetDone({ count }));
+			},
+		}).open();
 	};
 
 	return (
@@ -349,47 +402,46 @@ export const CommunityPlugin: FC = () => {
 			<SettingGroup
 				title={LL.settings.communityPlugin.pluginList.name()}
 				disabled={!settings.communityPlugins.enable}
+				search={
+					allPlugins > 0
+						? {
+								value: searchQuery,
+								placeholder: searchLL.placeholder(),
+								onChange: setSearchQuery,
+							}
+						: undefined
+				}
+				actions={
+					allPlugins > 0 ? (
+						<>
+							<ExtraButton
+								icon="dices"
+								tooltip={searchLL.dicesTooltip()}
+								onClick={randomizeFiltered}
+							/>
+							<ExtraButton
+								icon="reset"
+								tooltip={searchLL.resetTooltip()}
+								onClick={resetFiltered}
+							/>
+						</>
+					) : undefined
+				}
 			>
 				{/* 分组说明行：与 ribbon.list / bookmarks.overrides 等分组一致 */}
 				<SettingItem
 					desc={LL.settings.communityPlugin.pluginList.desc()}
 				/>
-				<SettingItem
-					name={
-						<Search
-							value={searchQuery}
-							onChange={(value) => setSearchQuery(value)}
-							placeholder={LL.settings.communityPlugin.search.placeholder()}
-						/>
-					}
-					control={
-						<>
-							<ExtraButton
-								icon="dices"
-								tooltip={LL.settings.communityPlugin.search.dicesTooltip()}
-								onClick={randomizeFiltered}
-							/>
-							<ExtraButton
-								icon="reset"
-								tooltip={LL.settings.communityPlugin.search.resetTooltip()}
-								onClick={async () => {
-									const count = filteredPlugins.length;
-									for (let i = 0; i < count; i++) {
-										const plugin = filteredPlugins[i];
-										await settingsStore.deleteSettingByPath(
-											`communityPlugins.data.${plugin.id}`,
-										);
-									}
-								}}
-							/>
-						</>
-					}
-				/>
 
-				{filteredPlugins.length === 0 && searchQuery.trim() && (
-					<SettingItem
-						name={LL.settings.communityPlugin.search.noneFound()}
-					/>
+				{/*
+				 * 两种「什么都没有」要分开说：
+				 * - 列表本身是空的（所有已装插件都自带图标，没什么可配）
+				 * - 有内容但筛选不中
+				 * 过去只有后者，于是真·空列表是一片什么都不说的空白。
+				 */}
+				{allPlugins === 0 && <SettingItem name={searchLL.listEmpty()} />}
+				{allPlugins > 0 && filteredPlugins.length === 0 && (
+					<SettingItem name={searchLL.noneFound()} />
 				)}
 
 				{filteredPlugins.map((plugin, index) => {

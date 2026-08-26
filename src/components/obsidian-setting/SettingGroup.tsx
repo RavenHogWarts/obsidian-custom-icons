@@ -2,6 +2,7 @@ import { SettingContainerContext } from "@src/context/SettingContext";
 import { useSettingContainer } from "@src/hooks/useSettingContext";
 import { SettingGroup as ObsidianSettingGroup } from "obsidian";
 import { FC, ReactNode, useEffect, useId, useMemo, useState } from "react";
+import "./Setting.css";
 
 export interface SettingGroupProps {
 	/**
@@ -18,6 +19,20 @@ export interface SettingGroupProps {
 	 * Children components (typically SettingItem components)
 	 */
 	children: ReactNode;
+
+	/**
+	 * 整组置灰且不可交互。
+	 *
+	 * 用于「功能总开关关掉了，下面这些配置当下不生效」——过去六个 tab 都是照常
+	 * 可编辑、毫无提示，可以认真配完几十条规则却看不到任何效果，也不知道为什么。
+	 *
+	 * 落到 `.setting-items` 上而不是整个 `.setting-group`：组标题（以及标题里的
+	 * 筛选框、批量按钮）不该跟着灰掉；真正不生效的是下面那些条目。
+	 *
+	 * 用 `inert` 而不只是 CSS `pointer-events: none`：后者挡得住鼠标，挡不住
+	 * Tab 键聚焦与回车触发，灰着的输入框照样能改。
+	 */
+	disabled?: boolean;
 
 	/**
 	 * Manual container element (overrides context)
@@ -45,6 +60,7 @@ export interface SettingGroupProps {
 export const SettingGroup: FC<SettingGroupProps> = ({
 	title,
 	children,
+	disabled = false,
 	containerEl: providedContainer,
 	className,
 }) => {
@@ -120,6 +136,13 @@ export const SettingGroup: FC<SettingGroupProps> = ({
 			settingGroupData.settingGroupEl.remove();
 		};
 	}, [settingGroupData]);
+
+	// 置灰 + 真正不可交互（inert 连键盘聚焦一起挡掉）
+	useEffect(() => {
+		const el = settingGroupData.itemsContainer;
+		el.toggleClass("ci-setting-items--disabled", disabled);
+		el.toggleAttribute("inert", disabled);
+	}, [settingGroupData, disabled]);
 
 	if (!settingItemsContainer) {
 		return null;

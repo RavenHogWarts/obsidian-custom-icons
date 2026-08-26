@@ -174,6 +174,9 @@ const zh_TW = {
 		},
 		tabHeader: {
 			name: "分頁標籤",
+			addNeedsBoth: "先選一個目標並挑好圖示",
+			addNeedsTarget: "還沒選目標（可先用「擷取」把開啟的分頁列出來）",
+			addNeedsIcon: "還沒挑圖示",
 			enable: {
 				name: "啟用功能",
 				desc: "為工作區分頁標籤頭（側邊欄工具頁與編輯器分頁）自訂圖示，兩級解析：單分頁優先（同名分頁各配各的）、類型兜底（未單配的分頁沿用該類型統一圖示）、未設定則保留原生。原生圖示不會被刪除，僅被隱藏，停用後自動恢復。",
@@ -194,6 +197,7 @@ const zh_TW = {
 				addTooltip: "新增覆蓋",
 				fetchTooltip: "從目前開啟的分頁擷取",
 				noneFound: "尚未設定單分頁覆蓋",
+				invalidKey: "鍵格式無法識別，此項不生效（建議刪除後重新新增）",
 				resetTooltip: "刪除",
 			},
 			menu: {
@@ -222,6 +226,9 @@ const zh_TW = {
 				desc: "在書籤面板中右鍵任意書籤「設定圖示」可單獨指定（六種類型均支援）；此處列出已設定項。",
 				noneFound: "尚未設定單項覆蓋",
 				invalid: "已失效（書籤不存在）",
+				coreDisabled: "書籤核心外掛未啟用，暫時無法顯示書籤名稱",
+				coreDisabledDesc:
+					"下面按內部鍵列出已設定項。這些設定都還在，啟用 Obsidian 的「書籤」核心外掛後即恢復顯示名稱並生效。",
 			},
 			menu: {
 				setIcon: "設定圖示",
@@ -243,6 +250,12 @@ const zh_TW = {
 		delete: "刪除",
 		cancel: "取消",
 		randomInSource: "在「{source:string}」中隨機",
+		featureOff: {
+			name: "此功能已關閉，下面的設定不生效",
+			desc: "打開上方的「啟用功能」後，這些設定會立即套用；關閉期間它們會原樣保留，不會遺失。",
+		},
+		pickIconFirst: "先選圖示，顏色才有作用",
+		nothingToReset: "這一項還沒設定過，無需重置",
 	},
 	view: {
 		CustomIconLib: {

@@ -21,6 +21,40 @@
 
 * 更新相关文档 ([a3212cf](https://github.com/Raven-Pensieve/obsidian-custom-icons/commit/a3212cf46abfa1099bc361a5c3e26241a76b41d0))
 
+## [2.7.0](https://github.com/Raven-Pensieve/obsidian-custom-icons/compare/2.6.0...2.7.0) (2026-08-26)
+
+
+### ✨ 新增功能 (Features)
+
+* SVG 分组支持重命名与删除 ([4e0fd33](https://github.com/Raven-Pensieve/obsidian-custom-icons/commit/4e0fd33ff241d9504d7c00ad8e70231930cdb02b))
+* 分组可折叠，筛选与批量动作移到原生分组标题区 ([e99593d](https://github.com/Raven-Pensieve/obsidian-custom-icons/commit/e99593df6c3f8c37ea74f6fb2b95c3f269a045cb))
+* 图标包页搜索联动、行内进度与取消、目录筛选排序与 a11y 清账 ([f2c9197](https://github.com/Raven-Pensieve/obsidian-custom-icons/commit/f2c9197ec1bb35d43ce7decc1304fd64a2d8fb83))
+* 图标库新增全部页统一搜索、卡片右键菜单、收藏置顶与密度切换 ([4911337](https://github.com/Raven-Pensieve/obsidian-custom-icons/commit/4911337fd67a7171a5ac0919ce1d641fbe23b0b2))
+* 图标库消除静默失败，补齐表单校验、SVG 预览与空态引导 ([d4c012e](https://github.com/Raven-Pensieve/obsidian-custom-icons/commit/d4c012e3375f51d5f4082d86b3cc222a468a2087))
+* 图标库视图偏好持久化，并补齐复核发现的遗留缺口 ([f8caf56](https://github.com/Raven-Pensieve/obsidian-custom-icons/commit/f8caf560bb75ebaee429ba8d12f10feb09387aed))
+* 图标选择器重做为分组网格，新增收藏与最近使用 ([33e8bf7](https://github.com/Raven-Pensieve/obsidian-custom-icons/commit/33e8bf787961a972a8d69294f4fe95f056f35217))
+* 我的 SVG 页支持多选批量、JSON 导入导出、拖放与最近添加排序 ([49b15a6](https://github.com/Raven-Pensieve/obsidian-custom-icons/commit/49b15a60df90c522d45b313c23ddca1ab9657ea2))
+* 扩展名支持分组统一配图标，并补齐筛选排序与批量动作 ([4b2c79b](https://github.com/Raven-Pensieve/obsidian-custom-icons/commit/4b2c79b53d355d6aaa17fa4828384d50f9bfa8bc))
+* 横向条溢出提示与激活项自动对位 ([0023dd2](https://github.com/Raven-Pensieve/obsidian-custom-icons/commit/0023dd29062a0f23436c0f2b077052ab081d43fd))
+* 自定义 SVG 支持分组管理 ([271f043](https://github.com/Raven-Pensieve/obsidian-custom-icons/commit/271f043097388def00cf8c8a2e779ad9813b8b7f))
+* 随机图标按当前来源随机，并通用化到全部处理器 ([2c313aa](https://github.com/Raven-Pensieve/obsidian-custom-icons/commit/2c313aa52c58d48a22d819d7d7e4f8b53cf17ed9))
+
+
+### 🐛 问题修复 (Bug Fixes)
+
+* 分组改名删除后筛选落盘同步，并补齐弹窗窗口归属与菜单文案 ([1a5f813](https://github.com/Raven-Pensieve/obsidian-custom-icons/commit/1a5f81316e1b04d0d2d489e63fc77a116e0a3246))
+* 分组标题槽位懒建一次，避免整组跳到后面的分组下面 ([dae2873](https://github.com/Raven-Pensieve/obsidian-custom-icons/commit/dae28731922721cf71e0bfad3097136ad7270d01))
+* 图标选择器点分段不再夺走焦点，并补齐输入法与空分组的键位边界 ([f1ba671](https://github.com/Raven-Pensieve/obsidian-custom-icons/commit/f1ba671076448f2f92f1ecfb87bee535d2d83a29))
+* 图标重命名后缀从 -1 起编号 ([27b6f0e](https://github.com/Raven-Pensieve/obsidian-custom-icons/commit/27b6f0eff0d01188b086e66a7ac410f387a42f7b))
+* 收藏与最近使用过滤失效图标，并在删除改名时同步清理 ([f99c056](https://github.com/Raven-Pensieve/obsidian-custom-icons/commit/f99c056e61f234aa1a35466ff3db88681c4db336))
+* 设置页禁用态与静默失败，修掉按钮监听器累积的根因 ([77b6dc0](https://github.com/Raven-Pensieve/obsidian-custom-icons/commit/77b6dc02cfb92b7d6b69d41ce7a94374aa7e8f7a))
+* 骰子按钮监听器累积、随机池含未注册图标、默认图标写两次盘 ([447fe15](https://github.com/Raven-Pensieve/obsidian-custom-icons/commit/447fe15e020f72b9e4e576bd4911d2c2996d7b25))
+
+
+### ♻️ 重构 (Refactor)
+
+* 统一「重置/删除」语义，写入路径深拷贝从 6 趟降到 1 趟 ([5ed8634](https://github.com/Raven-Pensieve/obsidian-custom-icons/commit/5ed863426093a863e1b532835f0532370d40bdea))
+
 ## [2.6.0](https://github.com/Raven-Pensieve/obsidian-custom-icons/compare/2.5.1...2.6.0) (2026-08-24)
 
 

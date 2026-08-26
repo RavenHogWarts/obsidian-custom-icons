@@ -1,7 +1,12 @@
 import { ICustomSVGIcon } from "@src/types/types";
+import { GROUP_NAME_MAX, normalizeGroupName } from "./groupName";
 
-/** 组名长度上限：组名只用于显示与筛选，不进注册 id，无需限制字符集 */
-export const GROUP_NAME_MAX = 64;
+/*
+ * 组名的收敛规则搬到了 `util/groupName.ts`——扩展名分组要用同一份，而让文件
+ * 浏览器去 import「SVG 图标库」的模块，依赖关系读起来是假的。这里继续转出，
+ * 本模块既有的导入方（组件、测试）不必改。
+ */
+export { GROUP_NAME_MAX, normalizeGroupName };
 
 /**
  * 「我的 SVG」页的分组筛选态。
@@ -13,21 +18,6 @@ export type SvgGroupFilter = string | null;
 
 /** 「仅未分组」这一档的筛选值 */
 export const UNGROUPED: SvgGroupFilter = "";
-
-/**
- * 收敛用户输入 / 落盘值为合法组名。
- *
- * 非字符串一律当未分组：`SettingsStore#normalizeSettings` 不覆盖 `customIconLib`，
- * 手改过的 `data.json` 里 `group` 可能是数字甚至对象，读到什么都不该抛。
- *
- * **不改大小写**——`Weather` 与 `weather` 是两个组（已确认的需求）。
- */
-export function normalizeGroupName(raw: unknown): string {
-	if (typeof raw !== "string") {
-		return "";
-	}
-	return raw.trim().slice(0, GROUP_NAME_MAX);
-}
 
 /** 取图标的组名（缺失 / 脏值 / 全空白都归一为 `""` = 未分组） */
 export function iconGroup(icon: ICustomSVGIcon): string {

@@ -9,6 +9,15 @@ interface GroupInputProps {
 	onChange: (next: string) => void;
 	/** 输入框下方的说明（添加与导入的语义不同，由调用方给） */
 	hint?: string;
+	/**
+	 * 字段名与占位符（省略则用 SVG 库那一套文案）。
+	 *
+	 * 文件浏览器的扩展名分组是同构的另一处调用方，只有这两句文案不同——
+	 * 与其复制一份组件，不如把它们开成参数：datalist、大小写敏感、
+	 * 「既能选已有又能新建」这些正是两处都要的东西。
+	 */
+	label?: string;
+	placeholder?: string;
 }
 
 /**
@@ -26,24 +35,28 @@ export const GroupInput: React.FC<GroupInputProps> = ({
 	value,
 	onChange,
 	hint,
+	label,
+	placeholder,
 }) => {
 	// 同一弹窗里可能出现多个实例（AddSvg 三个模式各一个），id 必须唯一
 	const listId = useId();
 	const groupLL = LL.view.CustomIconLib.svg.group;
 
 	// 标签与输入框同一行，说明另起一行：`.ci-lib__form-row` 是居中的横向 flex，
-	// 说明塞进去会挤在输入框右侧。两处调用方都把本组件放在纵向的 `.ci-lib__form` 里，
+	// 说明塞进去会挤在输入框右侧。调用方都把本组件放在纵向的 `.ci-lib__form` 里，
 	// 所以返回 fragment 即可让说明成为它的下一个 flex item
 	return (
 		<>
 			<div className="ci-lib__form-row ci-lib__form-row--field">
-				<span className="ci-lib__form-label">{groupLL.label()}</span>
+				<span className="ci-lib__form-label">
+					{label ?? groupLL.label()}
+				</span>
 				<input
 					className="ci-lib__form__input"
 					type="text"
 					list={groups.length > 0 ? listId : undefined}
 					maxLength={GROUP_NAME_MAX}
-					placeholder={groupLL.placeholder()}
+					placeholder={placeholder ?? groupLL.placeholder()}
 					value={value}
 					onChange={(e) => onChange(e.target.value)}
 				/>

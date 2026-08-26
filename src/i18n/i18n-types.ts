@@ -210,7 +210,7 @@ type RootTranslation = {
 				 */
 				name: string
 				/**
-				 * 为​某​类​扩​展​名​的​文​件​统​一​分​配​图​标​（​如​ ​p​d​f​、​c​a​n​v​a​s​）​；​支​持​复​合​后​缀​，​如​ ​e​x​c​a​l​i​d​r​a​w​.​m​d​ ​优​先​于​ ​m​d
+				 * 为​某​类​扩​展​名​的​文​件​统​一​分​配​图​标​（​如​ ​p​d​f​、​c​a​n​v​a​s​）​；​支​持​复​合​后​缀​，​如​ ​e​x​c​a​l​i​d​r​a​w​.​m​d​ ​优​先​于​ ​m​d​。​无​扩​展​名​的​文​件​（​如​ ​.​g​i​t​i​g​n​o​r​e​）​请​用​下​方​「​单​项​覆​盖​」​在​文​件​树​中​右​键​设​置​。
 				 */
 				desc: string
 				/**
@@ -225,6 +225,314 @@ type RootTranslation = {
 				 * 尚​未​配​置​扩​展​名​规​则
 				 */
 				noneFound: string
+				/**
+				 * 筛​选​扩​展​名​.​.​.
+				 */
+				filterPlaceholder: string
+				/**
+				 * 没​有​匹​配​的​扩​展​名
+				 */
+				noneMatched: string
+				/**
+				 * {​c​o​u​n​t​}​ ​个​文​件
+				 * @param {number} count
+				 */
+				fileCount: RequiredParams<'count'>
+				/**
+				 * 库​中​暂​无​此​类​文​件
+				 */
+				noFiles: string
+				/**
+				 * 未​配​置​图​标​，​此​规​则​不​生​效
+				 */
+				needIcon: string
+				/**
+				 * 已​添​加​ ​{​c​o​u​n​t​}​ ​个​扩​展​名
+				 * @param {number} count
+				 */
+				added: RequiredParams<'count'>
+				/**
+				 * 已​添​加​ ​{​a​d​d​e​d​}​ ​个​，​跳​过​ ​{​s​k​i​p​p​e​d​}​ ​个​（​已​存​在​）
+				 * @param {number} added
+				 * @param {number} skipped
+				 */
+				addedSkipped: RequiredParams<'added' | 'skipped'>
+				/**
+				 * 这​些​扩​展​名​都​已​配​置​过​了
+				 */
+				allDuplicate: string
+				/**
+				 * 无​法​识​别​为​扩​展​名​：​{​t​o​k​e​n​s​}
+				 * @param {string} tokens
+				 */
+				invalidInput: RequiredParams<'tokens'>
+				/**
+				 * 切​换​排​序​（​当​前​：​{​m​o​d​e​}​）
+				 * @param {string} mode
+				 */
+				sortTooltip: RequiredParams<'mode'>
+				/**
+				 * 按​文​件​数
+				 */
+				sortByCount: string
+				/**
+				 * 按​名​称
+				 */
+				sortByName: string
+				/**
+				 * 库​中​还​未​配​置​的​扩​展​名
+				 */
+				candidates: string
+				/**
+				 * 添​加​ ​.​{​e​x​t​}​（​{​c​o​u​n​t​}​ ​个​文​件​）
+				 * @param {number} count
+				 * @param {string} ext
+				 */
+				candidateTooltip: RequiredParams<'count' | 'ext'>
+				/**
+				 * 随​机​筛​选​出​的​图​标
+				 */
+				dicesTooltip: string
+				/**
+				 * 清​空​筛​选​出​的​图​标
+				 */
+				clearTooltip: string
+				/**
+				 * 清​空​ ​{​c​o​u​n​t​}​ ​条​规​则​的​图​标​？
+				 * @param {number} count
+				 */
+				clearTitle: RequiredParams<'count'>
+				/**
+				 * 这​些​扩​展​名​将​回​落​到​「​文​件​默​认​图​标​」​，​规​则​本​身​保​留​。
+				 */
+				clearBody: string
+				/**
+				 * 清​空​图​标
+				 */
+				clearConfirm: string
+				/**
+				 * 已​清​空​ ​{​c​o​u​n​t​}​ ​条​规​则​的​图​标
+				 * @param {number} count
+				 */
+				cleared: RequiredParams<'count'>
+			}
+			extGroup: {
+				/**
+				 * 移​到​分​组​…
+				 */
+				groupTooltip: string
+				/**
+				 * 管​理​分​组
+				 */
+				manageTooltip: string
+				/**
+				 * 未​分​组
+				 */
+				ungrouped: string
+				/**
+				 * {​e​x​t​s​}​ ​个​扩​展​名​ ​·​ ​{​f​i​l​e​s​}​ ​个​文​件
+				 * @param {number} exts
+				 * @param {number} files
+				 */
+				summary: RequiredParams<'exts' | 'files'>
+				/**
+				 * 组​内​图​标​不​一​致​，​从​此​处​重​新​选​择​即​可​统​一
+				 */
+				mixed: string
+				/**
+				 * 从​「​{​g​r​o​u​p​}​」​中​移​出​ ​.​{​e​x​t​}
+				 * @param {string} ext
+				 * @param {string} group
+				 */
+				removeTooltip: RequiredParams<'ext' | 'group'>
+				/**
+				 * 分​组
+				 */
+				label: string
+				/**
+				 * 分​组​名​（​留​空​则​不​分​组​）
+				 */
+				placeholder: string
+				/**
+				 * 移​到​分​组
+				 */
+				moveTitle: string
+				/**
+				 * 可​选​择​已​有​分​组​，​也​可​直​接​输​入​新​名​称​。
+				 */
+				moveHint: string
+				/**
+				 * 将​移​动​ ​{​c​o​u​n​t​}​ ​个​扩​展​名​。
+				 * @param {number} count
+				 */
+				moveCount: RequiredParams<'count'>
+				/**
+				 * 留​空​即​把​这​些​扩​展​名​移​出​分​组​。
+				 */
+				moveOutHint: string
+				/**
+				 * 「​{​g​r​o​u​p​}​」​已​存​在​，​将​与​其​中​已​有​的​扩​展​名​合​并
+				 * @param {string} group
+				 */
+				mergeWarning: RequiredParams<'group'>
+				/**
+				 * 已​把​ ​{​c​o​u​n​t​}​ ​个​扩​展​名​移​到​「​{​g​r​o​u​p​}​」
+				 * @param {number} count
+				 * @param {string} group
+				 */
+				moved: RequiredParams<'count' | 'group'>
+				/**
+				 * 已​把​ ​{​c​o​u​n​t​}​ ​个​扩​展​名​移​出​分​组
+				 * @param {number} count
+				 */
+				movedOut: RequiredParams<'count'>
+				/**
+				 * 重​命​名​分​组
+				 */
+				renameAction: string
+				/**
+				 * 重​命​名​「​{​g​r​o​u​p​}​」
+				 * @param {string} group
+				 */
+				renameTitle: RequiredParams<'group'>
+				/**
+				 * 该​分​组​有​ ​{​c​o​u​n​t​}​ ​个​扩​展​名​。
+				 * @param {number} count
+				 */
+				renameCount: RequiredParams<'count'>
+				/**
+				 * 请​输​入​组​名​。​想​去​掉​分​组​但​保​留​规​则​，​用​「​删​除​分​组​，​保​留​规​则​」​。
+				 */
+				renameEmpty: string
+				/**
+				 * 已​把​「​{​f​r​o​m​}​」​改​名​为​「​{​t​o​}​」
+				 * @param {string} from
+				 * @param {string} to
+				 */
+				renamed: RequiredParams<'from' | 'to'>
+				/**
+				 * 删​除​分​组​，​保​留​规​则
+				 */
+				dissolveAction: string
+				/**
+				 * 删​除​「​{​g​r​o​u​p​}​」​？
+				 * @param {string} group
+				 */
+				dissolveTitle: RequiredParams<'group'>
+				/**
+				 * 组​内​ ​{​c​o​u​n​t​}​ ​个​扩​展​名​规​则​会​保​留​下​来​，​各​自​的​图​标​不​变​，​变​成​未​分​组​。
+				 * @param {number} count
+				 */
+				dissolveBody: RequiredParams<'count'>
+				/**
+				 * 删​除​分​组
+				 */
+				dissolveConfirm: string
+				/**
+				 * 已​删​除​「​{​g​r​o​u​p​}​」​，​{​c​o​u​n​t​}​ ​个​扩​展​名​转​为​未​分​组
+				 * @param {number} count
+				 * @param {string} group
+				 */
+				dissolved: RequiredParams<'count' | 'group'>
+				/**
+				 * 删​除​分​组​及​其​中​的​规​则
+				 */
+				purgeAction: string
+				/**
+				 * 删​除​「​{​g​r​o​u​p​}​」​及​其​中​的​规​则​？
+				 * @param {string} group
+				 */
+				purgeTitle: RequiredParams<'group'>
+				/**
+				 * 这​会​删​掉​ ​{​c​o​u​n​t​}​ ​条​扩​展​名​规​则​。​这​些​扩​展​名​将​回​落​到​「​文​件​默​认​图​标​」​。
+				 * @param {number} count
+				 */
+				purgeBody: RequiredParams<'count'>
+				/**
+				 * 删​除​规​则
+				 */
+				purgeConfirm: string
+				/**
+				 * 已​删​除​「​{​g​r​o​u​p​}​」​及​其​中​的​ ​{​c​o​u​n​t​}​ ​条​规​则
+				 * @param {number} count
+				 * @param {string} group
+				 */
+				purged: RequiredParams<'count' | 'group'>
+				/**
+				 * 「​{​g​r​o​u​p​}​」​已​不​存​在
+				 * @param {string} group
+				 */
+				gone: RequiredParams<'group'>
+				/**
+				 * 从​预​设​创​建​分​组
+				 */
+				presetTooltip: string
+				/**
+				 * 从​预​设​创​建​分​组
+				 */
+				presetTitle: string
+				/**
+				 * 预​设​只​是​一​份​起​始​清​单​：​创​建​后​即​为​普​通​分​组​，​可​随​意​增​删​改​，​不​会​随​插​件​更​新​而​变​化​。
+				 */
+				presetHint: string
+				/**
+				 * 请​至​少​选​择​一​个​预​设
+				 */
+				presetEmpty: string
+				/**
+				 * 已​创​建​ ​{​g​r​o​u​p​s​}​ ​个​分​组​，​新​增​ ​{​a​d​d​e​d​}​ ​个​扩​展​名
+				 * @param {number} added
+				 * @param {number} groups
+				 */
+				presetCreated: RequiredParams<'added' | 'groups'>
+				/**
+				 * 并​入​已​有​规​则​ ​{​c​o​u​n​t​}​ ​个​（​图​标​保​持​不​变​）
+				 * @param {number} count
+				 */
+				presetAdopted: RequiredParams<'count'>
+				/**
+				 * 跳​过​ ​{​c​o​u​n​t​}​ ​个​（​已​属​于​其​它​分​组​）​：​{​e​x​t​s​}
+				 * @param {number} count
+				 * @param {string} exts
+				 */
+				presetSkipped: RequiredParams<'count' | 'exts'>
+				/**
+				 * 「​{​g​r​o​u​p​}​」​已​存​在​，​将​并​入​该​分​组
+				 * @param {string} group
+				 */
+				presetExisting: RequiredParams<'group'>
+				/**
+				 * 共​ ​{​t​o​t​a​l​}​ ​个​扩​展​名​，​将​新​增​ ​{​c​o​u​n​t​}​ ​个
+				 * @param {number} count
+				 * @param {number} total
+				 */
+				presetCount: RequiredParams<'count' | 'total'>
+			}
+			presets: {
+				/**
+				 * 图​片
+				 */
+				image: string
+				/**
+				 * 视​频
+				 */
+				video: string
+				/**
+				 * 音​频
+				 */
+				audio: string
+				/**
+				 * 文​档
+				 */
+				document: string
+				/**
+				 * 压​缩​包
+				 */
+				archive: string
+				/**
+				 * 代​码
+				 */
+				code: string
 			}
 			overrides: {
 				/**
@@ -247,6 +555,14 @@ type RootTranslation = {
 				 * 暂​无​单​项​覆​盖
 				 */
 				noneFound: string
+				/**
+				 * 筛​选​路​径​.​.​.
+				 */
+				filterPlaceholder: string
+				/**
+				 * 没​有​匹​配​的​路​径
+				 */
+				noneMatched: string
 			}
 			menu: {
 				/**
@@ -1613,7 +1929,7 @@ export type TranslationFunctions = {
 				 */
 				name: () => LocalizedString
 				/**
-				 * 为某类扩展名的文件统一分配图标（如 pdf、canvas）；支持复合后缀，如 excalidraw.md 优先于 md
+				 * 为某类扩展名的文件统一分配图标（如 pdf、canvas）；支持复合后缀，如 excalidraw.md 优先于 md。无扩展名的文件（如 .gitignore）请用下方「单项覆盖」在文件树中右键设置。
 				 */
 				desc: () => LocalizedString
 				/**
@@ -1628,6 +1944,274 @@ export type TranslationFunctions = {
 				 * 尚未配置扩展名规则
 				 */
 				noneFound: () => LocalizedString
+				/**
+				 * 筛选扩展名...
+				 */
+				filterPlaceholder: () => LocalizedString
+				/**
+				 * 没有匹配的扩展名
+				 */
+				noneMatched: () => LocalizedString
+				/**
+				 * {count} 个文件
+				 */
+				fileCount: (arg: { count: number }) => LocalizedString
+				/**
+				 * 库中暂无此类文件
+				 */
+				noFiles: () => LocalizedString
+				/**
+				 * 未配置图标，此规则不生效
+				 */
+				needIcon: () => LocalizedString
+				/**
+				 * 已添加 {count} 个扩展名
+				 */
+				added: (arg: { count: number }) => LocalizedString
+				/**
+				 * 已添加 {added} 个，跳过 {skipped} 个（已存在）
+				 */
+				addedSkipped: (arg: { added: number, skipped: number }) => LocalizedString
+				/**
+				 * 这些扩展名都已配置过了
+				 */
+				allDuplicate: () => LocalizedString
+				/**
+				 * 无法识别为扩展名：{tokens}
+				 */
+				invalidInput: (arg: { tokens: string }) => LocalizedString
+				/**
+				 * 切换排序（当前：{mode}）
+				 */
+				sortTooltip: (arg: { mode: string }) => LocalizedString
+				/**
+				 * 按文件数
+				 */
+				sortByCount: () => LocalizedString
+				/**
+				 * 按名称
+				 */
+				sortByName: () => LocalizedString
+				/**
+				 * 库中还未配置的扩展名
+				 */
+				candidates: () => LocalizedString
+				/**
+				 * 添加 .{ext}（{count} 个文件）
+				 */
+				candidateTooltip: (arg: { count: number, ext: string }) => LocalizedString
+				/**
+				 * 随机筛选出的图标
+				 */
+				dicesTooltip: () => LocalizedString
+				/**
+				 * 清空筛选出的图标
+				 */
+				clearTooltip: () => LocalizedString
+				/**
+				 * 清空 {count} 条规则的图标？
+				 */
+				clearTitle: (arg: { count: number }) => LocalizedString
+				/**
+				 * 这些扩展名将回落到「文件默认图标」，规则本身保留。
+				 */
+				clearBody: () => LocalizedString
+				/**
+				 * 清空图标
+				 */
+				clearConfirm: () => LocalizedString
+				/**
+				 * 已清空 {count} 条规则的图标
+				 */
+				cleared: (arg: { count: number }) => LocalizedString
+			}
+			extGroup: {
+				/**
+				 * 移到分组…
+				 */
+				groupTooltip: () => LocalizedString
+				/**
+				 * 管理分组
+				 */
+				manageTooltip: () => LocalizedString
+				/**
+				 * 未分组
+				 */
+				ungrouped: () => LocalizedString
+				/**
+				 * {exts} 个扩展名 · {files} 个文件
+				 */
+				summary: (arg: { exts: number, files: number }) => LocalizedString
+				/**
+				 * 组内图标不一致，从此处重新选择即可统一
+				 */
+				mixed: () => LocalizedString
+				/**
+				 * 从「{group}」中移出 .{ext}
+				 */
+				removeTooltip: (arg: { ext: string, group: string }) => LocalizedString
+				/**
+				 * 分组
+				 */
+				label: () => LocalizedString
+				/**
+				 * 分组名（留空则不分组）
+				 */
+				placeholder: () => LocalizedString
+				/**
+				 * 移到分组
+				 */
+				moveTitle: () => LocalizedString
+				/**
+				 * 可选择已有分组，也可直接输入新名称。
+				 */
+				moveHint: () => LocalizedString
+				/**
+				 * 将移动 {count} 个扩展名。
+				 */
+				moveCount: (arg: { count: number }) => LocalizedString
+				/**
+				 * 留空即把这些扩展名移出分组。
+				 */
+				moveOutHint: () => LocalizedString
+				/**
+				 * 「{group}」已存在，将与其中已有的扩展名合并
+				 */
+				mergeWarning: (arg: { group: string }) => LocalizedString
+				/**
+				 * 已把 {count} 个扩展名移到「{group}」
+				 */
+				moved: (arg: { count: number, group: string }) => LocalizedString
+				/**
+				 * 已把 {count} 个扩展名移出分组
+				 */
+				movedOut: (arg: { count: number }) => LocalizedString
+				/**
+				 * 重命名分组
+				 */
+				renameAction: () => LocalizedString
+				/**
+				 * 重命名「{group}」
+				 */
+				renameTitle: (arg: { group: string }) => LocalizedString
+				/**
+				 * 该分组有 {count} 个扩展名。
+				 */
+				renameCount: (arg: { count: number }) => LocalizedString
+				/**
+				 * 请输入组名。想去掉分组但保留规则，用「删除分组，保留规则」。
+				 */
+				renameEmpty: () => LocalizedString
+				/**
+				 * 已把「{from}」改名为「{to}」
+				 */
+				renamed: (arg: { from: string, to: string }) => LocalizedString
+				/**
+				 * 删除分组，保留规则
+				 */
+				dissolveAction: () => LocalizedString
+				/**
+				 * 删除「{group}」？
+				 */
+				dissolveTitle: (arg: { group: string }) => LocalizedString
+				/**
+				 * 组内 {count} 个扩展名规则会保留下来，各自的图标不变，变成未分组。
+				 */
+				dissolveBody: (arg: { count: number }) => LocalizedString
+				/**
+				 * 删除分组
+				 */
+				dissolveConfirm: () => LocalizedString
+				/**
+				 * 已删除「{group}」，{count} 个扩展名转为未分组
+				 */
+				dissolved: (arg: { count: number, group: string }) => LocalizedString
+				/**
+				 * 删除分组及其中的规则
+				 */
+				purgeAction: () => LocalizedString
+				/**
+				 * 删除「{group}」及其中的规则？
+				 */
+				purgeTitle: (arg: { group: string }) => LocalizedString
+				/**
+				 * 这会删掉 {count} 条扩展名规则。这些扩展名将回落到「文件默认图标」。
+				 */
+				purgeBody: (arg: { count: number }) => LocalizedString
+				/**
+				 * 删除规则
+				 */
+				purgeConfirm: () => LocalizedString
+				/**
+				 * 已删除「{group}」及其中的 {count} 条规则
+				 */
+				purged: (arg: { count: number, group: string }) => LocalizedString
+				/**
+				 * 「{group}」已不存在
+				 */
+				gone: (arg: { group: string }) => LocalizedString
+				/**
+				 * 从预设创建分组
+				 */
+				presetTooltip: () => LocalizedString
+				/**
+				 * 从预设创建分组
+				 */
+				presetTitle: () => LocalizedString
+				/**
+				 * 预设只是一份起始清单：创建后即为普通分组，可随意增删改，不会随插件更新而变化。
+				 */
+				presetHint: () => LocalizedString
+				/**
+				 * 请至少选择一个预设
+				 */
+				presetEmpty: () => LocalizedString
+				/**
+				 * 已创建 {groups} 个分组，新增 {added} 个扩展名
+				 */
+				presetCreated: (arg: { added: number, groups: number }) => LocalizedString
+				/**
+				 * 并入已有规则 {count} 个（图标保持不变）
+				 */
+				presetAdopted: (arg: { count: number }) => LocalizedString
+				/**
+				 * 跳过 {count} 个（已属于其它分组）：{exts}
+				 */
+				presetSkipped: (arg: { count: number, exts: string }) => LocalizedString
+				/**
+				 * 「{group}」已存在，将并入该分组
+				 */
+				presetExisting: (arg: { group: string }) => LocalizedString
+				/**
+				 * 共 {total} 个扩展名，将新增 {count} 个
+				 */
+				presetCount: (arg: { count: number, total: number }) => LocalizedString
+			}
+			presets: {
+				/**
+				 * 图片
+				 */
+				image: () => LocalizedString
+				/**
+				 * 视频
+				 */
+				video: () => LocalizedString
+				/**
+				 * 音频
+				 */
+				audio: () => LocalizedString
+				/**
+				 * 文档
+				 */
+				document: () => LocalizedString
+				/**
+				 * 压缩包
+				 */
+				archive: () => LocalizedString
+				/**
+				 * 代码
+				 */
+				code: () => LocalizedString
 			}
 			overrides: {
 				/**
@@ -1650,6 +2234,14 @@ export type TranslationFunctions = {
 				 * 暂无单项覆盖
 				 */
 				noneFound: () => LocalizedString
+				/**
+				 * 筛选路径...
+				 */
+				filterPlaceholder: () => LocalizedString
+				/**
+				 * 没有匹配的路径
+				 */
+				noneMatched: () => LocalizedString
 			}
 			menu: {
 				/**

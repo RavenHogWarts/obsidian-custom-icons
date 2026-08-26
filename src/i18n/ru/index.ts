@@ -74,10 +74,95 @@ const ru = {
 			},
 			extensions: {
 				name: "По расширению",
-				desc: "Назначить общий значок файлам с определённым расширением (напр. pdf, canvas); поддерживаются составные суффиксы, напр. excalidraw.md имеет приоритет над md",
+				desc: "Назначить общий значок файлам с определённым расширением (напр. pdf, canvas); поддерживаются составные суффиксы, напр. excalidraw.md имеет приоритет над md. Файлы без расширения (напр. .gitignore) настраиваются через «Индивидуальные переопределения» — щёлкните по файлу правой кнопкой в дереве.",
 				placeholder: "Поддерживается пакетный ввод (напр. .xdb .js)...",
 				addTooltip: "Добавить расширение",
 				noneFound: "Правила расширений ещё не настроены",
+				filterPlaceholder: "Фильтр расширений...",
+				noneMatched: "Нет подходящих расширений",
+				fileCount: "{count:number} файл(ов)",
+				noFiles: "В хранилище пока нет таких файлов",
+				needIcon: "Значок не задан — правило не действует",
+				added: "Добавлено расширений: {count:number}",
+				addedSkipped:
+					"Добавлено: {added:number}, пропущено: {skipped:number} (уже настроены)",
+				allDuplicate: "Все эти расширения уже настроены",
+				invalidInput: "Не распознано как расширение: {tokens:string}",
+				sortTooltip: "Сменить сортировку (сейчас: {mode:string})",
+				sortByCount: "По числу файлов",
+				sortByName: "По имени",
+				candidates: "Расширения в хранилище без правил",
+				candidateTooltip: "Добавить .{ext:string} ({count:number} файл(ов))",
+				dicesTooltip: "Случайные значки для отфильтрованных",
+				clearTooltip: "Очистить значки у отфильтрованных",
+				clearTitle: "Очистить значки у {count:number} правил(а)?",
+				clearBody:
+					"Эти расширения вернутся к «Значку файла по умолчанию», сами правила сохранятся.",
+				clearConfirm: "Очистить значки",
+				cleared: "Значки очищены у {count:number} правил(а)",
+			},
+			extGroup: {
+				groupTooltip: "Переместить в группу…",
+				manageTooltip: "Управление группой",
+				ungrouped: "Без группы",
+				summary: "{exts:number} расшир. · {files:number} файл(ов)",
+				mixed: "Значки внутри группы различаются — выберите здесь один, чтобы их объединить",
+				removeTooltip: "Убрать .{ext:string} из «{group:string}»",
+				label: "Группа",
+				placeholder: "Название группы (пусто — без группы)",
+				moveTitle: "Переместить в группу",
+				moveHint:
+					"Выберите существующую группу или введите новое название.",
+				moveCount: "Будет перемещено расширений: {count:number}.",
+				moveOutHint:
+					"Оставьте пустым, чтобы убрать эти расширения из группы.",
+				mergeWarning:
+					"«{group:string}» уже существует — расширения будут объединены с имеющимися",
+				moved: "Перемещено {count:number} расширений в «{group:string}»",
+				movedOut: "Убрано из группы расширений: {count:number}",
+				renameAction: "Переименовать группу",
+				renameTitle: "Переименовать «{group:string}»",
+				renameCount: "В этой группе расширений: {count:number}.",
+				renameEmpty:
+					"Введите название группы. Чтобы убрать группу, сохранив правила, используйте «Удалить группу, оставить правила».",
+				renamed: "«{from:string}» переименована в «{to:string}»",
+				dissolveAction: "Удалить группу, оставить правила",
+				dissolveTitle: "Удалить «{group:string}»?",
+				dissolveBody:
+					"{count:number} правил(а) расширений сохранятся со своими значками и станут без группы.",
+				dissolveConfirm: "Удалить группу",
+				dissolved:
+					"«{group:string}» удалена, расширений без группы: {count:number}",
+				purgeAction: "Удалить группу и её правила",
+				purgeTitle: "Удалить «{group:string}» вместе с правилами?",
+				purgeBody:
+					"Будет удалено {count:number} правил(а) расширений. Эти расширения вернутся к «Значку файла по умолчанию».",
+				purgeConfirm: "Удалить правила",
+				purged: "«{group:string}» удалена вместе с {count:number} правил(ами)",
+				gone: "«{group:string}» больше не существует",
+				presetTooltip: "Создать группу из шаблона",
+				presetTitle: "Создать группу из шаблона",
+				presetHint:
+					"Шаблон — лишь стартовый список: после создания это обычная группа, её можно свободно менять, и она не обновляется вместе с плагином.",
+				presetEmpty: "Выберите хотя бы один шаблон",
+				presetCreated:
+					"Создано групп: {groups:number}, добавлено расширений: {added:number}",
+				presetAdopted:
+					"Включено существующих правил: {count:number} (значки сохранены)",
+				presetSkipped:
+					"Пропущено: {count:number} (уже в других группах): {exts:string}",
+				presetExisting:
+					"«{group:string}» уже существует — расширения войдут в неё",
+				presetCount:
+					"всего расширений: {total:number}, будет добавлено: {count:number}",
+			},
+			presets: {
+				image: "Изображения",
+				video: "Видео",
+				audio: "Аудио",
+				document: "Документы",
+				archive: "Архивы",
+				code: "Код",
 			},
 			overrides: {
 				name: "Индивидуальные переопределения",
@@ -85,6 +170,8 @@ const ru = {
 				folderSection: "Папки",
 				fileSection: "Файлы",
 				noneFound: "Пока нет индивидуальных переопределений",
+				filterPlaceholder: "Фильтр путей...",
+				noneMatched: "Нет подходящих путей",
 			},
 			menu: {
 				setIcon: "Задать значок",

@@ -13,7 +13,11 @@ import {
 	normalizeIconColor,
 } from "@src/util/communityPluginIcon";
 import { isBookmarkKind } from "@src/util/bookmarkIcon";
-import { normalizeExtensionKey } from "@src/util/fileExplorerIcon";
+import {
+	isValidExtensionKey,
+	normalizeExtensionKey,
+} from "@src/util/fileExplorerIcon";
+import { normalizeGroupName } from "@src/util/groupName";
 import { parseTabKey } from "@src/util/tabHeaderIcon";
 
 export default class SettingsStore {
@@ -191,6 +195,14 @@ export default class SettingsStore {
 			source: Record<string, IFileExplorerIconOverride>,
 			keyTransform: (key: string) => string,
 			dropEmpty: boolean,
+			/**
+			 * `true` 仅用于 extensions：保留并收敛 `group`。
+			 * folders / files 手写的 `group` 在此被**剥掉**——那两张表没有分组概念，
+			 * 留着只会让日后读代码的人以为它有意义（见 types.ts 的字段注释）。
+			 */
+			keepGroup = false,
+			/** extensions 专用：拒掉 `photos/`、`*.png` 这类永不命中的死键 */
+			keyIsValid?: (key: string) => boolean,
 		): Record<string, IFileExplorerIconOverride> => {
 			const result: Record<string, IFileExplorerIconOverride> = {};
 			Object.entries(source ?? {}).forEach(([rawKey, override]) => {
@@ -204,25 +216,45 @@ export default class SettingsStore {
 				) {
 					return;
 				}
+				// 手改过的 data.json 不该把死规则带进界面：它会占一行、永不命中，
+				// 而用户无从判断为什么。设置页的输入校验是同一套判定（isValidExtensionKey）
+				if (keyIsValid && !keyIsValid(key)) {
+					return;
+				}
 				// folders/files：无图标即无意义（右键分配必带图标），丢弃；
 				// extensions：允许空行持久化——设置页「先添加行、再配置图标」的交互，
 				// 渲染层 resolveFileIcon 对空 icon 天然跳过，无副作用
 				if (dropEmpty && (!override?.icon || !override.type)) {
 					return;
 				}
-				result[key] = {
+				const normalized: IFileExplorerIconOverride = {
 					id: key,
 					icon: override?.icon ?? "",
 					type: override?.type ?? "lucide",
 					color: normalizeIconColor(override?.color) ?? "",
 				};
+				if (keepGroup) {
+					// 未分组不留空字段（与 ICustomSVGIcon.group 的写法一致，
+					// 不往 data.json 里塞 ""）；脏值 / 非字符串归一为未分组
+					const group = normalizeGroupName(override?.group);
+					if (group) {
+						normalized.group = group;
+					}
+				}
+				result[key] = normalized;
 			});
 			return result;
 		};
 
 		fe.folders = normalizeMap(fe.folders, (k) => k, true);
 		fe.files = normalizeMap(fe.files, (k) => k, true);
-		fe.extensions = normalizeMap(fe.extensions, normalizeExtensionKey, false);
+		fe.extensions = normalizeMap(
+			fe.extensions,
+			normalizeExtensionKey,
+			false,
+			true,
+			isValidExtensionKey,
+		);
 
 		return normalizedSettings;
 	}

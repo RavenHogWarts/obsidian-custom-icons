@@ -3,11 +3,13 @@ import {
 	getCompoundExtension,
 	getExtension,
 	IFileExplorerConfig,
+	isValidExtensionKey,
 	migrateFileExplorerPaths,
 	normalizeExtensionKey,
 	parseExtensionInput,
 	resolveFileIcon,
 	resolveFolderIcon,
+	tallyExtensions,
 } from "./fileExplorerIcon";
 
 const emptyCfg: IFileExplorerConfig = {
@@ -160,24 +162,110 @@ describe("getCompoundExtension", () => {
 	});
 });
 
+describe("isValidExtensionKey", () => {
+	it("accepts plain and compound suffixes", () => {
+		expect(isValidExtensionKey("md")).toBe(true);
+		expect(isValidExtensionKey("excalidraw.md")).toBe(true);
+		expect(isValidExtensionKey("tar.gz")).toBe(true);
+		expect(isValidExtensionKey("d-ts")).toBe(true);
+		expect(isValidExtensionKey("my_ext")).toBe(true);
+	});
+
+	it("accepts non-ASCII extensions (a hard ASCII rule would reject valid config)", () => {
+		expect(isValidExtensionKey("笔记")).toBe(true);
+	});
+
+	it("rejects keys outside getExtension's range (dead rules)", () => {
+		expect(isValidExtensionKey("")).toBe(false);
+		expect(isValidExtensionKey("photos/")).toBe(false);
+		expect(isValidExtensionKey("a\\b")).toBe(false);
+		expect(isValidExtensionKey("*.png")).toBe(false);
+		expect(isValidExtensionKey("p?g")).toBe(false);
+		expect(isValidExtensionKey("a b")).toBe(false);
+	});
+
+	it("rejects leading and trailing dots", () => {
+		// 前导点在 normalizeExtensionKey 之后不该还剩；结尾点永远截不出来
+		expect(isValidExtensionKey(".md")).toBe(false);
+		expect(isValidExtensionKey("md.")).toBe(false);
+	});
+});
+
+describe("normalizeExtensionKey glob correction", () => {
+	it("strips a leading asterisk so *.png becomes png", () => {
+		expect(normalizeExtensionKey("*.png")).toBe("png");
+		expect(normalizeExtensionKey("*.PNG")).toBe("png");
+	});
+
+	it("leaves other illegal shapes alone (they are rejected, not silently fixed)", () => {
+		expect(normalizeExtensionKey("Photos/")).toBe("photos/");
+	});
+});
+
 describe("parseExtensionInput", () => {
 	it("splits on commas and whitespace, normalizes and dedupes", () => {
-		expect(parseExtensionInput(".xdb .js")).toEqual(["xdb", "js"]);
-		expect(parseExtensionInput(".xdb,.js , md")).toEqual([
+		expect(parseExtensionInput(".xdb .js").keys).toEqual(["xdb", "js"]);
+		expect(parseExtensionInput(".xdb,.js , md").keys).toEqual([
 			"xdb",
 			"js",
 			"md",
 		]);
-		expect(parseExtensionInput("md, MD ,  .md")).toEqual(["md"]);
+		expect(parseExtensionInput("md, MD ,  .md").keys).toEqual(["md"]);
 	});
 
 	it("keeps a compound suffix as a single token", () => {
-		expect(parseExtensionInput(".excalidraw.md")).toEqual(["excalidraw.md"]);
+		expect(parseExtensionInput(".excalidraw.md").keys).toEqual([
+			"excalidraw.md",
+		]);
 	});
 
-	it("returns an empty array for blank input", () => {
-		expect(parseExtensionInput("   ")).toEqual([]);
-		expect(parseExtensionInput(",, ")).toEqual([]);
+	it("returns empty results for blank input", () => {
+		expect(parseExtensionInput("   ")).toEqual({ keys: [], invalid: [] });
+		expect(parseExtensionInput(",, ")).toEqual({ keys: [], invalid: [] });
+	});
+
+	it("corrects the glob form instead of rejecting it", () => {
+		expect(parseExtensionInput("*.png *.jpg")).toEqual({
+			keys: ["png", "jpg"],
+			invalid: [],
+		});
+	});
+
+	it("separates illegal tokens, returning them verbatim", () => {
+		const result = parseExtensionInput("png Photos/ md");
+		expect(result.keys).toEqual(["png", "md"]);
+		// 原样回显（不是归一化后的 "photos/"）：用户要认出自己敲的是哪一个
+		expect(result.invalid).toEqual(["Photos/"]);
+	});
+});
+
+describe("tallyExtensions", () => {
+	it("counts the trailing suffix", () => {
+		const counts = tallyExtensions(["a.md", "b/c.md", "d.pdf"]);
+		expect(counts.get("md")).toBe(2);
+		expect(counts.get("pdf")).toBe(1);
+	});
+
+	it("counts a compound suffix in addition to the trailing one", () => {
+		// resolveFileIcon 对这两个键各查一次，所以两边都得计——否则
+		// excalidraw.md 永远不会出现在候选里
+		const counts = tallyExtensions(["X.excalidraw.md", "plain.md"]);
+		expect(counts.get("excalidraw.md")).toBe(1);
+		expect(counts.get("md")).toBe(2);
+	});
+
+	it("does not double count when both suffixes are identical", () => {
+		const counts = tallyExtensions(["note.md"]);
+		expect(counts.get("md")).toBe(1);
+	});
+
+	it("ignores extensionless and hidden files", () => {
+		const counts = tallyExtensions(["README", ".gitignore", "dir/.env"]);
+		expect(counts.size).toBe(0);
+	});
+
+	it("lowercases keys so they line up with the stored map", () => {
+		expect(tallyExtensions(["A.PNG"]).get("png")).toBe(1);
 	});
 });
 

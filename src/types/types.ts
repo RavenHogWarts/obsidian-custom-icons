@@ -69,6 +69,20 @@ export interface IFileExplorerIconOverride {
 	icon?: string;
 	type?: IconType;
 	color?: string;
+	/**
+	 * 所属分组，**仅 `extensions` 一表有意义**（`folders` / `files` 归一化时剥掉——
+	 * 那两表天生有继承 `inherit.subfolder` / `inherit.file`，那就是路径版的「一起设置」）。
+	 *
+	 * 缺失 / 空串 = 未分组。组名即身份且**区分大小写**，没有独立分组注册表——
+	 * 因此空组不存在，改组名 = 改写全部成员的该字段（一次整 map 写入）。
+	 *
+	 * 「一起设置图标」在**写入侧**实现（`setGroupIcon` 把图标扇出到全部成员），
+	 * 解析层因此完全不知道分组的存在：`resolveFileIcon` 仍是两级 O(1) 查表，
+	 * 不存在「单条规则 vs 分组规则谁优先」这个问题。代价是组的图标不是单一真相
+	 * ——用户单独改过某个成员后组进入「混合」态，界面如实显示而不隐藏。
+	 * 详见 dev/260826/文件浏览器扩展名分组与同类设置UX方案.md §3.2。
+	 */
+	group?: string;
 }
 export interface ITabHeaderIconOverride {
 	/**

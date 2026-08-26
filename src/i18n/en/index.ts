@@ -74,10 +74,95 @@ const en = {
 			},
 			extensions: {
 				name: "By extension",
-				desc: "Assign a shared icon to files of an extension (e.g. pdf, canvas); compound suffixes are supported, e.g. excalidraw.md takes precedence over md",
+				desc: "Assign a shared icon to files of an extension (e.g. pdf, canvas); compound suffixes are supported, e.g. excalidraw.md takes precedence over md. Files without an extension (such as .gitignore) can only be set through \"Per-item overrides\" below, by right-clicking them in the file tree.",
 				placeholder: "Batch supported (e.g. .xdb .js)...",
 				addTooltip: "Add extension",
 				noneFound: "No extension rules configured yet",
+				filterPlaceholder: "Filter extensions...",
+				noneMatched: "No matching extensions",
+				fileCount: "{count:number} files",
+				noFiles: "No such files in the vault",
+				needIcon: "No icon configured; this rule has no effect",
+				added: "Added {count:number} extensions",
+				addedSkipped:
+					"Added {added:number}, skipped {skipped:number} (already configured)",
+				allDuplicate: "All of these extensions are already configured",
+				invalidInput: "Not recognized as extensions: {tokens:string}",
+				sortTooltip: "Change sorting (current: {mode:string})",
+				sortByCount: "by file count",
+				sortByName: "by name",
+				candidates: "Extensions in your vault that are not configured yet",
+				candidateTooltip: "Add .{ext:string} ({count:number} files)",
+				dicesTooltip: "Randomize the filtered icons",
+				clearTooltip: "Clear the filtered icons",
+				clearTitle: "Clear the icon of {count:number} rules?",
+				clearBody:
+					"These extensions will fall back to the default file icon; the rules themselves are kept.",
+				clearConfirm: "Clear icons",
+				cleared: "Cleared the icon of {count:number} rules",
+			},
+			extGroup: {
+				groupTooltip: "Move to group…",
+				manageTooltip: "Manage group",
+				ungrouped: "Ungrouped",
+				summary: "{exts:number} extensions · {files:number} files",
+				mixed: "Icons differ within this group; pick one here to unify them",
+				removeTooltip: "Remove .{ext:string} from \"{group:string}\"",
+				label: "Group",
+				placeholder: "Group name (leave empty for none)",
+				moveTitle: "Move to group",
+				moveHint:
+					"Pick an existing group or type a new name.",
+				moveCount: "{count:number} extensions will be moved.",
+				moveOutHint: "Leaving this empty moves them out of their group.",
+				mergeWarning:
+					"\"{group:string}\" already exists; they will be merged with its extensions",
+				moved: "Moved {count:number} extensions to \"{group:string}\"",
+				movedOut: "Moved {count:number} extensions out of their group",
+				renameAction: "Rename group",
+				renameTitle: "Rename \"{group:string}\"",
+				renameCount: "This group has {count:number} extensions.",
+				renameEmpty:
+					"Enter a group name. To drop the group but keep the rules, use \"Delete group, keep rules\".",
+				renamed: "Renamed \"{from:string}\" to \"{to:string}\"",
+				dissolveAction: "Delete group, keep rules",
+				dissolveTitle: "Delete \"{group:string}\"?",
+				dissolveBody:
+					"The {count:number} extension rules are kept with their icons unchanged, and become ungrouped.",
+				dissolveConfirm: "Delete group",
+				dissolved:
+					"Deleted \"{group:string}\"; {count:number} extensions are now ungrouped",
+				purgeAction: "Delete group and its rules",
+				purgeTitle: "Delete \"{group:string}\" and its rules?",
+				purgeBody:
+					"This deletes {count:number} extension rules. These extensions will fall back to the default file icon.",
+				purgeConfirm: "Delete rules",
+				purged:
+					"Deleted \"{group:string}\" and its {count:number} rules",
+				gone: "\"{group:string}\" no longer exists",
+				presetTooltip: "Create groups from presets",
+				presetTitle: "Create groups from presets",
+				presetHint:
+					"A preset is just a starting list: once created it is an ordinary group you can edit freely, and it never changes with plugin updates.",
+				presetEmpty: "Select at least one preset",
+				presetCreated:
+					"Created {groups:number} groups with {added:number} new extensions",
+				presetAdopted:
+					"Adopted {count:number} existing rules (icons left unchanged)",
+				presetSkipped:
+					"Skipped {count:number} (already in another group): {exts:string}",
+				presetExisting:
+					"\"{group:string}\" already exists; entries will be merged into it",
+				presetCount:
+					"{total:number} extensions, {count:number} to be added",
+			},
+			presets: {
+				image: "Images",
+				video: "Video",
+				audio: "Audio",
+				document: "Documents",
+				archive: "Archives",
+				code: "Code",
 			},
 			overrides: {
 				name: "Per-item overrides",
@@ -85,6 +170,8 @@ const en = {
 				folderSection: "Folders",
 				fileSection: "Files",
 				noneFound: "No per-item overrides yet",
+				filterPlaceholder: "Filter paths...",
+				noneMatched: "No matching paths",
 			},
 			menu: {
 				setIcon: "Set icon",

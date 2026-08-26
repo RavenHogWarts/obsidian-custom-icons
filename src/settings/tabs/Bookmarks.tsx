@@ -2,6 +2,7 @@ import { IconPicker } from "@src/components/icon-picker/IconPicker";
 import {
 	Color,
 	ExtraButton,
+	RandomIconButton,
 	SettingGroup,
 	SettingItem,
 	Toggle,
@@ -91,6 +92,19 @@ export const Bookmarks: FC = () => {
 			name={name}
 			control={
 				<>
+					<RandomIconButton
+						// 类型层的空行（还没配图标）会回落 Lucide——正是骰子最有用的场景
+						value={override.icon ?? ""}
+						type={override.type ?? "lucide"}
+						onPick={async (value, type) => {
+							await writeMap(mapKey, key, {
+								id: key,
+								icon: value,
+								type,
+								color: override.color ?? "",
+							});
+						}}
+					/>
 					<ExtraButton
 						icon="trash-2"
 						tooltip={LL.common.delete()}

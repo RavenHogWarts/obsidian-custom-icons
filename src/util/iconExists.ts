@@ -19,6 +19,47 @@ export interface IconExistenceDeps {
 }
 
 /**
+ * 构建「这个 svg 注册 id 属于哪个已启用图标包」的判定函数。
+ *
+ * 包图标的注册 id 是 `CI-{packId}-{name}`，而 packId 与 name **都可含连字符**
+ * （name 甚至可含冒号，如 Iconify 的 `mdi:home`），没法从 id 反推切分点，
+ * 所以只能按已启用包的前缀逐个试，并要求 name 确实在该包的图标表里
+ * ——包更新后消失的 name 前缀仍对，但已经渲染不出来了。
+ *
+ * 抽成独立函数是因为这套知识有两个消费方：存在性判定（`buildIconExistence`）
+ * 与随机域推断（`randomIcon.ts` 要知道「当前图标属于哪个包」才能在同一个包里
+ * 随机）。抄第二遍必然会漏掉上面那条 name 校验。
+ *
+ * @returns 命中则返回 packId，否则 `null`（用户自己导入的 SVG 也走这条路返回 null）
+ */
+export function buildPackLookup(
+	deps: Pick<IconExistenceDeps, "lib" | "getPack">,
+): (id: string) => string | null {
+	const packs = Object.values(deps.lib.packs)
+		.filter((manifest) => manifest.enabled)
+		.map((manifest) => ({
+			id: manifest.id,
+			prefix: packIconId(manifest.id, ""),
+			icons: deps.getPack(manifest.id)?.icons ?? {},
+		}));
+
+	return (id) => {
+		for (const pack of packs) {
+			if (
+				id.startsWith(pack.prefix) &&
+				Object.prototype.hasOwnProperty.call(
+					pack.icons,
+					id.slice(pack.prefix.length),
+				)
+			) {
+				return pack.id;
+			}
+		}
+		return null;
+	};
+}
+
+/**
  * 构建「这个图标引用现在还能渲染吗」的判定函数。
  *
  * `recent` / `favorites` 只存 `${type}:${id}` 键，图标被删掉、改名，或所属包被
@@ -39,12 +80,7 @@ export function buildIconExistence(
 	const svgIds = new Set(
 		deps.lib.svg.filter((icon) => icon.content).map((icon) => icon.id),
 	);
-	const packs = Object.values(deps.lib.packs)
-		.filter((manifest) => manifest.enabled)
-		.map((manifest) => ({
-			prefix: packIconId(manifest.id, ""),
-			icons: deps.getPack(manifest.id)?.icons ?? {},
-		}));
+	const packOf = buildPackLookup(deps);
 
 	return (ref) => {
 		if (ref.type === "lucide") {
@@ -53,15 +89,6 @@ export function buildIconExistence(
 		if (svgIds.has(ref.id)) {
 			return true;
 		}
-		// 包图标的注册 id 是 `CI-{packId}-{name}`，packId 与 name 都可含连字符，
-		// 没法从 id 反推切分点，所以按已启用包的前缀逐个试
-		return packs.some(
-			(pack) =>
-				ref.id.startsWith(pack.prefix) &&
-				Object.prototype.hasOwnProperty.call(
-					pack.icons,
-					ref.id.slice(pack.prefix.length),
-				),
-		);
+		return packOf(ref.id) !== null;
 	};
 }

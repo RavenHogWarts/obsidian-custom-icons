@@ -2,6 +2,7 @@ import { IconPicker } from "@src/components/icon-picker/IconPicker";
 import {
 	Color,
 	ExtraButton,
+	RandomIconButton,
 	Search,
 	SettingGroup,
 	SettingItem,
@@ -10,12 +11,16 @@ import {
 import usePluginSettings from "@src/hooks/usePluginSettings";
 import useSettingsStore from "@src/hooks/useSettingsStore";
 import { LL } from "@src/i18n/i18n";
-import { DEFAULT_SETTINGS } from "@src/types/types";
+import {
+	DEFAULT_SETTINGS,
+	ICommunityPluginIconOverride,
+} from "@src/types/types";
 import {
 	normalizeIconColor,
 	resolveCommunityPluginIcon,
 } from "@src/util/communityPluginIcon";
-import { getRandomIcon, getUniqueRandomIcons } from "@src/util/randomIcon";
+import { encodeIconRef, iconRefOf } from "@src/util/iconRef";
+import { randomIconsFor } from "@src/util/randomIcon";
 import { FC, useMemo, useState } from "react";
 
 export const CommunityPlugin: FC = () => {
@@ -29,6 +34,30 @@ export const CommunityPlugin: FC = () => {
 			pluginId,
 			defaultIcon,
 			settings.communityPlugins.data[pluginId],
+		);
+	};
+
+	/**
+	 * 整 map 写入一条覆盖项（`next` 省略 = 删除该条）。
+	 *
+	 * 与其余四个设置页同一姿态。本页其它写入还走 `updateSettingByPath` 逐字段，
+	 * 但骰子这条必须整 map 写：逐字段要写三次（id / icon / type），每次都是
+	 * 一份设置深拷贝 + `saveSettings()` + `applyAll()`，而 `applyAll()` 在装了
+	 * 大包时是上万次 `addIcon`。顺带避开插件 id 含 `.` 时被路径拆分写坏的隐患。
+	 */
+	const writeOverride = async (
+		pluginId: string,
+		next?: ICommunityPluginIconOverride,
+	) => {
+		const nextData = { ...settings.communityPlugins.data };
+		if (next) {
+			nextData[pluginId] = next;
+		} else {
+			delete nextData[pluginId];
+		}
+		await settingsStore.updateSettingByPath(
+			"communityPlugins.data",
+			nextData,
 		);
 	};
 
@@ -141,6 +170,75 @@ export const CommunityPlugin: FC = () => {
 		return filtered.sort((a, b) => a.name.localeCompare(b.name));
 	}, [installedPlugins, searchQuery]);
 
+	/**
+	 * 批量随机：给筛选出的每一行掷一个图标，**一次落盘**。
+	 *
+	 * 原实现对每行连写三次 `updateSettingByPath`，而每次都是整份设置深拷贝 →
+	 * `saveSettings()` → `iconManager.applyAll()`（main.ts）。50 个插件 = 150 次
+	 * 全量重注册，装了大包时那是上万次 `addIcon` × 150——用户可感的卡顿。
+	 * 改为构建整份 `data` 后单写一次，与其余四个处理器的整 map 写入姿态一致，
+	 * 顺带修掉插件 id 含 `.` 时被路径拆分写坏的隐患。
+	 *
+	 * 随机域取自**默认图标**（一批同来源）：不按各行自己的来源，否则「尽量互不
+	 * 相同」跨池子无意义，各池大小不同、重复策略也难向用户解释。
+	 */
+	const randomizeFiltered = async () => {
+		if (filteredPlugins.length === 0) {
+			return;
+		}
+		// 排除各行当前生效的图标：尽量不把某行掷回原样（排除后无人可选时
+		// sampleMany 自会退回整池，是尽力而为不是硬约束）
+		const exclude = new Set<string>();
+		for (const plugin of filteredPlugins) {
+			const effective = getEffectivePluginIcon(plugin.id);
+			const ref = iconRefOf(effective.icon, effective.type);
+			if (ref) {
+				exclude.add(encodeIconRef(ref));
+			}
+		}
+		const picked = randomIconsFor(
+			settingsStore.plugin,
+			iconRefOf(defaultIcon.icon, defaultIcon.type),
+			filteredPlugins.length,
+			exclude,
+		);
+		// 池子空（理论上碰不到，Lucide 恒在）：什么都不写，而不是清空一片图标
+		if (picked.length === 0) {
+			return;
+		}
+
+		const next: Record<string, ICommunityPluginIconOverride> = {
+			...settings.communityPlugins.data,
+		};
+		filteredPlugins.forEach((plugin, index) => {
+			// sampleMany 在池子非空时恒返回 count 项（会循环复用），这里的兜底
+			// 只为不依赖那个不变式——原实现按下标取就把 undefined 写进了设置
+			const ref = picked[index];
+			if (!ref) {
+				return;
+			}
+			const current = next[plugin.id];
+			// 与默认图标相同就不落 override：normalizeCommunityPluginOverride
+			// 随后也会把它清掉，白写一轮
+			if (ref.id === defaultIcon.icon && ref.type === defaultIcon.type) {
+				if (current?.color) {
+					next[plugin.id] = { id: plugin.id, color: current.color };
+				} else {
+					delete next[plugin.id];
+				}
+				return;
+			}
+			next[plugin.id] = {
+				...current,
+				id: plugin.id,
+				icon: ref.id,
+				type: ref.type,
+			};
+		});
+
+		await settingsStore.updateSettingByPath("communityPlugins.data", next);
+	};
+
 	return (
 		<>
 			{/* 默认图标设置 */}
@@ -187,21 +285,18 @@ export const CommunityPlugin: FC = () => {
 					desc={LL.settings.communityPlugin.default.desc()}
 					control={
 						<>
-							<ExtraButton
-								icon="dices"
-								tooltip={LL.settings.communityPlugin.default.dicesTooltip()}
-								onClick={async () => {
-									const randomIcon = getRandomIcon();
-									if (randomIcon) {
-										await settingsStore.updateSettingByPath(
-											"communityPlugins.default.icon",
-											randomIcon,
-										);
-										await settingsStore.updateSettingByPath(
-											"communityPlugins.default.type",
-											"lucide",
-										);
-									}
+							<RandomIconButton
+								value={defaultIcon.icon}
+								type={defaultIcon.type}
+								onPick={async (value, type) => {
+									await settingsStore.updateSettingByPath(
+										"communityPlugins.default.icon",
+										value,
+									);
+									await settingsStore.updateSettingByPath(
+										"communityPlugins.default.type",
+										type,
+									);
 								}}
 							/>
 							<ExtraButton
@@ -263,33 +358,7 @@ export const CommunityPlugin: FC = () => {
 							<ExtraButton
 								icon="dices"
 								tooltip={LL.settings.communityPlugin.search.dicesTooltip()}
-								onClick={async () => {
-									const count = filteredPlugins.length;
-									// Generate unique random icons for the filtered plugins
-									const randomIcons =
-										getUniqueRandomIcons(count);
-
-									for (let i = 0; i < count; i++) {
-										const plugin = filteredPlugins[i];
-										const icon = randomIcons[i];
-										// We need to persist the id structure first if it doesn't exist?
-										// updateSettingByPath handles object creation if path segments exist,
-										// but 'data' is a Record.
-										// Safest is to update id first then icon.
-										await settingsStore.updateSettingByPath(
-											`communityPlugins.data.${plugin.id}.id`,
-											plugin.id,
-										);
-										await settingsStore.updateSettingByPath(
-											`communityPlugins.data.${plugin.id}.icon`,
-											icon,
-										);
-										await settingsStore.updateSettingByPath(
-											`communityPlugins.data.${plugin.id}.type`,
-											"lucide",
-										);
-									}
-								}}
+								onClick={randomizeFiltered}
 							/>
 							<ExtraButton
 								icon="reset"
@@ -326,30 +395,17 @@ export const CommunityPlugin: FC = () => {
 							desc={plugin.id}
 							control={
 								<>
-									<ExtraButton
-										icon="dices"
-										tooltip={LL.settings.communityPlugin.pluginList.dicesTooltip()}
-										onClick={async () => {
-											const currentIcon =
-												effectivePluginIcon.icon;
-
-											const randomIcon =
-												getRandomIcon(currentIcon);
-
-											if (randomIcon) {
-												await settingsStore.updateSettingByPath(
-													`communityPlugins.data.${plugin.id}.id`,
-													plugin.id,
-												);
-												await settingsStore.updateSettingByPath(
-													`communityPlugins.data.${plugin.id}.icon`,
-													randomIcon,
-												);
-												await settingsStore.updateSettingByPath(
-													`communityPlugins.data.${plugin.id}.type`,
-													"lucide",
-												);
-											}
+									<RandomIconButton
+										value={effectivePluginIcon.icon}
+										type={effectivePluginIcon.type}
+										onPick={async (value, type) => {
+											await writeOverride(plugin.id, {
+												...settings.communityPlugins
+													.data[plugin.id],
+												id: plugin.id,
+												icon: value,
+												type,
+											});
 										}}
 									/>
 									<ExtraButton

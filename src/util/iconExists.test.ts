@@ -1,4 +1,8 @@
-import { buildIconExistence, IconExistenceDeps } from "./iconExists";
+import {
+	buildIconExistence,
+	buildPackLookup,
+	IconExistenceDeps,
+} from "./iconExists";
 
 const PACKS: Record<string, { icons: Record<string, string> }> = {
 	mdi: { icons: { home: "<svg/>", star: "<svg/>" } },
@@ -81,5 +85,44 @@ describe("buildIconExistence", () => {
 			}),
 		);
 		expect(exists({ type: "svg", id: "CI-mdi-mdi:arrow-left" })).toBe(true);
+	});
+});
+
+/**
+ * `buildPackLookup` 单独测：`buildIconExistence` 只透出布尔值，锁不住「返回的是
+ * 哪个包」——而随机域推断要靠这个 id 去取对应的段（掷出的图标必须来自同一个包）。
+ */
+describe("buildPackLookup", () => {
+	test("命中已启用包时返回该包 id", () => {
+		const packOf = buildPackLookup(deps());
+		expect(packOf("CI-mdi-home")).toBe("mdi");
+	});
+
+	test("用户自己导入的 SVG 不属于任何包", () => {
+		const packOf = buildPackLookup(deps());
+		expect(packOf("my-icon")).toBeNull();
+	});
+
+	test("停用的包不认（掷进去的图标渲染不出来）", () => {
+		const packOf = buildPackLookup(deps());
+		expect(packOf("CI-off-ghost")).toBeNull();
+	});
+
+	test("前缀对但 name 已随包更新消失：不算命中", () => {
+		const packOf = buildPackLookup(deps());
+		expect(packOf("CI-mdi-removed")).toBeNull();
+	});
+
+	test("packId 本身含连字符时按前缀逐个试仍能认出", () => {
+		const packOf = buildPackLookup({
+			lib: {
+				svg: [],
+				packs: {
+					"fa-solid": { id: "fa-solid", enabled: true },
+				},
+			},
+			getPack: () => ({ icons: { "arrow-left": "<svg/>" } }),
+		});
+		expect(packOf("CI-fa-solid-arrow-left")).toBe("fa-solid");
 	});
 });

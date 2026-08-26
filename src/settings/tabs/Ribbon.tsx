@@ -2,6 +2,7 @@ import { IconPicker } from "@src/components/icon-picker/IconPicker";
 import {
 	Color,
 	ExtraButton,
+	RandomIconButton,
 	SettingGroup,
 	SettingItem,
 	Toggle,
@@ -140,6 +141,24 @@ export const Ribbon: FC = () => {
 							}
 							control={
 								<>
+									<RandomIconButton
+										// 未分配时随机域由按钮当前的原生图标决定；
+										// 连原生图标都没有则回落 Lucide，这正是骰子最有用的场景
+										value={
+											override?.icon ??
+											action.currentIcon ??
+											""
+										}
+										type={override?.type ?? action.currentType}
+										onPick={async (value, type) => {
+											await writeOverride(action.label, {
+												id: action.label,
+												icon: value,
+												type,
+												color: override?.color ?? "",
+											});
+										}}
+									/>
 									<ExtraButton
 										icon="reset"
 										disabled={!override}

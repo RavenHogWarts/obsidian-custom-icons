@@ -55,10 +55,6 @@ type RootTranslation = {
 				 * 重​置
 				 */
 				resetTooltip: string
-				/**
-				 * 随​机
-				 */
-				dicesTooltip: string
 			}
 			search: {
 				/**
@@ -91,10 +87,6 @@ type RootTranslation = {
 				 * 重​置​为​默​认​图​标
 				 */
 				resetTooltip: string
-				/**
-				 * 随​机​图​标
-				 */
-				dicesTooltip: string
 			}
 		}
 		ribbon: {
@@ -469,6 +461,11 @@ type RootTranslation = {
 		 * 取​消
 		 */
 		cancel: string
+		/**
+		 * 在​「​{​s​o​u​r​c​e​}​」​中​随​机
+		 * @param {string} source
+		 */
+		randomInSource: RequiredParams<'source'>
 	}
 	view: {
 		CustomIconLib: {
@@ -1461,10 +1458,6 @@ export type TranslationFunctions = {
 				 * 重置
 				 */
 				resetTooltip: () => LocalizedString
-				/**
-				 * 随机
-				 */
-				dicesTooltip: () => LocalizedString
 			}
 			search: {
 				/**
@@ -1497,10 +1490,6 @@ export type TranslationFunctions = {
 				 * 重置为默认图标
 				 */
 				resetTooltip: () => LocalizedString
-				/**
-				 * 随机图标
-				 */
-				dicesTooltip: () => LocalizedString
 			}
 		}
 		ribbon: {
@@ -1875,6 +1864,10 @@ export type TranslationFunctions = {
 		 * 取消
 		 */
 		cancel: () => LocalizedString
+		/**
+		 * 在「{source}」中随机
+		 */
+		randomInSource: (arg: { source: string }) => LocalizedString
 	}
 	view: {
 		CustomIconLib: {

@@ -16,7 +16,6 @@ const en = {
 				name: "Default icon",
 				desc: "Set a default icon for community plugins without icons",
 				resetTooltip: "Reset",
-				dicesTooltip: "Random",
 			},
 			search: {
 				placeholder: "Enter plugin name or ID...",
@@ -28,7 +27,6 @@ const en = {
 				name: "Plugin list",
 				desc: "Add custom icons for community plugins without icons (fix for Obsidian v1.11.0)",
 				resetTooltip: "Reset to default icon",
-				dicesTooltip: "Random icon",
 			},
 		},
 		ribbon: {
@@ -163,6 +161,7 @@ const en = {
 		edit: "Edit",
 		delete: "Delete",
 		cancel: "Cancel",
+		randomInSource: "Random within \"{source:string}\"",
 	},
 	view: {
 		CustomIconLib: {
@@ -378,8 +377,17 @@ const en = {
 				catalogOnline: "online",
 				catalogLoadFailed: "Failed to load catalog (offline and no cache)",
 				catalogLoading: "Loading icon set catalog…",
-				catalogFilter: { group: "Filter by install state", all: "All", installed: "Installed", notInstalled: "Not installed" },
-				catalogSort: { label: "Sort", name: "By name", count: "By icon count" },
+				catalogFilter: {
+					group: "Filter by install state",
+					all: "All",
+					installed: "Installed",
+					notInstalled: "Not installed",
+				},
+				catalogSort: {
+					label: "Sort",
+					name: "By name",
+					count: "By icon count",
+				},
 				noMatch: "No matching icon packs",
 				presetsSection: "Popular npm icon packs (one-click)",
 				alreadyInstalled: "Installed",
@@ -396,7 +404,11 @@ const en = {
 				tabName: "Lucide",
 				count: "{count:number} icon(s)",
 				emptyFilter: "No icons under the current filter",
-				sort: { label: "Sort", asc: "Name A→Z", desc: "Name Z→A" },
+				sort: {
+					label: "Sort",
+					asc: "Name A→Z",
+					desc: "Name Z→A",
+				},
 				showAll: "Show all",
 				descHints: {
 					all: "All Lucide icons bundled with the plugin (deduplicated). Click an icon to copy its name.",

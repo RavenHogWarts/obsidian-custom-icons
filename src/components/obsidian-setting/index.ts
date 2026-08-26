@@ -72,6 +72,8 @@ export type {
 	TextProps,
 	ToggleProps,
 } from "./Controls";
+export { RandomIconButton } from "./RandomIconButton";
+export type { RandomIconButtonProps } from "./RandomIconButton";
 export { SettingGroup } from "./SettingGroup";
 export type { SettingGroupProps } from "./SettingGroup";
 export { SettingItem } from "./SettingItem";

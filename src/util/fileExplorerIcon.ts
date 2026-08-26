@@ -63,30 +63,114 @@ export function getCompoundExtension(path: string): string {
 	return base.slice(firstDot + 1).toLowerCase();
 }
 
-/** 扩展名归一化：小写、去除前导点、trim */
+/**
+ * 扩展名归一化：小写、去除前导点、trim。
+ *
+ * 前导 `*` 一并去掉，于是 `*.png`（glob 写法，最常见的误写）归一为 `png`
+ * 而不是变成一条永不命中的死规则。**只纠正这一种形态**：其余非法字符交给
+ * `isValidExtensionKey` 判定并拒绝，在这里悄悄「修好」用户没写对的东西，
+ * 会让他以为自己的写法是被支持的。
+ */
 export function normalizeExtensionKey(ext: string): string {
-	return ext.trim().replace(/^\.+/, "").toLowerCase();
+	return ext
+		.trim()
+		.replace(/^\*+/, "")
+		.replace(/^\.+/, "")
+		.toLowerCase();
 }
 
 /**
- * 批量解析扩展名输入：按逗号 / 空白分隔，逐个归一化（去前导点、小写、trim），
+ * 扩展名键是否合法（= 有可能命中真实文件）。
+ *
+ * 允许 `a-z 0-9 - _` 与中间的 `.`（复合后缀），以及非 ASCII 字符——扩展名可以是
+ * 中文（`.笔记`），一刀切成 ASCII 会拒掉合法配置。拒绝的是**结构上不可能**是
+ * 扩展名的东西：路径分隔符、通配符、空白、以及首尾的点。
+ *
+ * 这道校验的存在理由是 `getExtension` 的返回值域：它从路径里截出的东西永远不含
+ * `/`、`\`、空白。键落在值域外就意味着**永远不会被查中**——那不是"暂时没匹配上"，
+ * 而是一条死数据，必须在入口拦掉而不是列在设置页上。
+ */
+export function isValidExtensionKey(key: string): boolean {
+	if (!key || key.startsWith(".") || key.endsWith(".")) {
+		return false;
+	}
+	// 空白 / 路径分隔符 / 通配符 / 引号等 shell 元字符
+	return !/[\s/\\*?"<>|:]/.test(key);
+}
+
+/** `parseExtensionInput` 的结果：合法键与被拒绝的原始 token 分开 */
+export interface ParsedExtensionInput {
+	/** 归一化、去重后的合法扩展名键（保持输入顺序） */
+	keys: string[];
+	/** 结构上不可能是扩展名的原始 token（原样返回，供界面回显给用户） */
+	invalid: string[];
+}
+
+/**
+ * 批量解析扩展名输入：按逗号 / 空白分隔，逐个归一化（去前导 `*` 与点、小写、trim），
  * 去空、去重。中间点保留，天然衔接复合后缀（如 "excalidraw.md"）。
  *
- * "xdb .js"        → ["xdb", "js"]
- * ".xdb,.js , md"  → ["xdb", "js", "md"]
- * ".excalidraw.md" → ["excalidraw.md"]
+ * "xdb .js"        → { keys: ["xdb", "js"] }
+ * ".xdb,.js , md"  → { keys: ["xdb", "js", "md"] }
+ * ".excalidraw.md" → { keys: ["excalidraw.md"] }
+ * "*.png"          → { keys: ["png"] }              // glob 写法自动纠正
+ * "Photos/"        → { keys: [], invalid: ["Photos/"] }
+ *
+ * 非法 token **原样**回到 `invalid`（不是归一化后的形态）：要让用户认出自己
+ * 敲的是哪一个，得把他敲的东西还给他。
  */
-export function parseExtensionInput(raw: string): string[] {
+export function parseExtensionInput(raw: string): ParsedExtensionInput {
 	const seen = new Set<string>();
-	const result: string[] = [];
+	const keys: string[] = [];
+	const invalid: string[] = [];
 	for (const token of raw.split(/[,\s]+/)) {
+		if (!token.trim()) {
+			continue;
+		}
 		const key = normalizeExtensionKey(token);
-		if (key && !seen.has(key)) {
+		if (!isValidExtensionKey(key)) {
+			invalid.push(token);
+			continue;
+		}
+		if (!seen.has(key)) {
 			seen.add(key);
-			result.push(key);
+			keys.push(key);
 		}
 	}
-	return result;
+	return { keys, invalid };
+}
+
+/**
+ * 统计 vault 里每个扩展名的文件数，用于「候选芯片」与每行的 `N 个文件`。
+ *
+ * **同一路径同时计入末段后缀与复合后缀**（`foo.excalidraw.md` 记进 `md` 也记进
+ * `excalidraw.md`），因为 `resolveFileIcon` 就是按这两个键各查一次的——只计末段
+ * 的话 `excalidraw.md` 永远不会出现在候选里，而它恰恰是最值得单独配图标的那类。
+ * 代价是各扩展名的计数之和大于文件总数，但每一项单独看都是诚实的：
+ * 「配置这个键会影响多少文件」。
+ *
+ * 计数是**近似值**，语义为「vault 中该扩展名的文件数」，不是「受此规则影响的
+ * 文件数」——后者还要扣掉被 `files[path]` 单项覆盖、被更具体的复合后缀抢走的
+ * 部分，代价远高于这个诚实的近似。
+ */
+export function tallyExtensions(
+	paths: readonly string[],
+): Map<string, number> {
+	const counts = new Map<string, number>();
+	const bump = (key: string) => {
+		if (key) {
+			counts.set(key, (counts.get(key) ?? 0) + 1);
+		}
+	};
+	for (const path of paths) {
+		const ext = getExtension(path);
+		bump(ext);
+		const compound = getCompoundExtension(path);
+		if (compound && compound !== ext) {
+			bump(compound);
+		}
+	}
+	return counts;
 }
 
 function hasIcon(

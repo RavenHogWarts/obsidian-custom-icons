@@ -1,0 +1,107 @@
+/*
+ * 文件浏览器设置页专有样式：预设勾选列表、候选扩展名芯片、分组行与组内行。
+ *
+ * 表单容器、提示 / 警告 / 错误三种文字沿用 `IconLib.css` 里的 `.ci-lib__form*`
+ * ——那几个类与图标库无关，是「弹窗里的一段表单」这个通用形状，
+ * 复制一套 `.ci-fe__form*` 只会让两处的间距慢慢长歪。
+ */
+
+/* ------------------------------ 预设勾选列表 ------------------------------ */
+
+.ci-fe__preset-list {
+	display: flex;
+	flex-direction: column;
+	gap: var(--size-4-1);
+}
+
+.ci-fe__preset {
+	display: flex;
+	align-items: center;
+	gap: var(--size-4-2);
+	padding: var(--size-4-1) var(--size-4-2);
+	border-radius: var(--radius-s);
+	cursor: pointer;
+}
+
+.ci-fe__preset:hover {
+	background-color: var(--background-modifier-hover);
+}
+
+.ci-fe__preset-name {
+	font-weight: var(--font-medium);
+}
+
+/* ------------------------------ 候选扩展名芯片 ---------------------------- */
+/*
+ * 库里扫出来、尚未配置的扩展名：点一下即添加一条规则。
+ *
+ * 平铺成芯片而不是下拉：候选的价值在于「一眼看见库里都有什么」，藏进下拉就又
+ * 回到了凭记忆默写。数量由 `CANDIDATE_LIMIT` 卡住，不会铺满一屏。
+ */
+
+.ci-fe__candidates .setting-item-control {
+	flex-wrap: wrap;
+	justify-content: flex-start;
+}
+
+.ci-fe__chips {
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--size-4-1);
+}
+
+/*
+ * 芯片本身是 `<button>`（键盘可达），所以要把 Obsidian 默认按钮的高度、
+ * 阴影、背景全压掉，否则一行芯片会被撑成两倍行高。
+ */
+.ci-fe__chip {
+	display: inline-flex;
+	align-items: center;
+	gap: var(--size-2-1);
+	height: auto;
+	padding: 0 var(--size-4-1);
+	border: 1px dashed var(--interactive-accent);
+	border-radius: var(--radius-s);
+	background-color: transparent;
+	box-shadow: none;
+	color: var(--text-muted);
+	font-size: var(--font-ui-smaller);
+	font-family: var(--font-monospace);
+	line-height: 1.8;
+	cursor: pointer;
+}
+
+.ci-fe__chip:hover {
+	background-color: var(--background-modifier-hover);
+	color: var(--text-normal);
+}
+
+.ci-fe__chip-count {
+	color: var(--text-faint);
+	font-family: var(--font-interface);
+}
+
+/* ------------------------------ 分组行与组内行 ---------------------------- */
+/*
+ * 分组行是一整组的操作入口（改整组图标 / ⋮ 菜单），组内成员紧跟在它下面缩进。
+ *
+ * 靠缩进 + 左侧竖线表达归属，而不是把成员折叠成芯片：每个扩展名都还要能单独
+ * 调图标和颜色（组图标只是扇出的起点，不是单一真相），折叠掉就没地方放控件了。
+ */
+
+.ci-fe__group-row {
+	border-top: 1px solid var(--background-modifier-border);
+}
+
+.ci-fe__group-row .setting-item-name {
+	font-weight: var(--font-semibold);
+}
+
+.ci-fe__group-menu {
+	color: var(--text-muted);
+}
+
+.ci-fe__ext-row--grouped {
+	padding-left: var(--size-4-4);
+	border-left: 2px solid var(--background-modifier-border);
+}

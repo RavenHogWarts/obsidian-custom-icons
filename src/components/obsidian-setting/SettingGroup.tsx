@@ -164,44 +164,67 @@ export const SettingGroup: FC<SettingGroupProps> = ({
 			(settingGroupEl.querySelector(".setting-items") as HTMLElement) ??
 			settingGroupEl.createDiv("setting-items");
 
-		/*
-		 * 原生筛选框与操作按钮的容器。
-		 *
-		 * `addSearch` / `addExtraButton` 自己决定往哪儿插，文档只说搜索在
-		 * 「分组开头」。所以不去猜 DOM 结构：先让它真的建一个组件，取其元素的
-		 * **父节点**当作 slot，再把这个探路用的元素删掉。这样 Obsidian 以后改
-		 * 结构也不会把这里改坏。
-		 */
-		/*
-		 * 用一个可变容器接住回调里拿到的东西，而不是两个 `let`：
-		 * 回调是同步执行的，但 TS 的控制流分析看不出来，会把 `let` 收窄成 `never`。
-		 */
-		const captured: {
-			search: SearchComponent | null;
-			actions: HTMLElement | null;
-		} = { search: null, actions: null };
+		return { group, settingGroupEl, itemsContainer };
+	}, [parentContainer, className, title, groupId]);
 
-		if (hasSearch) {
-			group.addSearch((component) => {
-				captured.search = component;
+	/*
+	 * 筛选框与操作按钮的槽位：**懒建一次，之后不再动**。
+	 *
+	 * 千万不要把「有没有 search / actions」放进上面那个 `useMemo` 的 deps。
+	 * 调用方传的是 `extCount > 0 ? {...} : undefined` 这类条件值，第一条规则加进去
+	 * 的那一刻它会 false → true；一旦它进 deps，整个 `ObsidianSettingGroup` 就会
+	 * 重建，而新建的分组是 `append` 到父容器**末尾**的——于是「按扩展名」整组会
+	 * 一下子跑到「单项覆盖」下面。（这个坑踩过一次，别再踩。）
+	 *
+	 * `addSearch` 按文档把输入框插在分组开头，所以晚一点再建位置也是对的。
+	 */
+	const slotsRef = useRef<{
+		owner: unknown;
+		search: SearchComponent | null;
+		actions: HTMLElement | null;
+	}>({ owner: null, search: null, actions: null });
+	// 分组本身若真的重建了（容器 / 标题变了），槽位跟着作废
+	if (slotsRef.current.owner !== settingGroupData) {
+		slotsRef.current = {
+			owner: settingGroupData,
+			search: null,
+			actions: null,
+		};
+	}
+	const [, bumpSlots] = useState(0);
+	useEffect(() => {
+		const slots = slotsRef.current;
+		let created = false;
+		if (hasSearch && !slots.search) {
+			settingGroupData.group.addSearch((component) => {
+				slots.search = component;
 			});
+			created = true;
 		}
-
-		if (hasActions) {
-			group.addExtraButton((component) => {
-				captured.actions = component.extraSettingsEl.parentElement;
+		if (hasActions && !slots.actions) {
+			settingGroupData.group.addExtraButton((component) => {
+				// 不猜 DOM 结构：拿探路组件的父节点当槽位，再把它自己删掉
+				slots.actions = component.extraSettingsEl.parentElement;
 				component.extraSettingsEl.remove();
 			});
+			created = true;
 		}
+		if (created) {
+			bumpSlots((n) => n + 1);
+		}
+	}, [settingGroupData, hasSearch, hasActions]);
 
-		return {
-			group,
-			settingGroupEl,
-			itemsContainer,
-			searchComponent: captured.search,
-			actionsSlot: captured.actions,
-		};
-	}, [parentContainer, className, title, groupId, hasSearch, hasActions]);
+	const searchComponent = slotsRef.current.search;
+	const actionsSlot = slotsRef.current.actions;
+
+	// 建好之后不再销毁，只按当下是否需要显示——销毁就意味着重建，重建就会跑位
+	useEffect(() => {
+		searchComponent?.containerEl.toggleClass(
+			"ci-setting-slot--hidden",
+			!hasSearch,
+		);
+		actionsSlot?.toggleClass("ci-setting-slot--hidden", !hasActions);
+	}, [searchComponent, actionsSlot, hasSearch, hasActions]);
 
 	useEffect(() => {
 		// Set the correct container for children (the .setting-items div)
@@ -224,8 +247,8 @@ export const SettingGroup: FC<SettingGroupProps> = ({
 	useEffect(() => {
 		const targets = [
 			settingGroupData.itemsContainer,
-			settingGroupData.actionsSlot,
-			settingGroupData.searchComponent?.containerEl ?? null,
+			actionsSlot,
+			searchComponent?.containerEl ?? null,
 		];
 		for (const el of targets) {
 			if (!el) {
@@ -234,12 +257,11 @@ export const SettingGroup: FC<SettingGroupProps> = ({
 			el.toggleClass("ci-setting-items--disabled", disabled);
 			el.toggleAttribute("inert", disabled);
 		}
-	}, [settingGroupData, disabled]);
+	}, [settingGroupData, actionsSlot, searchComponent, disabled]);
 
 	// 原生筛选框：回调只注册一次（与 Controls 里的做法一致，见 useStableCallback）
 	const searchRef = useRef(search);
 	searchRef.current = search;
-	const { searchComponent } = settingGroupData;
 	useEffect(() => {
 		if (!searchComponent) {
 			return;
@@ -264,11 +286,9 @@ export const SettingGroup: FC<SettingGroupProps> = ({
 	return (
 		<SettingContainerContext.Provider value={settingItemsContainer}>
 			{/* 标题区的操作按钮：与 SettingItem 的 control 槽同一套 slot 机制 */}
-			{actions && settingGroupData.actionsSlot && (
-				<SettingSlotContext.Provider
-					value={{ slotEl: settingGroupData.actionsSlot }}
-				>
-					{createPortal(actions, settingGroupData.actionsSlot)}
+			{actions && actionsSlot && (
+				<SettingSlotContext.Provider value={{ slotEl: actionsSlot }}>
+					{createPortal(actions, actionsSlot)}
 				</SettingSlotContext.Provider>
 			)}
 			{children}

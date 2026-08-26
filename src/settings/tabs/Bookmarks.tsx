@@ -110,6 +110,17 @@ export const Bookmarks: FC = () => {
 		 * 逐行挂同一句话是 6 行重复的噪音，反而盖住了各行真正的信息（类型名）。
 		 */
 		const configured = Boolean(override.icon);
+		/*
+		 * 第二格是「重置」还是「删除」，按**这一行会不会消失**决定：
+		 *
+		 * - 类型层是 6 行固定常量，清掉配置后这一行还在、只是回落原生图标
+		 *   → `reset` + 「重置」；
+		 * - 单项覆盖是从表里来的，清掉就整行消失 → `trash-2` + 「删除」。
+		 *
+		 * 全插件按同一条规则对齐：行还在叫重置，行没了叫删除。之前这两层共用
+		 * 同一个渲染函数，于是类型层也顶着一个 trash 图标说「删除」，而它删不掉任何行。
+		 */
+		const removes = mapKey === "items";
 		return (
 			<SettingItem
 				key={`${mapKey}-${key}`}
@@ -130,12 +141,14 @@ export const Bookmarks: FC = () => {
 							}}
 						/>
 						<ExtraButton
-							icon="trash-2"
+							icon={removes ? "trash-2" : "reset"}
 							disabled={!configured}
 							tooltip={
-								configured
-									? LL.common.delete()
-									: LL.common.nothingToReset()
+								!configured
+									? LL.common.nothingToReset()
+									: removes
+										? LL.common.delete()
+										: LL.settings.bookmarks.types.resetTooltip()
 							}
 							onClick={async () => {
 								await writeMap(mapKey, key, undefined);

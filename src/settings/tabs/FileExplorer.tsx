@@ -193,10 +193,27 @@ export const FileExplorer: FC = () => {
 						),
 						// 未配图标的成员数：决定这一组默认是否展开（有活要干就摊开）
 						iconless: all.filter((ext) => !extMap[ext]?.icon).length,
+						// 是**组名**命中了筛选（而非某个成员名）：组行上要说一句，
+						// 否则「我搜 png 怎么冒出来一堆 mp4」无从理解
+						nameMatched: Boolean(
+							filterQuery &&
+								group.name.toLowerCase().includes(filterQuery),
+						),
 					};
 				})
-				.filter((group) => group.members.length > 0),
-		[groups, extMap, matches, compareExt, tally],
+				.filter((group) => group.members.length > 0)
+				// 组的顺序跟随同一个排序开关：按文件数时组也按组内文件总数降序。
+				// 不为它单开一个控件——收起之后每组只占一行，再多一枚按钮不值得
+				.sort((a, b) => {
+					if (extSort === "count") {
+						const diff = b.files - a.files;
+						if (diff !== 0) {
+							return diff;
+						}
+					}
+					return a.name.localeCompare(b.name);
+				}),
+		[groups, extMap, matches, compareExt, tally, filterQuery, extSort],
 	);
 
 	const visibleUngrouped = useMemo(
@@ -922,6 +939,7 @@ export const FileExplorer: FC = () => {
 		iconless: number,
 		expanded: boolean,
 		previewMembers: string[],
+		nameMatched: boolean,
 	) => {
 		const uniform = uniformIcon(extMap, group);
 		if (!uniform) {
@@ -931,6 +949,7 @@ export const FileExplorer: FC = () => {
 			groupLL.summary({ exts: memberCount, files: fileCount }),
 			iconless > 0 ? groupLL.needIconCount({ count: iconless }) : "",
 			uniform.mixed ? groupLL.mixed() : "",
+			nameMatched ? groupLL.matchedByName({ query: extFilter.trim() }) : "",
 		].filter(Boolean);
 		const shown = previewMembers.slice(0, MEMBER_PREVIEW_LIMIT);
 		const rest = previewMembers.slice(MEMBER_PREVIEW_LIMIT);
@@ -1006,6 +1025,7 @@ export const FileExplorer: FC = () => {
 						<RandomIconButton
 							value={uniform.icon}
 							type={uniform.type}
+							note={groupLL.diceGroupNote({ count: memberCount })}
 							onPick={async (value, type) => {
 								await writeExtensions(
 									setGroupIcon(extMap, group, value, type),
@@ -1261,6 +1281,7 @@ export const FileExplorer: FC = () => {
 
 				{/* 添加行：扩展名 + 图标 + 可选分组 */}
 				<SettingItem
+					className="ci-fe__add-row"
 					control={
 						<>
 							<Text
@@ -1343,6 +1364,7 @@ export const FileExplorer: FC = () => {
 								group.iconless,
 								expanded,
 								group.members,
+								group.nameMatched,
 							)}
 							{expanded &&
 								group.members.map((ext) =>

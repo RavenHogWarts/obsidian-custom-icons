@@ -558,6 +558,16 @@ type RootTranslation = {
 				 * 筛​选​时​一​律​展​开​，​清​空​筛​选​词​后​可​收​起
 				 */
 				expandLockedTooltip: string
+				/**
+				 * 组​名​匹​配​「​{​q​u​e​r​y​}​」​，​已​列​出​全​组
+				 * @param {string} query
+				 */
+				matchedByName: RequiredParams<'query'>
+				/**
+				 * 为​整​组​ ​{​c​o​u​n​t​}​ ​个​扩​展​名​掷​同​一​个​图​标
+				 * @param {number} count
+				 */
+				diceGroupNote: RequiredParams<'count'>
 			}
 			presets: {
 				/**
@@ -681,7 +691,7 @@ type RootTranslation = {
 				/**
 				 * 删​除
 				 */
-				resetTooltip: string
+				deleteTooltip: string
 			}
 			tabs: {
 				/**
@@ -723,7 +733,7 @@ type RootTranslation = {
 				/**
 				 * 删​除
 				 */
-				resetTooltip: string
+				deleteTooltip: string
 			}
 			menu: {
 				/**
@@ -756,6 +766,10 @@ type RootTranslation = {
 				 * 按​类​型
 				 */
 				name: string
+				/**
+				 * 重​置​为​原​生​图​标
+				 */
+				resetTooltip: string
 				/**
 				 * 为​每​种​书​签​类​型​设​置​默​认​图​标​，​作​用​于​该​类​型​的​全​部​书​签​；​任​意​书​签​还​可​右​键​单​独​覆​盖​。
 				 */
@@ -2343,6 +2357,14 @@ export type TranslationFunctions = {
 				 * 筛选时一律展开，清空筛选词后可收起
 				 */
 				expandLockedTooltip: () => LocalizedString
+				/**
+				 * 组名匹配「{query}」，已列出全组
+				 */
+				matchedByName: (arg: { query: string }) => LocalizedString
+				/**
+				 * 为整组 {count} 个扩展名掷同一个图标
+				 */
+				diceGroupNote: (arg: { count: number }) => LocalizedString
 			}
 			presets: {
 				/**
@@ -2466,7 +2488,7 @@ export type TranslationFunctions = {
 				/**
 				 * 删除
 				 */
-				resetTooltip: () => LocalizedString
+				deleteTooltip: () => LocalizedString
 			}
 			tabs: {
 				/**
@@ -2508,7 +2530,7 @@ export type TranslationFunctions = {
 				/**
 				 * 删除
 				 */
-				resetTooltip: () => LocalizedString
+				deleteTooltip: () => LocalizedString
 			}
 			menu: {
 				/**
@@ -2541,6 +2563,10 @@ export type TranslationFunctions = {
 				 * 按类型
 				 */
 				name: () => LocalizedString
+				/**
+				 * 重置为原生图标
+				 */
+				resetTooltip: () => LocalizedString
 				/**
 				 * 为每种书签类型设置默认图标，作用于该类型的全部书签；任意书签还可右键单独覆盖。
 				 */

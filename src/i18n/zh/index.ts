@@ -163,6 +163,8 @@ const zh = {
 				expandAllTooltip: "展开全部分组",
 				collapseAllTooltip: "收起全部分组",
 				expandLockedTooltip: "筛选时一律展开，清空筛选词后可收起",
+				matchedByName: "组名匹配「{query:string}」，已列出全组",
+				diceGroupNote: "为整组 {count:number} 个扩展名掷同一个图标",
 			},
 			presets: {
 				image: "图片",
@@ -202,7 +204,7 @@ const zh = {
 				addTooltip: "添加映射",
 				fetchTooltip: "从当前打开的侧栏工具标签页抓取类型",
 				noneFound: "尚未配置类型映射",
-				resetTooltip: "删除",
+				deleteTooltip: "删除",
 			},
 			tabs: {
 				name: "单标签覆盖",
@@ -214,7 +216,7 @@ const zh = {
 				filterPlaceholder: "筛选标签...",
 				noneMatched: "没有匹配的标签",
 				invalidKey: "键格式无法识别，此项不生效（建议删除后重新添加）",
-				resetTooltip: "删除",
+				deleteTooltip: "删除",
 			},
 			menu: {
 				setIcon: "设置图标",
@@ -229,6 +231,7 @@ const zh = {
 			},
 			types: {
 				name: "按类型",
+				resetTooltip: "重置为原生图标",
 				desc: "为每种书签类型设置默认图标，作用于该类型的全部书签；任意书签还可右键单独覆盖。",
 				file: "文件",
 				folder: "文件夹",

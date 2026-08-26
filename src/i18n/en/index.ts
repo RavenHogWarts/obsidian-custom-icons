@@ -171,6 +171,10 @@ const en = {
 				collapseAllTooltip: "Collapse all groups",
 				expandLockedTooltip:
 					"Groups stay expanded while filtering — clear the filter to collapse",
+				matchedByName:
+					"the group name matches \"{query:string}\", so all members are listed",
+				diceGroupNote:
+					"rolls one icon for all {count:number} extensions in this group",
 			},
 			presets: {
 				image: "Images",
@@ -210,7 +214,7 @@ const en = {
 				addTooltip: "Add mapping",
 				fetchTooltip: "Fetch types from currently open sidebar tool tabs",
 				noneFound: "No type mappings configured yet",
-				resetTooltip: "Delete",
+				deleteTooltip: "Delete",
 			},
 			tabs: {
 				name: "Per-tab overrides",
@@ -222,7 +226,7 @@ const en = {
 				filterPlaceholder: "Filter tabs...",
 				noneMatched: "No matching tabs",
 				invalidKey: "Unrecognised key format — this entry has no effect (delete it and add it again)",
-				resetTooltip: "Delete",
+				deleteTooltip: "Delete",
 			},
 			menu: {
 				setIcon: "Set icon",
@@ -237,6 +241,7 @@ const en = {
 			},
 			types: {
 				name: "By type",
+				resetTooltip: "Reset to the native icon",
 				desc: "Assign a default icon to each bookmark type, applied to all bookmarks of that type. Any bookmark can also be overridden individually by right-clicking it.",
 				file: "File",
 				folder: "Folder",

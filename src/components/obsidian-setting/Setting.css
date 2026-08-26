@@ -1,0 +1,26 @@
+/*
+ * 设置页共用样式。
+ *
+ * 在此之前 `src/` 下七个 CSS 全部服务于图标库 / 选择器 / 卡片 / 弹窗，设置页一份没有
+ * ——六个 tab 完全依赖 Obsidian 原生的 `.setting-item` 布局。这里只加确实需要
+ * 自己表达的东西，不重写原生外观。
+ */
+
+/*
+ * 功能总开关关闭时，下面整组配置置灰。
+ *
+ * 真正的「不可交互」由 `SettingGroup` 打在同一元素上的 `inert` 负责（它连 Tab 键
+ * 聚焦一起挡掉）；这里只管「看起来就不生效」。不用 `pointer-events: none`：
+ * 与 inert 重复，而且会顺手把 tooltip 也挡掉——灰着的时候 tooltip 仍然有用。
+ */
+.ci-setting-items--disabled {
+	opacity: 0.5;
+}
+
+/*
+ * 「功能已关闭」提示行：它是唯一**不**跟着灰掉的一行，必须在一片灰里显眼，
+ * 否则用户只会看到「全灰了」而不知道原因。
+ */
+.ci-setting-notice .setting-item-name {
+	color: var(--text-warning);
+}

@@ -74,6 +74,8 @@ export type {
 } from "./Controls";
 export { RandomIconButton } from "./RandomIconButton";
 export type { RandomIconButtonProps } from "./RandomIconButton";
+export { FeatureOffNotice } from "./FeatureOffNotice";
+export type { FeatureOffNoticeProps } from "./FeatureOffNotice";
 export { SettingGroup } from "./SettingGroup";
 export type { SettingGroupProps } from "./SettingGroup";
 export { SettingItem } from "./SettingItem";

@@ -580,6 +580,18 @@ type RootTranslation = {
 			 * 标​签​页
 			 */
 			name: string
+			/**
+			 * 先​选​一​个​目​标​并​挑​好​图​标
+			 */
+			addNeedsBoth: string
+			/**
+			 * 还​没​选​目​标​（​可​先​用​「​抓​取​」​把​打​开​的​标​签​列​出​来​）
+			 */
+			addNeedsTarget: string
+			/**
+			 * 还​没​挑​图​标
+			 */
+			addNeedsIcon: string
 			enable: {
 				/**
 				 * 启​用​功​能
@@ -645,6 +657,10 @@ type RootTranslation = {
 				 * 尚​未​配​置​单​标​签​覆​盖
 				 */
 				noneFound: string
+				/**
+				 * 键​格​式​无​法​识​别​，​此​项​不​生​效​（​建​议​删​除​后​重​新​添​加​）
+				 */
+				invalidKey: string
 				/**
 				 * 删​除
 				 */
@@ -727,6 +743,14 @@ type RootTranslation = {
 				 * 已​失​效​（​书​签​不​存​在​）
 				 */
 				invalid: string
+				/**
+				 * 书​签​核​心​插​件​未​启​用​，​暂​时​无​法​显​示​书​签​名​称
+				 */
+				coreDisabled: string
+				/**
+				 * 下​面​按​内​部​键​列​出​已​配​置​项​。​这​些​配​置​都​还​在​，​启​用​ ​O​b​s​i​d​i​a​n​ ​的​「​书​签​」​核​心​插​件​后​即​恢​复​显​示​名​称​并​生​效​。
+				 */
+				coreDisabledDesc: string
 			}
 			menu: {
 				/**
@@ -782,6 +806,24 @@ type RootTranslation = {
 		 * @param {string} source
 		 */
 		randomInSource: RequiredParams<'source'>
+		featureOff: {
+			/**
+			 * 此​功​能​已​关​闭​，​下​面​的​配​置​不​生​效
+			 */
+			name: string
+			/**
+			 * 打​开​上​方​的​「​启​用​功​能​」​后​，​这​些​配​置​会​立​即​应​用​；​关​闭​期​间​它​们​会​原​样​保​留​，​不​会​丢​失​。
+			 */
+			desc: string
+		}
+		/**
+		 * 先​选​图​标​，​颜​色​才​有​作​用
+		 */
+		pickIconFirst: string
+		/**
+		 * 这​一​项​还​没​配​置​过​，​无​需​重​置
+		 */
+		nothingToReset: string
 	}
 	view: {
 		CustomIconLib: {
@@ -2259,6 +2301,18 @@ export type TranslationFunctions = {
 			 * 标签页
 			 */
 			name: () => LocalizedString
+			/**
+			 * 先选一个目标并挑好图标
+			 */
+			addNeedsBoth: () => LocalizedString
+			/**
+			 * 还没选目标（可先用「抓取」把打开的标签列出来）
+			 */
+			addNeedsTarget: () => LocalizedString
+			/**
+			 * 还没挑图标
+			 */
+			addNeedsIcon: () => LocalizedString
 			enable: {
 				/**
 				 * 启用功能
@@ -2324,6 +2378,10 @@ export type TranslationFunctions = {
 				 * 尚未配置单标签覆盖
 				 */
 				noneFound: () => LocalizedString
+				/**
+				 * 键格式无法识别，此项不生效（建议删除后重新添加）
+				 */
+				invalidKey: () => LocalizedString
 				/**
 				 * 删除
 				 */
@@ -2406,6 +2464,14 @@ export type TranslationFunctions = {
 				 * 已失效（书签不存在）
 				 */
 				invalid: () => LocalizedString
+				/**
+				 * 书签核心插件未启用，暂时无法显示书签名称
+				 */
+				coreDisabled: () => LocalizedString
+				/**
+				 * 下面按内部键列出已配置项。这些配置都还在，启用 Obsidian 的「书签」核心插件后即恢复显示名称并生效。
+				 */
+				coreDisabledDesc: () => LocalizedString
 			}
 			menu: {
 				/**
@@ -2460,6 +2526,24 @@ export type TranslationFunctions = {
 		 * 在「{source}」中随机
 		 */
 		randomInSource: (arg: { source: string }) => LocalizedString
+		featureOff: {
+			/**
+			 * 此功能已关闭，下面的配置不生效
+			 */
+			name: () => LocalizedString
+			/**
+			 * 打开上方的「启用功能」后，这些配置会立即应用；关闭期间它们会原样保留，不会丢失。
+			 */
+			desc: () => LocalizedString
+		}
+		/**
+		 * 先选图标，颜色才有作用
+		 */
+		pickIconFirst: () => LocalizedString
+		/**
+		 * 这一项还没配置过，无需重置
+		 */
+		nothingToReset: () => LocalizedString
 	}
 	view: {
 		CustomIconLib: {

@@ -7,6 +7,7 @@ import { ConfirmDialog } from "@src/components/modal/ConfirmDialog";
 import {
 	Color,
 	ExtraButton,
+	FeatureOffNotice,
 	RandomIconButton,
 	Search,
 	SettingGroup,
@@ -47,7 +48,7 @@ import { encodeIconRef, iconRefOf } from "@src/util/iconRef";
 import { randomIconsFor } from "@src/util/randomIcon";
 import { MoreVertical } from "lucide-react";
 import { Menu, Notice } from "obsidian";
-import { FC, Fragment, useCallback, useMemo, useRef, useState } from "react";
+import { FC, Fragment, useCallback, useMemo, useState } from "react";
 
 /** 候选芯片最多显示几个：够用来一键补齐常见类型，又不至于铺满一屏 */
 const CANDIDATE_LIMIT = 12;
@@ -284,32 +285,22 @@ export const FileExplorer: FC = () => {
 
 	// ---------------------------------------------------------------- 批量动作
 
-	/*
-	 * 批量骰子与批量清空：稳定回调 + 最新闭包（与 RandomIconButton 同一手法）。
-	 *
-	 * 必须这么写：`ExtraButton` 在 `onClick` 变化时重新调 `button.onClick(handler)`
-	 * 而**不清理上一个**，内联箭头每次渲染都是新引用，处理器会随渲染次数累积。
-	 * 这两个动作都不幂等——叠 N 层就是一次点击写 N 次盘、触发 N 次 applyAll，
-	 * 而每次写入又让设置页重渲、再叠一层。
-	 */
-	const batchRef = useRef({ filteredExts, extMap, plugin: settingsStore.plugin });
-	batchRef.current = { filteredExts, extMap, plugin: settingsStore.plugin };
-
 	/**
 	 * 给筛选出的每一行掷一个图标，**一次落盘**。
 	 *
 	 * 随机域取自**文件默认图标**（一批同来源）：不按各行自己的来源，否则「尽量互不
 	 * 相同」跨池子无意义，各池大小不同、重复策略也难向用户解释。
 	 */
-	const randomizeFiltered = useCallback(async () => {
-		const { filteredExts: exts, extMap: map, plugin } = batchRef.current;
-		if (exts.length === 0) {
+	const randomizeFiltered = async () => {
+		if (filteredExts.length === 0) {
 			return;
 		}
+		const plugin = settingsStore.plugin;
+		const map = extMap;
 		// 排除各行当前的图标：尽量不把某行掷回原样（排除后无人可选时 sampleMany
 		// 自会退回整池，是尽力而为不是硬约束）
 		const exclude = new Set<string>();
-		for (const ext of exts) {
+		for (const ext of filteredExts) {
 			const ref = iconRefOf(map[ext]?.icon ?? "", map[ext]?.type ?? "lucide");
 			if (ref) {
 				exclude.add(encodeIconRef(ref));
@@ -319,13 +310,18 @@ export const FileExplorer: FC = () => {
 			plugin.settings.fileExplorer.fileDefault.icon,
 			plugin.settings.fileExplorer.fileDefault.type,
 		);
-		const picked = randomIconsFor(plugin, anchor, exts.length, exclude);
+		const picked = randomIconsFor(
+			plugin,
+			anchor,
+			filteredExts.length,
+			exclude,
+		);
 		// 池子空（理论上碰不到，Lucide 恒在）：什么都不写，而不是清空一片图标
 		if (picked.length === 0) {
 			return;
 		}
 		const next: ExtensionMap = { ...map };
-		exts.forEach((ext, index) => {
+		filteredExts.forEach((ext, index) => {
 			const ref = picked[index];
 			// sampleMany 在池子非空时恒返回 count 项，这个兜底只为不依赖那个不变式
 			if (!ref || !next[ext]) {
@@ -333,8 +329,8 @@ export const FileExplorer: FC = () => {
 			}
 			next[ext] = { ...next[ext], icon: ref.id, type: ref.type };
 		});
-		await settingsStore.updateSettingByPath("fileExplorer.extensions", next);
-	}, [settingsStore]);
+		await writeExtensions(next);
+	};
 
 	/**
 	 * 清空筛选出的这些规则的图标（**保留规则本身**）。
@@ -342,13 +338,13 @@ export const FileExplorer: FC = () => {
 	 * 要确认：一次动 N 行、没有撤销。与「删除规则」是两件不同的事——清空后这些
 	 * 扩展名回落到「文件默认图标」，规则还在，用户随后重配不必重新输入扩展名。
 	 */
-	const clearFiltered = useCallback(() => {
-		const { filteredExts: exts, plugin } = batchRef.current;
-		if (exts.length === 0) {
+	const clearFiltered = () => {
+		if (filteredExts.length === 0) {
 			return;
 		}
+		const exts = filteredExts;
 		const count = exts.length;
-		new ConfirmDialog(plugin, {
+		new ConfirmDialog(settingsStore.plugin, {
 			title: extLL.clearTitle({ count }),
 			confirmLL: extLL.clearConfirm(),
 			children: (
@@ -359,9 +355,8 @@ export const FileExplorer: FC = () => {
 				</div>
 			),
 			onConfirm: async () => {
-				// 重新从 settings 取当前表：弹窗开着的这段时间里可能已经变了
-				const map = plugin.settings.fileExplorer.extensions;
-				const next: ExtensionMap = { ...map };
+				// 重新取当前表：弹窗开着的这段时间里可能已经变了
+				const next: ExtensionMap = { ...liveExtMap() };
 				for (const ext of exts) {
 					if (next[ext]) {
 						next[ext] = { ...next[ext], icon: "", color: "" };
@@ -374,7 +369,7 @@ export const FileExplorer: FC = () => {
 				new Notice(extLL.cleared({ count }));
 			},
 		}).open();
-	}, [settingsStore, extLL]);
+	};
 
 	// ---------------------------------------------------------------- 分组动作
 
@@ -1036,6 +1031,11 @@ export const FileExplorer: FC = () => {
 						/>
 					}
 				/>
+				<FeatureOffNotice enabled={fe.enable} />
+			</SettingGroup>
+
+			{/* 总开关以下全部随它禁用：关着的时候这些配置一条都不生效 */}
+			<SettingGroup disabled={!fe.enable}>
 				{renderDefault(
 					"folderDefault",
 					LL.settings.fileExplorer.folderDefault.name(),
@@ -1078,7 +1078,7 @@ export const FileExplorer: FC = () => {
 				/>
 			</SettingGroup>
 
-			<SettingGroup title={extLL.name()}>
+			<SettingGroup title={extLL.name()} disabled={!fe.enable}>
 				<SettingItem desc={extLL.desc()} />
 
 				{/* 添加行：扩展名 + 图标 + 可选分组 */}
@@ -1215,7 +1215,10 @@ export const FileExplorer: FC = () => {
 				{visibleUngrouped.map((ext) => renderExtRow(ext, ""))}
 			</SettingGroup>
 
-			<SettingGroup title={LL.settings.fileExplorer.overrides.name()}>
+			<SettingGroup
+				title={LL.settings.fileExplorer.overrides.name()}
+				disabled={!fe.enable}
+			>
 				<SettingItem desc={LL.settings.fileExplorer.overrides.desc()} />
 				{!hasAnyOverride && (
 					<SettingItem

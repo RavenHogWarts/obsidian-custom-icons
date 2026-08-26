@@ -125,14 +125,22 @@ export const SettingItem: FC<SettingItemProps> = ({
 
 	// Apply basic settings (合并多个相关的设置以减少 DOM 操作)
 	useEffect(() => {
-		// Set name if provided
-		if (name && typeof name === "string") {
-			setting.setName(name);
+		/*
+		 * 字符串的 name / desc 必须**也能被清空**。
+		 *
+		 * 过去这里写的是 `if (name && typeof name === "string")`，于是值从
+		 * 「某段文字」变成 `undefined` / `""` 时根本不调 `setName`，旧文字留在
+		 * DOM 里。行状态会变的地方就会踩到：例如书签的行在配好图标之后
+		 * 「先选图标，颜色才有作用」本该消失，却会永远挂着。
+		 *
+		 * ReactNode 形式的 name / desc 走 portal（见下方），不归这里管，
+		 * 所以只在「不是 ReactNode」时接管文本。
+		 */
+		if (typeof name === "string" || name === undefined || name === null) {
+			setting.setName(name ?? "");
 		}
-
-		// Set desc if provided
-		if (desc && typeof desc === "string") {
-			setting.setDesc(desc);
+		if (typeof desc === "string" || desc === undefined || desc === null) {
+			setting.setDesc(desc ?? "");
 		}
 
 		// Apply disabled state

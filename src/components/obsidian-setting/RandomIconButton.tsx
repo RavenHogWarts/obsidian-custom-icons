@@ -6,7 +6,7 @@ import {
 	randomIconFor,
 	resolveRandomScope,
 } from "@src/util/randomIcon";
-import { FC, useCallback, useRef } from "react";
+import { FC } from "react";
 import { ExtraButton } from "./Controls";
 
 export interface RandomIconButtonProps {
@@ -46,35 +46,18 @@ export const RandomIconButton: FC<RandomIconButtonProps> = ({
 	// 只查一次数组 + 已启用包的前缀，不枚举任何包的图标内容，渲染期调用是安全的
 	const scope = resolveRandomScope(plugin, current);
 
-	/*
-	 * 稳定回调 + 最新闭包（与 IconPickerModal 里 IconTile 的处理同一手法）。
-	 *
-	 * 必须这么写，不能图省事传内联箭头：`ExtraButton` 在 `[button, onClick]` 变化时
-	 * 重新调 `button.onClick(handler)`，而**没有清理上一个**（见 Controls.tsx）。
-	 * 内联箭头每次渲染都是新引用，于是处理器会随渲染次数累积。
-	 *
-	 * 别的按钮（重置 / 删除）幂等，叠几次看不出来；**骰子不幂等**——叠 N 个监听
-	 * 就是一次点击掷 N 次、写 N 次盘、触发 N 次 applyAll，而每次写入又会让设置页
-	 * 重渲、再叠一层，越点越糟。这里 deps 为空，因此只注册一次。
-	 */
-	const latest = useRef({ current, onPick, plugin });
-	latest.current = { current, onPick, plugin };
-
-	const handleClick = useCallback(async () => {
-		const { current: ref, onPick: pick, plugin: p } = latest.current;
-		const picked = randomIconFor(p, ref);
-		// 无可掷（池子空，或池子里只剩当前图标）：什么都不写
-		if (!picked) {
-			return;
-		}
-		await pick(picked.id, picked.type);
-	}, []);
-
 	return (
 		<ExtraButton
 			icon="dices"
 			tooltip={describeRandomScope(plugin, scope)}
-			onClick={handleClick}
+			onClick={async () => {
+				const picked = randomIconFor(plugin, current);
+				// 无可掷（池子空，或池子里只剩当前图标）：什么都不写
+				if (!picked) {
+					return;
+				}
+				await onPick(picked.id, picked.type);
+			}}
 		/>
 	);
 };

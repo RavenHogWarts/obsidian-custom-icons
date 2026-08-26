@@ -175,6 +175,9 @@ const zh = {
 		},
 		tabHeader: {
 			name: "标签页",
+			addNeedsBoth: "先选一个目标并挑好图标",
+			addNeedsTarget: "还没选目标（可先用「抓取」把打开的标签列出来）",
+			addNeedsIcon: "还没挑图标",
 			enable: {
 				name: "启用功能",
 				desc: "为工作区标签页头（侧栏工具页与编辑器标签）自定义图标，两级解析：单标签优先（同名标签各配各的）、类型兜底（未单配的标签沿用该类型统一图标）、未配置则保留原生。原生图标不会被删除，仅被隐藏，禁用后自动恢复。",
@@ -195,6 +198,7 @@ const zh = {
 				addTooltip: "添加覆盖",
 				fetchTooltip: "从当前打开的标签页抓取",
 				noneFound: "尚未配置单标签覆盖",
+				invalidKey: "键格式无法识别，此项不生效（建议删除后重新添加）",
 				resetTooltip: "删除",
 			},
 			menu: {
@@ -223,6 +227,9 @@ const zh = {
 				desc: "在书签面板中右键任意书签「设置图标」可单独指定（六种类型均支持）；此处列出已配置项。",
 				noneFound: "暂无单项覆盖",
 				invalid: "已失效（书签不存在）",
+				coreDisabled: "书签核心插件未启用，暂时无法显示书签名称",
+				coreDisabledDesc:
+					"下面按内部键列出已配置项。这些配置都还在，启用 Obsidian 的「书签」核心插件后即恢复显示名称并生效。",
 			},
 			menu: {
 				setIcon: "设置图标",
@@ -244,6 +251,12 @@ const zh = {
 		delete: "删除",
 		cancel: "取消",
 		randomInSource: "在「{source:string}」中随机",
+		featureOff: {
+			name: "此功能已关闭，下面的配置不生效",
+			desc: "打开上方的「启用功能」后，这些配置会立即应用；关闭期间它们会原样保留，不会丢失。",
+		},
+		pickIconFirst: "先选图标，颜色才有作用",
+		nothingToReset: "这一项还没配置过，无需重置",
 	},
 	view: {
 		CustomIconLib: {

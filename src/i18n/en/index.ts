@@ -180,6 +180,9 @@ const en = {
 		},
 		tabHeader: {
 			name: "Tab headers",
+			addNeedsBoth: "Pick a target and choose an icon first",
+			addNeedsTarget: "No target selected yet (use \"Fetch\" to list the open tabs)",
+			addNeedsIcon: "No icon chosen yet",
 			enable: {
 				name: "Enable feature",
 				desc: "Customize icons for workspace tab headers (sidebar tool tabs and editor tabs) with two-level resolution: per-tab overrides take priority, the type mapping acts as fallback for tabs without one, and native icons are kept otherwise. Native icons are hidden, not removed, and are restored automatically when disabled.",
@@ -200,6 +203,7 @@ const en = {
 				addTooltip: "Add override",
 				fetchTooltip: "Fetch from currently open tabs",
 				noneFound: "No per-tab overrides configured yet",
+				invalidKey: "Unrecognised key format — this entry has no effect (delete it and add it again)",
 				resetTooltip: "Delete",
 			},
 			menu: {
@@ -228,6 +232,9 @@ const en = {
 				desc: "Right-click any bookmark in the bookmarks pane and choose 'Set icon' to assign one individually (all six types are supported). Configured items are listed here.",
 				noneFound: "No per-item overrides configured yet",
 				invalid: "No longer valid (bookmark does not exist)",
+				coreDisabled: "The Bookmarks core plugin is off — names cannot be shown",
+				coreDisabledDesc:
+					"The entries below are listed by their internal keys. Nothing is lost: enable Obsidian's \"Bookmarks\" core plugin and the names come back and the icons apply again.",
 			},
 			menu: {
 				setIcon: "Set icon",
@@ -249,6 +256,12 @@ const en = {
 		delete: "Delete",
 		cancel: "Cancel",
 		randomInSource: "Random within \"{source:string}\"",
+		featureOff: {
+			name: "This feature is off — the settings below have no effect",
+			desc: "Turn on \"Enable\" above and they apply immediately. While it is off they are kept as-is, nothing is lost.",
+		},
+		pickIconFirst: "Pick an icon first — colour has nothing to apply to yet",
+		nothingToReset: "Nothing configured here yet, nothing to reset",
 	},
 	view: {
 		CustomIconLib: {

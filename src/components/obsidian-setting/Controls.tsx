@@ -12,9 +12,34 @@ import {
 	TextComponent,
 	ToggleComponent,
 	TooltipOptions,
+	setTooltip,
 } from "obsidian";
-import { FC, ReactNode, useEffect, useMemo, useRef } from "react";
+import { FC, ReactNode, useCallback, useEffect, useMemo, useRef } from "react";
 import { createPortal } from "react-dom";
+
+/**
+ * 把随渲染变化的回调包成一个**恒定引用**的回调。
+ *
+ * 为什么必须有这个：Obsidian 的按钮组件（`ButtonComponent` /
+ * `ExtraButtonComponent`）的 `onClick` 是 `addEventListener`，**注册新的不会清理
+ * 旧的**。而调用方几乎都传内联箭头，每次渲染都是新引用，于是
+ * `useEffect(..., [component, onClick])` 每渲染一次就多挂一个监听器。
+ *
+ * 设置页用的是全量快照的 `useSyncExternalStore`（见 `usePluginSettings`），
+ * **在筛选框里打一个字就重渲整页**——屏幕上每一枚按钮都随击键增长。幂等按钮
+ * （删除、重置）看不出来；不幂等的（骰子、批量清空）会成倍执行，而每次写入又
+ * 触发重渲、再叠一层，越点越糟。
+ *
+ * 包一层之后 deps 恒定，只注册一次；值组件（`onChange` 是赋值而非 addEventListener）
+ * 一并用它，省掉每渲染一次的重复注册。
+ */
+function useStableCallback<A extends unknown[], R>(
+	fn: ((...args: A) => R) | undefined,
+): (...args: A) => R | undefined {
+	const latest = useRef(fn);
+	latest.current = fn;
+	return useCallback((...args: A) => latest.current?.(...args), []);
+}
 
 // ============================================================================
 // Button Component
@@ -49,12 +74,11 @@ export const Button: FC<ButtonProps> = ({
 		return () => button.buttonEl.remove();
 	}, [button]);
 
-	// 分离 onClick 事件处理（事件处理器需要独立更新）
+	// 只注册一次：`onClick` 是 addEventListener，重复注册会累积（见 useStableCallback）
+	const handleClick = useStableCallback(onClick);
 	useEffect(() => {
-		if (onClick) {
-			button.onClick(onClick);
-		}
-	}, [button, onClick]);
+		button.onClick(handleClick);
+	}, [button, handleClick]);
 
 	// 合并其他属性设置（这些属性变化时一起更新）
 	useEffect(() => {
@@ -62,8 +86,9 @@ export const Button: FC<ButtonProps> = ({
 		if (typeof children === "string") button.setButtonText(children);
 		if (className) button.setClass(className);
 		if (disabled !== undefined) button.setDisabled(disabled);
-		if (cta) button.setCta();
-		if (warning) button.setWarning();
+		// cta / warning 是加类，从真变假时必须自己摘掉——组件本身只提供加法
+		button.buttonEl.toggleClass("mod-cta", Boolean(cta));
+		button.buttonEl.toggleClass("mod-warning", Boolean(warning));
 		if (tooltip) {
 			if (typeof tooltip === "string") {
 				button.setTooltip(tooltip);
@@ -103,12 +128,11 @@ export const ExtraButton: FC<ExtraButtonProps> = ({
 		return () => button.extraSettingsEl.remove();
 	}, [button]);
 
-	// 分离 onClick 事件处理
+	// 只注册一次：同 Button，`onClick` 会累积
+	const handleClick = useStableCallback(onClick);
 	useEffect(() => {
-		if (onClick) {
-			button.onClick(onClick);
-		}
-	}, [button, onClick]);
+		button.onClick(handleClick);
+	}, [button, handleClick]);
 
 	// 合并其他属性设置
 	useEffect(() => {
@@ -152,11 +176,10 @@ export const Toggle: FC<ToggleProps> = ({
 	}, [toggle]);
 
 	// 分离 onChange 事件处理
+	const handleChange = useStableCallback(onChange);
 	useEffect(() => {
-		if (onChange) {
-			toggle.onChange(onChange);
-		}
-	}, [toggle, onChange]);
+		toggle.onChange(handleChange);
+	}, [toggle, handleChange]);
 
 	// 合并其他属性设置
 	useEffect(() => {
@@ -200,11 +223,10 @@ export const Text: FC<TextProps> = ({
 	}, [text]);
 
 	// 分离 onChange 事件处理
+	const handleChange = useStableCallback(onChange);
 	useEffect(() => {
-		if (onChange) {
-			text.onChange(onChange);
-		}
-	}, [text, onChange]);
+		text.onChange(handleChange);
+	}, [text, handleChange]);
 
 	// 合并其他属性设置
 	useEffect(() => {
@@ -242,11 +264,10 @@ export const TextArea: FC<TextAreaProps> = ({
 	}, [textArea]);
 
 	// 分离 onChange 事件处理
+	const handleChange = useStableCallback(onChange);
 	useEffect(() => {
-		if (onChange) {
-			textArea.onChange(onChange);
-		}
-	}, [textArea, onChange]);
+		textArea.onChange(handleChange);
+	}, [textArea, handleChange]);
 
 	// 合并其他属性设置
 	useEffect(() => {
@@ -287,11 +308,10 @@ export const Dropdown: FC<DropdownProps> = ({
 	}, [dropdown]);
 
 	// 分离 onChange 事件处理
+	const handleChange = useStableCallback(onChange);
 	useEffect(() => {
-		if (onChange) {
-			dropdown.onChange(onChange);
-		}
-	}, [dropdown, onChange]);
+		dropdown.onChange(handleChange);
+	}, [dropdown, handleChange]);
 
 	// 处理 options 更新
 	useEffect(() => {
@@ -322,7 +342,6 @@ export interface SliderProps {
 	max?: number;
 	step?: number | "any";
 	disabled?: boolean;
-	dynamicTooltip?: boolean;
 	instant?: boolean;
 	onChange?: (value: number) => void;
 }
@@ -333,7 +352,6 @@ export const Slider: FC<SliderProps> = ({
 	max = 100,
 	step = 1,
 	disabled,
-	dynamicTooltip,
 	instant,
 	onChange,
 }) => {
@@ -350,19 +368,19 @@ export const Slider: FC<SliderProps> = ({
 	}, [slider]);
 
 	// 分离 onChange 事件处理
+	const handleChange = useStableCallback(onChange);
 	useEffect(() => {
-		if (onChange) {
-			slider.onChange(onChange);
-		}
-	}, [slider, onChange]);
+		slider.onChange(handleChange);
+	}, [slider, handleChange]);
 
 	// 合并其他属性设置
 	useEffect(() => {
 		if (value !== undefined) slider.setValue(value);
 		if (disabled !== undefined) slider.setDisabled(disabled);
-		if (dynamicTooltip) slider.setDynamicTooltip();
+		// 不再调 setDynamicTooltip()：Obsidian 现在恒在滑块旁内联显示数值，
+		// 该方法已废弃且无对应开关，所以连 prop 一起去掉（本仓库无调用方）
 		if (instant !== undefined) slider.setInstant(instant);
-	}, [slider, value, disabled, dynamicTooltip, instant]);
+	}, [slider, value, disabled, instant]);
 
 	return null;
 };
@@ -374,10 +392,23 @@ export const Slider: FC<SliderProps> = ({
 export interface ColorProps {
 	value?: string;
 	disabled?: boolean;
+	/**
+	 * 悬浮说明。
+	 *
+	 * 主要用途是解释 `disabled`：一个灰掉的颜色格子只说明「现在不能改」，
+	 * 不说明「为什么」。而在几个 tab 里「为什么」是同一件事——那一行还没选图标，
+	 * 颜色无处可施（handler 一律要求有 icon 才渲染）。
+	 */
+	tooltip?: string;
 	onChange?: (value: string) => void | Promise<void>;
 }
 
-export const Color: FC<ColorProps> = ({ value, disabled, onChange }) => {
+export const Color: FC<ColorProps> = ({
+	value,
+	disabled,
+	tooltip,
+	onChange,
+}) => {
 	const { slotEl } = useSettingSlot();
 	const programmaticSetRef = useRef(false);
 
@@ -388,15 +419,15 @@ export const Color: FC<ColorProps> = ({ value, disabled, onChange }) => {
 	}, [color]);
 
 	// 分离 onChange 事件处理
+	const handleChange = useStableCallback(onChange);
 	useEffect(() => {
-		if (onChange) {
-			color.onChange((v) => {
-				if (!programmaticSetRef.current) {
-					void onChange(v);
-				}
-			});
-		}
-	}, [color, onChange]);
+		color.onChange((v) => {
+			// setValue 触发的回调不算用户操作，否则每次外部值变化都会写回一遍
+			if (!programmaticSetRef.current) {
+				void handleChange(v);
+			}
+		});
+	}, [color, handleChange]);
 
 	// 合并其他属性设置
 	useEffect(() => {
@@ -406,7 +437,11 @@ export const Color: FC<ColorProps> = ({ value, disabled, onChange }) => {
 			programmaticSetRef.current = false;
 		}
 		if (disabled !== undefined) color.setDisabled(disabled);
-	}, [color, value, disabled]);
+		// ColorComponent 没有 setTooltip，直接挂到它的元素上
+		if (color.colorPickerEl) {
+			setTooltip(color.colorPickerEl, tooltip ?? "");
+		}
+	}, [color, value, disabled, tooltip]);
 
 	return null;
 };
@@ -439,11 +474,10 @@ export const Search: FC<SearchProps> = ({
 	}, [search]);
 
 	// 分离 onChange 事件处理
+	const handleChange = useStableCallback(onChange);
 	useEffect(() => {
-		if (onChange) {
-			search.onChange(onChange);
-		}
-	}, [search, onChange]);
+		search.onChange(handleChange);
+	}, [search, handleChange]);
 
 	// 合并其他属性设置
 	useEffect(() => {
@@ -519,11 +553,10 @@ export const MomentFormat: FC<MomentFormatProps> = ({
 	}, [momentFormat]);
 
 	// 分离 onChange 事件处理
+	const handleChange = useStableCallback(onChange);
 	useEffect(() => {
-		if (onChange) {
-			momentFormat.onChange(onChange);
-		}
-	}, [momentFormat, onChange]);
+		momentFormat.onChange(handleChange);
+	}, [momentFormat, handleChange]);
 
 	// 合并其他属性设置
 	useEffect(() => {

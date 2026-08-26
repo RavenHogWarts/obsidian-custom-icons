@@ -2,6 +2,7 @@ import { IconPicker } from "@src/components/icon-picker/IconPicker";
 import {
 	Color,
 	ExtraButton,
+	FeatureOffNotice,
 	RandomIconButton,
 	SettingGroup,
 	SettingItem,
@@ -110,9 +111,13 @@ export const Ribbon: FC = () => {
 						/>
 					}
 				/>
+				<FeatureOffNotice enabled={settings.ribbon.enable} />
 			</SettingGroup>
 
-			<SettingGroup title={LL.settings.ribbon.list.name()}>
+			<SettingGroup
+				title={LL.settings.ribbon.list.name()}
+				disabled={!settings.ribbon.enable}
+			>
 				<SettingItem
 					desc={LL.settings.ribbon.list.desc()}
 					control={
@@ -162,7 +167,11 @@ export const Ribbon: FC = () => {
 									<ExtraButton
 										icon="reset"
 										disabled={!override}
-										tooltip={LL.settings.ribbon.list.resetTooltip()}
+										tooltip={
+											override
+												? LL.settings.ribbon.list.resetTooltip()
+												: LL.common.nothingToReset()
+										}
 										onClick={async () => {
 											await writeOverride(action.label);
 										}}
@@ -188,9 +197,21 @@ export const Ribbon: FC = () => {
 										}}
 									/>
 									<Color
+										// 没有 override 就没有 icon，而 handler 一律
+										// 要求有 icon 才渲染（RibbonIconHandler:92）
+										// ——颜色无处可施。所以灰掉并说明，而不是
+										// 让它看着能拉、拉完静默丢弃
 										value={override?.color ?? ""}
+										disabled={!override}
+										tooltip={
+											override
+												? undefined
+												: LL.common.pickIconFirst()
+										}
 										onChange={async (rawColor) => {
-											if (!override) return;
+											if (!override) {
+												return;
+											}
 											await writeOverride(action.label, {
 												...override,
 												color: rawColor,

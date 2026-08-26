@@ -2,6 +2,7 @@ import { IconPicker } from "@src/components/icon-picker/IconPicker";
 import {
 	Color,
 	ExtraButton,
+	FeatureOffNotice,
 	RandomIconButton,
 	Search,
 	SettingGroup,
@@ -241,7 +242,7 @@ export const CommunityPlugin: FC = () => {
 
 	return (
 		<>
-			{/* 默认图标设置 */}
+			{/* 总开关 */}
 			<SettingGroup>
 				<SettingItem
 					name={LL.settings.communityPlugin.enable.name()}
@@ -260,6 +261,11 @@ export const CommunityPlugin: FC = () => {
 						</>
 					}
 				/>
+				<FeatureOffNotice enabled={settings.communityPlugins.enable} />
+			</SettingGroup>
+
+			{/* 默认图标设置：随总开关禁用 */}
+			<SettingGroup disabled={!settings.communityPlugins.enable}>
 				<SettingItem
 					name={LL.settings.communityPlugin.searchResults.name()}
 					desc={LL.settings.communityPlugin.searchResults.desc()}
@@ -340,7 +346,10 @@ export const CommunityPlugin: FC = () => {
 			</SettingGroup>
 
 			{/* 插件列表分组 */}
-			<SettingGroup title={LL.settings.communityPlugin.pluginList.name()}>
+			<SettingGroup
+				title={LL.settings.communityPlugin.pluginList.name()}
+				disabled={!settings.communityPlugins.enable}
+			>
 				{/* 分组说明行：与 ribbon.list / bookmarks.overrides 等分组一致 */}
 				<SettingItem
 					desc={LL.settings.communityPlugin.pluginList.desc()}

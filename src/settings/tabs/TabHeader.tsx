@@ -3,6 +3,7 @@ import {
 	Color,
 	Dropdown,
 	ExtraButton,
+	FeatureOffNotice,
 	RandomIconButton,
 	SettingGroup,
 	SettingItem,
@@ -179,8 +180,31 @@ export const TabHeader: FC = () => {
 		return opts;
 	}, [fetchedTabs, configuredTabs]);
 
+	/*
+	 * 两个「添加」按钮的可用条件：类型 / 标签与图标都得选。
+	 *
+	 * 过去是回调里 `if (!selectedType || !newIcon) return;`——按下去什么都不发生、
+	 * 无提示、按钮也没灰。而单标签层不按「抓取」就没有任何候选，于是
+	 * 「打开设置页 → 直接点 +」是一条完全静默的死路。现在灰掉并在 tooltip 里
+	 * 说缺什么。
+	 */
+	const canAddMapping = Boolean(selectedType && newIcon);
+	const canAddTab = Boolean(selectedTab && tabIcon);
+
+	/** 缺什么就说什么：只缺一样时不要笼统地说「请填完」 */
+	const missingHint = (hasTarget: boolean, hasIcon: boolean): string => {
+		if (!hasTarget && !hasIcon) {
+			return LL.settings.tabHeader.addNeedsBoth();
+		}
+		return hasTarget
+			? LL.settings.tabHeader.addNeedsIcon()
+			: LL.settings.tabHeader.addNeedsTarget();
+	};
+
 	const addMapping = async () => {
-		if (!selectedType || !newIcon) return;
+		if (!canAddMapping) {
+			return;
+		}
 		await writeOverride(selectedType, {
 			id: selectedType,
 			icon: newIcon,
@@ -193,7 +217,9 @@ export const TabHeader: FC = () => {
 	};
 
 	const addTabMapping = async () => {
-		if (!selectedTab || !tabIcon) return;
+		if (!canAddTab) {
+			return;
+		}
 		await writeTabOverride(selectedTab, {
 			id: selectedTab,
 			icon: tabIcon,
@@ -226,9 +252,13 @@ export const TabHeader: FC = () => {
 						/>
 					}
 				/>
+				<FeatureOffNotice enabled={th.enable} />
 			</SettingGroup>
 
-			<SettingGroup title={LL.settings.tabHeader.mapping.name()}>
+			<SettingGroup
+				title={LL.settings.tabHeader.mapping.name()}
+				disabled={!th.enable}
+			>
 				<SettingItem
 					desc={LL.settings.tabHeader.mapping.desc()}
 					control={
@@ -248,7 +278,15 @@ export const TabHeader: FC = () => {
 							/>
 							<ExtraButton
 								icon="plus"
-								tooltip={LL.settings.tabHeader.mapping.addTooltip()}
+								disabled={!canAddMapping}
+								tooltip={
+									canAddMapping
+										? LL.settings.tabHeader.mapping.addTooltip()
+										: missingHint(
+												Boolean(selectedType),
+												Boolean(newIcon),
+											)
+								}
 								onClick={addMapping}
 							/>
 							<ExtraButton
@@ -264,64 +302,83 @@ export const TabHeader: FC = () => {
 						name={LL.settings.tabHeader.mapping.noneFound()}
 					/>
 				)}
-				{entries.map(([dataType, override]) => (
-					<SettingItem
-						key={dataType}
-						name={dataType}
-						control={
-							<>
-								<RandomIconButton
-									value={override.icon ?? ""}
-									type={override.type ?? "lucide"}
-									onPick={async (value, type) => {
-										await writeOverride(dataType, {
-											id: dataType,
-											icon: value,
-											type,
-											color: override.color ?? "",
-										});
-									}}
-								/>
-								<ExtraButton
-									icon="trash-2"
-									tooltip={LL.settings.tabHeader.mapping.resetTooltip()}
-									onClick={async () => {
-										await writeOverride(dataType);
-									}}
-								/>
-								<IconPicker
-									value={override.icon ?? ""}
-									type={override.type ?? "lucide"}
-									color={override.color}
-									onChange={async (value, type) => {
-										await writeOverride(dataType, {
-											id: dataType,
-											icon: value,
-											type,
-											color: override.color ?? "",
-										});
-									}}
-								/>
-								<Color
-									value={override.color ?? ""}
-									onChange={async (rawColor) => {
-										if (!override.icon || !override.type)
-											return;
-										await writeOverride(dataType, {
-											...override,
-											color:
-												normalizeIconColor(rawColor) ??
-												"",
-										});
-									}}
-								/>
-							</>
-						}
-					/>
-				))}
+				{entries.map(([dataType, override]) => {
+					// 用「不使用图标」清空过的条目仍留在表里，此时颜色无处可施
+					// （resolveTabHeaderIcon 要求有 icon）。灰掉并说明，不静默丢弃。
+					// 删除键不跟着灰——删掉这条空条目是正当的清理动作。
+					const configured = Boolean(override.icon);
+					return (
+						<SettingItem
+							key={dataType}
+							name={dataType}
+							desc={
+								configured ? undefined : LL.common.pickIconFirst()
+							}
+							control={
+								<>
+									<RandomIconButton
+										value={override.icon ?? ""}
+										type={override.type ?? "lucide"}
+										onPick={async (value, type) => {
+											await writeOverride(dataType, {
+												id: dataType,
+												icon: value,
+												type,
+												color: override.color ?? "",
+											});
+										}}
+									/>
+									<ExtraButton
+										icon="trash-2"
+										tooltip={LL.settings.tabHeader.mapping.resetTooltip()}
+										onClick={async () => {
+											await writeOverride(dataType);
+										}}
+									/>
+									<IconPicker
+										value={override.icon ?? ""}
+										type={override.type ?? "lucide"}
+										color={override.color}
+										onChange={async (value, type) => {
+											await writeOverride(dataType, {
+												id: dataType,
+												icon: value,
+												type,
+												color: override.color ?? "",
+											});
+										}}
+									/>
+									<Color
+										value={override.color ?? ""}
+										disabled={!configured}
+										tooltip={
+											configured
+												? undefined
+												: LL.common.pickIconFirst()
+										}
+										onChange={async (rawColor) => {
+											if (!configured) {
+												return;
+											}
+											await writeOverride(dataType, {
+												...override,
+												color:
+													normalizeIconColor(rawColor) ??
+													"",
+											});
+										}}
+									/>
+								</>
+							}
+						/>
+					);
+				})}
 			</SettingGroup>
 
-			<SettingGroup title={LL.settings.tabHeader.tabs.name()}>
+			<SettingGroup
+				title={LL.settings.tabHeader.tabs.name()}
+				disabled={!th.enable}
+			>
 				<SettingItem
 					desc={LL.settings.tabHeader.tabs.desc()}
 					control={
@@ -341,7 +398,15 @@ export const TabHeader: FC = () => {
 							/>
 							<ExtraButton
 								icon="plus"
-								tooltip={LL.settings.tabHeader.tabs.addTooltip()}
+								disabled={!canAddTab}
+								tooltip={
+									canAddTab
+										? LL.settings.tabHeader.tabs.addTooltip()
+										: missingHint(
+												Boolean(selectedTab),
+												Boolean(tabIcon),
+											)
+								}
 								onClick={addTabMapping}
 							/>
 							<ExtraButton
@@ -359,6 +424,13 @@ export const TabHeader: FC = () => {
 				)}
 				{tabEntries.map(([tabKey, override]) => {
 					const parsed = parseTabKey(tabKey);
+					const configured = Boolean(override.icon);
+					// 两种「这行有问题」分开说：键解析不出来（过去只是静默回落成
+					// 裸 key，看不出它已经失效）、以及图标被清空导致颜色无处可施
+					const notes = [
+						parsed ? "" : LL.settings.tabHeader.tabs.invalidKey(),
+						configured ? "" : LL.common.pickIconFirst(),
+					].filter(Boolean);
 					return (
 						<SettingItem
 							key={tabKey}
@@ -367,6 +439,7 @@ export const TabHeader: FC = () => {
 									? `${parsed.label}（${parsed.dataType}）`
 									: tabKey
 							}
+							desc={notes.join(" · ")}
 							control={
 								<>
 									<RandomIconButton
@@ -403,9 +476,16 @@ export const TabHeader: FC = () => {
 									/>
 									<Color
 										value={override.color ?? ""}
+										disabled={!configured}
+										tooltip={
+											configured
+												? undefined
+												: LL.common.pickIconFirst()
+										}
 										onChange={async (rawColor) => {
-											if (!override.icon || !override.type)
+											if (!configured) {
 												return;
+											}
 											await writeTabOverride(tabKey, {
 												...override,
 												color:

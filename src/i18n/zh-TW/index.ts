@@ -16,7 +16,6 @@ const zh_TW = {
 				name: "預設圖示",
 				desc: "為沒有圖示的第三方外掛程式設定添加預設圖示",
 				resetTooltip: "重置",
-				dicesTooltip: "隨機",
 			},
 			search: {
 				placeholder: "輸入外掛程式名稱或ID...",
@@ -28,7 +27,6 @@ const zh_TW = {
 				name: "外掛程式列表",
 				desc: "為沒有圖示的第三方外掛程式添加自訂圖示（修復 Obsidian v1.11.0）",
 				resetTooltip: "重置爲預設圖示",
-				dicesTooltip: "隨機圖示",
 			},
 		},
 		ribbon: {
@@ -163,6 +161,7 @@ const zh_TW = {
 		edit: "編輯",
 		delete: "刪除",
 		cancel: "取消",
+		randomInSource: "在「{source:string}」中隨機",
 	},
 	view: {
 		CustomIconLib: {
@@ -250,42 +249,33 @@ const zh_TW = {
 					ungrouped: "未分組",
 					label: "分組",
 					placeholder: "分組名稱（留空則不分組）",
-					addHint:
-						"可選擇既有分組，也可直接輸入新名稱。留空則不歸入任何分組。",
-					importHint:
-						"留空則沿用檔案中各圖示自帶的分組；填寫則統一歸入該分組。",
+					addHint: "可選擇既有分組，也可直接輸入新名稱。留空則不歸入任何分組。",
+					importHint: "留空則沿用檔案中各圖示自帶的分組；填寫則統一歸入該分組。",
 					moveSelected: "移到分組…",
 					moveAction: "移到分組…",
 					moveTitle: "移到分組",
 					moveCount: "將移動 {count:number} 個圖示。",
 					moveOutHint: "留空即把這些圖示移出分組。",
-					mergeWarning:
-						"「{group:string}」已存在，將與其中既有的圖示合併",
+					mergeWarning: "「{group:string}」已存在，將與其中既有的圖示合併",
 					moved: "已將 {count:number} 個圖示移到「{group:string}」",
 					movedOut: "已將 {count:number} 個圖示移出分組",
-					noResultsInGroup:
-						"「{group:string}」中沒有符合「{query:string}」的圖示",
-					noResultsUngrouped:
-						"未分組的圖示中沒有符合「{query:string}」的",
+					noResultsInGroup: "「{group:string}」中沒有符合「{query:string}」的圖示",
+					noResultsUngrouped: "未分組的圖示中沒有符合「{query:string}」的",
 					searchAllGroups: "搜尋全部分組",
 					menuHint: "在分組標籤上按右鍵可重新命名或刪除",
 					renameAction: "重新命名分組",
 					renameTitle: "重新命名「{group:string}」",
 					renameCount: "此分組中有 {count:number} 個圖示。",
-					renameEmpty:
-						"請輸入分組名稱。若只想取消分組但保留圖示，請用「刪除分組，保留圖示」。",
+					renameEmpty: "請輸入分組名稱。若只想取消分組但保留圖示，請用「刪除分組，保留圖示」。",
 					renamed: "已將「{from:string}」重新命名為「{to:string}」",
 					dissolveAction: "刪除分組，保留圖示",
 					dissolveTitle: "刪除「{group:string}」？",
-					dissolveBody:
-						"分組中的 {count:number} 個圖示會保留下來，變成未分組。",
+					dissolveBody: "分組中的 {count:number} 個圖示會保留下來，變成未分組。",
 					dissolveConfirm: "刪除分組",
-					dissolved:
-						"已刪除「{group:string}」，{count:number} 個圖示變成未分組",
+					dissolved: "已刪除「{group:string}」，{count:number} 個圖示變成未分組",
 					purgeAction: "刪除分組與其中的圖示",
 					purgeTitle: "刪除「{group:string}」與其中的圖示？",
-					purgeBody:
-						"這會永久刪除 {count:number} 個圖示。所有已指派它們的地方都會退回預設圖示。",
+					purgeBody: "這會永久刪除 {count:number} 個圖示。所有已指派它們的地方都會退回預設圖示。",
 					purgeConfirm: "刪除圖示",
 					purged: "已刪除「{group:string}」與其中的 {count:number} 個圖示",
 					gone: "「{group:string}」已不存在",
@@ -387,8 +377,17 @@ const zh_TW = {
 				catalogOnline: "線上",
 				catalogLoadFailed: "圖示集目錄載入失敗（網路不可用且無快取）",
 				catalogLoading: "正在載入圖示集目錄…",
-				catalogFilter: { group: "依安裝狀態篩選", all: "全部", installed: "已安裝", notInstalled: "未安裝" },
-				catalogSort: { label: "排序", name: "依名稱", count: "依圖示數" },
+				catalogFilter: {
+					group: "依安裝狀態篩選",
+					all: "全部",
+					installed: "已安裝",
+					notInstalled: "未安裝",
+				},
+				catalogSort: {
+					label: "排序",
+					name: "依名稱",
+					count: "依圖示數",
+				},
 				noMatch: "沒有符合的圖示包",
 				presetsSection: "常用 npm 圖示包（一鍵安裝）",
 				alreadyInstalled: "已安裝",
@@ -405,7 +404,11 @@ const zh_TW = {
 				tabName: "Lucide",
 				count: "共 {count:number} 個圖示",
 				emptyFilter: "目前篩選下沒有圖示",
-				sort: { label: "排序", asc: "名稱 A→Z", desc: "名稱 Z→A" },
+				sort: {
+					label: "排序",
+					asc: "名稱 A→Z",
+					desc: "名稱 Z→A",
+				},
 				showAll: "顯示全部",
 				descHints: {
 					all: "外掛內建的全部 Lucide 圖示（已去重），點擊圖示可複製名稱。",

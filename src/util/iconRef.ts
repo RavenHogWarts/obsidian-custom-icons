@@ -7,6 +7,21 @@ export interface IconRef {
 }
 
 /**
+ * 把设置里的 `{icon, type}` 形状转成 `IconRef`。
+ *
+ * 五张覆盖表存的都是 `icon`（裸 id）+ `type` 两个字段，而判定图标身份的地方
+ * 一律吃 `IconRef`。**图标名为空时返回 `undefined`** 而不是 `{id: ""}`：
+ * 「这一行还没配图标」是一个必须能区分出来的状态（随机域据此回落 Lucide、
+ * 排除项据此不参与），塞一个空 id 进去只会让每个调用方各自再判一次。
+ */
+export function iconRefOf(
+	icon: string | undefined,
+	type: IconType | undefined,
+): IconRef | undefined {
+	return icon ? { type: type ?? "lucide", id: icon } : undefined;
+}
+
+/**
  * 编码为 `${type}:${id}` 复合键（用于 recent / favorites 的存储）。
  *
  * `lucide` 与 `svg` 是两个命名空间、可能撞名，因此不能只存裸 id。

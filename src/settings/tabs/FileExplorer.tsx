@@ -2,6 +2,7 @@ import { IconPicker } from "@src/components/icon-picker/IconPicker";
 import {
 	Color,
 	ExtraButton,
+	RandomIconButton,
 	SettingGroup,
 	SettingItem,
 	Text,
@@ -52,6 +53,18 @@ export const FileExplorer: FC = () => {
 			name={name}
 			control={
 				<>
+					<RandomIconButton
+						value={override.icon ?? ""}
+						type={override.type ?? "lucide"}
+						onPick={async (value, type) => {
+							await writeMap(mapKey, key, {
+								id: key,
+								icon: value,
+								type,
+								color: override.color ?? "",
+							});
+						}}
+					/>
 					<ExtraButton
 						icon="trash-2"
 						tooltip={LL.common.delete()}
@@ -99,6 +112,20 @@ export const FileExplorer: FC = () => {
 				desc={desc}
 				control={
 					<>
+						<RandomIconButton
+							value={icon.icon}
+							type={icon.type}
+							onPick={async (value, type) => {
+								await settingsStore.updateSettingByPath(
+									`fileExplorer.${field}.icon`,
+									value,
+								);
+								await settingsStore.updateSettingByPath(
+									`fileExplorer.${field}.type`,
+									type,
+								);
+							}}
+						/>
 						<ExtraButton
 							icon="reset"
 							tooltip={LL.settings.fileExplorer[

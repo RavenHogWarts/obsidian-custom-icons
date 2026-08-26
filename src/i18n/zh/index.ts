@@ -16,7 +16,6 @@ const zh = {
 				name: "默认图标",
 				desc: "为没有图标的第三方插件设置添加默认图标",
 				resetTooltip: "重置",
-				dicesTooltip: "随机",
 			},
 			search: {
 				placeholder: "输入插件名称...",
@@ -28,7 +27,6 @@ const zh = {
 				name: "插件列表",
 				desc: "为没有图标的第三方插件添加自定义图标（修复 Obsidian v1.11.0）",
 				resetTooltip: "重置为默认图标",
-				dicesTooltip: "随机图标",
 			},
 		},
 		ribbon: {
@@ -163,6 +161,7 @@ const zh = {
 		edit: "编辑",
 		delete: "删除",
 		cancel: "取消",
+		randomInSource: "在「{source:string}」中随机",
 	},
 	view: {
 		CustomIconLib: {

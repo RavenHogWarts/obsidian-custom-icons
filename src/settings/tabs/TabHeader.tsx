@@ -3,6 +3,7 @@ import {
 	Color,
 	Dropdown,
 	ExtraButton,
+	RandomIconButton,
 	SettingGroup,
 	SettingItem,
 	Toggle,
@@ -269,6 +270,18 @@ export const TabHeader: FC = () => {
 						name={dataType}
 						control={
 							<>
+								<RandomIconButton
+									value={override.icon ?? ""}
+									type={override.type ?? "lucide"}
+									onPick={async (value, type) => {
+										await writeOverride(dataType, {
+											id: dataType,
+											icon: value,
+											type,
+											color: override.color ?? "",
+										});
+									}}
+								/>
 								<ExtraButton
 									icon="trash-2"
 									tooltip={LL.settings.tabHeader.mapping.resetTooltip()}
@@ -356,6 +369,18 @@ export const TabHeader: FC = () => {
 							}
 							control={
 								<>
+									<RandomIconButton
+										value={override.icon ?? ""}
+										type={override.type ?? "lucide"}
+										onPick={async (value, type) => {
+											await writeTabOverride(tabKey, {
+												id: tabKey,
+												icon: value,
+												type,
+												color: override.color ?? "",
+											});
+										}}
+									/>
 									<ExtraButton
 										icon="trash-2"
 										tooltip={LL.settings.tabHeader.tabs.resetTooltip()}

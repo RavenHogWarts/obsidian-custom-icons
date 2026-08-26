@@ -289,13 +289,13 @@ export const CommunityPlugin: FC = () => {
 								value={defaultIcon.icon}
 								type={defaultIcon.type}
 								onPick={async (value, type) => {
+									// 一次写整个 default 而不是 icon / type 各写一次：
+									// 每次写入都是一遍 saveSettings + applyAll（装了大包
+									// 时是上万次 addIcon），而中间那一拍还是「新 icon 配
+									// 旧 type」的错配状态，会渲染出一个不存在的图标
 									await settingsStore.updateSettingByPath(
-										"communityPlugins.default.icon",
-										value,
-									);
-									await settingsStore.updateSettingByPath(
-										"communityPlugins.default.type",
-										type,
+										"communityPlugins.default",
+										{ ...defaultIcon, icon: value, type },
 									);
 								}}
 							/>

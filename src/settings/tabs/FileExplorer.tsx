@@ -116,13 +116,12 @@ export const FileExplorer: FC = () => {
 							value={icon.icon}
 							type={icon.type}
 							onPick={async (value, type) => {
+								// 一次写整个默认项而不是 icon / type 各写一次：每次写入
+								// 都是一遍 saveSettings + applyAll，而中间那一拍还是
+								// 「新 icon 配旧 type」的错配状态（会渲染出不存在的图标）
 								await settingsStore.updateSettingByPath(
-									`fileExplorer.${field}.icon`,
-									value,
-								);
-								await settingsStore.updateSettingByPath(
-									`fileExplorer.${field}.type`,
-									type,
+									`fileExplorer.${field}`,
+									{ ...icon, icon: value, type },
 								);
 							}}
 						/>

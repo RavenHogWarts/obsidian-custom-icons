@@ -3,6 +3,8 @@ import { LL } from "@src/i18n/i18n";
 import type CIPlugin from "@src/main";
 import { IIcon, ITabHeaderIconOverride } from "@src/types/types";
 import { AbstractIconHandler } from "@src/util/IconHandler";
+import { createIconRenderable } from "@src/util/createIconRenderable";
+import { type IconRenderable } from "@src/util/iconRenderable";
 import setIcon, { cleanupIcon } from "@src/util/setIcon";
 import { buildTabKey, resolveTabIcon } from "@src/util/tabHeaderIcon";
 import { EventRef, Menu, WorkspaceLeaf } from "obsidian";
@@ -136,10 +138,15 @@ export default class TabHeaderIconHandler extends AbstractIconHandler<ITabHeader
 	// ---------------------------------------------------------------------
 
 	private applyToAll(): void {
-		this.getTabs().forEach((tabEl) => this.applyToTab(tabEl));
+		// 一轮 sweep 建一个（见 util/iconRenderable.ts）
+		const canRender = createIconRenderable();
+		this.getTabs().forEach((tabEl) => this.applyToTab(tabEl, canRender));
 	}
 
-	private applyToTab(tabEl: HTMLElement): void {
+	private applyToTab(
+		tabEl: HTMLElement,
+		canRender: IconRenderable = createIconRenderable(),
+	): void {
 		const dataType = tabEl.dataset.type;
 		if (!dataType) return;
 
@@ -149,12 +156,14 @@ export default class TabHeaderIconHandler extends AbstractIconHandler<ITabHeader
 		if (!inner) return;
 
 		// 两级解析：单标签（aria-label，建头时原生同步设置，observer 回调时已可用；
-		// 极端时序缺失则仅走类型级，layout-change 重扫自愈）> 类型兜底
+		// 极端时序缺失则仅走类型级，layout-change 重扫自愈）> 类型兜底。
+		// 画不出来的那一级会被跳过，级联继续往下（图标包被停用 / 图标被删）
 		const resolved = resolveTabIcon(
 			this.settings?.tabs,
 			this.settings?.data,
 			dataType,
 			tabEl.getAttribute("aria-label"),
+			canRender,
 		);
 		const existing = inner.querySelector<HTMLElement>(
 			`:scope > .${this.customIconClass}`,
@@ -262,12 +271,13 @@ export default class TabHeaderIconHandler extends AbstractIconHandler<ITabHeader
 	}
 
 	private applyToElementTree(rootEl: HTMLElement): void {
+		const canRender = createIconRenderable();
 		if (rootEl.matches(this.tabSelector)) {
-			this.applyToTab(rootEl);
+			this.applyToTab(rootEl, canRender);
 		}
 		rootEl
 			.querySelectorAll<HTMLElement>(this.tabSelector)
-			.forEach((el) => this.applyToTab(el));
+			.forEach((el) => this.applyToTab(el, canRender));
 	}
 
 	// ---------------------------------------------------------------------

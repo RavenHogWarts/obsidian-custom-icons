@@ -9,6 +9,8 @@ import {
 	resolveFolderIcon,
 } from "@src/util/fileExplorerIcon";
 import { AbstractIconHandler } from "@src/util/IconHandler";
+import { createIconRenderable } from "@src/util/createIconRenderable";
+import { type IconRenderable } from "@src/util/iconRenderable";
 import setIcon, { cleanupIcon } from "@src/util/setIcon";
 import { EventRef, Menu, TAbstractFile, TFolder, WorkspaceLeaf } from "obsidian";
 
@@ -119,23 +121,30 @@ export default class FileExplorerIconHandler extends AbstractIconHandler<IFileEx
 	}
 
 	private applyToAllExplorers(): void {
+		// 一轮 sweep 建一个：注册表在一轮内不会变，Set 只建一次；
+		// 下一轮重建，图标包启停后立刻反映（见 util/iconRenderable.ts）
+		const canRender = createIconRenderable();
 		this.getExplorerContainers().forEach((container) => {
 			container
 				.querySelectorAll<HTMLElement>(this.folderTitleSelector)
-				.forEach((el) => this.applyToTitle(el, true));
+				.forEach((el) => this.applyToTitle(el, true, canRender));
 			container
 				.querySelectorAll<HTMLElement>(this.fileTitleSelector)
-				.forEach((el) => this.applyToTitle(el, false));
+				.forEach((el) => this.applyToTitle(el, false, canRender));
 		});
 	}
 
-	private applyToTitle(titleEl: HTMLElement, isFolder: boolean): void {
+	private applyToTitle(
+		titleEl: HTMLElement,
+		isFolder: boolean,
+		canRender: IconRenderable = createIconRenderable(),
+	): void {
 		const path = titleEl.getAttribute("data-path");
 		if (!path) return;
 
 		const resolved = isFolder
-			? resolveFolderIcon(path, this.settings)
-			: resolveFileIcon(path, this.settings);
+			? resolveFolderIcon(path, this.settings, canRender)
+			: resolveFileIcon(path, this.settings, canRender);
 
 		const existing = titleEl.querySelector<HTMLElement>(
 			`:scope > .${this.iconClass}`,

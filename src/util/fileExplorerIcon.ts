@@ -4,6 +4,10 @@ import {
 	IconType,
 } from "@src/types/types";
 import { normalizeIconColor } from "@src/util/communityPluginIcon";
+import {
+	alwaysRenderable,
+	type IconRenderable,
+} from "@src/util/iconRenderable";
 
 /**
  * 文件浏览器图标解析工具。
@@ -173,10 +177,24 @@ export function tallyExtensions(
 	return counts;
 }
 
+/**
+ * 这一级「配了图标，且那个图标现在画得出来」。
+ *
+ * 加上 `canRender` 这一问是**回退语义的全部实现**：图标包被停用 / 卸载、
+ * 用户 SVG 被删之后，配置仍在，但那条引用已经画不出来了；判成「这一级没配」，
+ * 级联便自然往下走到 folderDefault / fileDefault，而不是卡在一块空白上。
+ * 设置一个字都不动——重新启用图标包即刻恢复。
+ */
 function hasIcon(
-	override?: IFileExplorerIconOverride | IIcon,
+	override: IFileExplorerIconOverride | IIcon | undefined,
+	canRender: IconRenderable,
 ): override is IFileExplorerIconOverride {
-	return Boolean(override && override.icon && override.type);
+	return Boolean(
+		override &&
+			override.icon &&
+			override.type &&
+			canRender(override.icon, override.type),
+	);
 }
 
 function toIcon(
@@ -201,13 +219,16 @@ function toIcon(
 export function findNearestConfiguredAncestor(
 	path: string,
 	folders: Record<string, IFileExplorerIconOverride>,
+	canRender: IconRenderable = alwaysRenderable,
 ): IFileExplorerIconOverride | undefined {
 	let cur = path;
 	let slash = cur.lastIndexOf("/");
 	while (slash >= 0) {
 		cur = cur.slice(0, slash);
 		const ancestor = folders[cur];
-		if (hasIcon(ancestor)) return ancestor;
+		// 继承也要跳过画不出来的祖先，否则会停在一个「配了但已失效」的祖先上，
+		// 而不是继续往上找那个还画得出来的
+		if (hasIcon(ancestor, canRender)) return ancestor;
 		slash = cur.lastIndexOf("/");
 	}
 	return undefined;
@@ -222,28 +243,35 @@ export function findNearestConfiguredAncestor(
 export function resolveFileIcon(
 	path: string,
 	cfg: IFileExplorerConfig,
+	canRender: IconRenderable = alwaysRenderable,
 ): IIcon | null {
 	const fileOverride = cfg.files?.[path];
-	if (hasIcon(fileOverride)) return toIcon(path, fileOverride);
+	if (hasIcon(fileOverride, canRender)) return toIcon(path, fileOverride);
 
 	// 复合后缀（.excalidraw.md）更具体，优先于末段后缀（.md）；两者相同时不多查
 	const ext = getExtension(path);
 	const compoundExt = getCompoundExtension(path);
 	if (compoundExt && compoundExt !== ext) {
 		const compoundOverride = cfg.extensions?.[compoundExt];
-		if (hasIcon(compoundOverride)) return toIcon(path, compoundOverride);
+		if (hasIcon(compoundOverride, canRender))
+			return toIcon(path, compoundOverride);
 	}
 
 	const extOverride = ext ? cfg.extensions?.[ext] : undefined;
-	if (hasIcon(extOverride)) return toIcon(path, extOverride);
+	if (hasIcon(extOverride, canRender)) return toIcon(path, extOverride);
 
 	// 子文件继承：套用最近祖先文件夹图标（默认关，扩展名优先）
 	if (cfg.inherit?.file) {
-		const ancestor = findNearestConfiguredAncestor(path, cfg.folders ?? {});
-		if (hasIcon(ancestor)) return toIcon(path, ancestor);
+		const ancestor = findNearestConfiguredAncestor(
+			path,
+			cfg.folders ?? {},
+			canRender,
+		);
+		if (hasIcon(ancestor, canRender)) return toIcon(path, ancestor);
 	}
 
-	if (hasIcon(cfg.fileDefault)) return toIcon(path, cfg.fileDefault);
+	if (hasIcon(cfg.fileDefault, canRender))
+		return toIcon(path, cfg.fileDefault);
 
 	return null;
 }
@@ -256,17 +284,23 @@ export function resolveFileIcon(
 export function resolveFolderIcon(
 	path: string,
 	cfg: IFileExplorerConfig,
+	canRender: IconRenderable = alwaysRenderable,
 ): IIcon | null {
 	const folderOverride = cfg.folders?.[path];
-	if (hasIcon(folderOverride)) return toIcon(path, folderOverride);
+	if (hasIcon(folderOverride, canRender)) return toIcon(path, folderOverride);
 
 	// 子文件夹继承：套用最近祖先文件夹图标（默认关）
 	if (cfg.inherit?.subfolder) {
-		const ancestor = findNearestConfiguredAncestor(path, cfg.folders ?? {});
-		if (hasIcon(ancestor)) return toIcon(path, ancestor);
+		const ancestor = findNearestConfiguredAncestor(
+			path,
+			cfg.folders ?? {},
+			canRender,
+		);
+		if (hasIcon(ancestor, canRender)) return toIcon(path, ancestor);
 	}
 
-	if (hasIcon(cfg.folderDefault)) return toIcon(path, cfg.folderDefault);
+	if (hasIcon(cfg.folderDefault, canRender))
+		return toIcon(path, cfg.folderDefault);
 
 	return null;
 }

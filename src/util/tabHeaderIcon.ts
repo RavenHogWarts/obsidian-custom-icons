@@ -1,4 +1,8 @@
 import { ITabHeaderIconOverride, IIcon } from "@src/types/types";
+import {
+	alwaysRenderable,
+	type IconRenderable,
+} from "@src/util/iconRenderable";
 
 /**
  * 标签页头图标解析工具（两级）。
@@ -52,11 +56,17 @@ export function resolveTabIcon(
 	data: Record<string, ITabHeaderIconOverride> | undefined,
 	dataType: string,
 	label: string | null | undefined,
+	canRender: IconRenderable = alwaysRenderable,
 ): IIcon | null {
 	if (label) {
 		const key = buildTabKey(dataType, label);
 		const tabOverride = key ? tabs?.[key] : undefined;
-		if (tabOverride?.icon && tabOverride.type) {
+		// 画不出来就当这一级没配，落到类型级（见 util/iconRenderable.ts）
+		if (
+			tabOverride?.icon &&
+			tabOverride.type &&
+			canRender(tabOverride.icon, tabOverride.type)
+		) {
 			return {
 				id: key,
 				icon: tabOverride.icon,
@@ -68,6 +78,7 @@ export function resolveTabIcon(
 
 	const typeOverride = data?.[dataType];
 	if (!typeOverride?.icon || !typeOverride.type) return null;
+	if (!canRender(typeOverride.icon, typeOverride.type)) return null;
 	return {
 		id: dataType,
 		icon: typeOverride.icon,

@@ -4,6 +4,8 @@ import {
 } from "@src/types/types";
 import { AbstractIconHandler } from "@src/util/IconHandler";
 import { resolveCommunityPluginIcon } from "@src/util/communityPluginIcon";
+import { createIconRenderable } from "@src/util/createIconRenderable";
+import { type IconRenderable } from "@src/util/iconRenderable";
 import setIcon from "@src/util/setIcon";
 
 interface ICommunityPluginConfig {
@@ -144,30 +146,41 @@ export default class CommunityPluginIconHandler extends AbstractIconHandler<ICom
 		}
 	}
 
-	private applyPluginListIconsInContainer(container: ParentNode): void {
+	private applyPluginListIconsInContainer(
+		container: ParentNode,
+		// 一轮 sweep 建一个（见 util/iconRenderable.ts）。由调用方传入时复用同一个：
+		// applyIconsForElementTree 会连调四处，各建一个等于把注册表 Set 建四遍
+		canRender: IconRenderable = createIconRenderable(),
+	): void {
 		const pluginNavItems = container.querySelectorAll<HTMLElement>(
 			this.pluginNavItemSelector,
 		);
 
 		pluginNavItems.forEach((navItemEl) => {
-			this.applyIconToNavItem(navItemEl);
+			this.applyIconToNavItem(navItemEl, canRender);
 		});
 	}
 
-	private applySearchResultIconsInContainer(container: ParentNode): void {
+	private applySearchResultIconsInContainer(
+		container: ParentNode,
+		canRender: IconRenderable = createIconRenderable(),
+	): void {
 		const searchResultItems = container.querySelectorAll<HTMLElement>(
 			this.searchResultItemSelector,
 		);
 
 		searchResultItems.forEach((resultEl) => {
-			this.applyIconToSearchResult(resultEl);
+			this.applyIconToSearchResult(resultEl, canRender);
 		});
 	}
 
 	/**
 	 * 为单个导航项应用图标
 	 */
-	private applyIconToNavItem(navItemEl: HTMLElement): void {
+	private applyIconToNavItem(
+		navItemEl: HTMLElement,
+		canRender: IconRenderable = createIconRenderable(),
+	): void {
 		if (!this.isPluginListEnabled()) return;
 
 		const pluginId = navItemEl.getAttribute("data-setting-id");
@@ -177,12 +190,16 @@ export default class CommunityPluginIconHandler extends AbstractIconHandler<ICom
 			pluginId,
 			this.settings.default,
 			this.settings.data[pluginId],
+			canRender,
 		);
 
 		this.addIconToPluginNavItem(navItemEl, iconConfig);
 	}
 
-	private applyIconToSearchResult(resultEl: HTMLElement): void {
+	private applyIconToSearchResult(
+		resultEl: HTMLElement,
+		canRender: IconRenderable = createIconRenderable(),
+	): void {
 		if (!this.isSearchResultsEnabled()) return;
 
 		const pluginId = this.resolvePluginIdFromSearchResult(resultEl);
@@ -192,6 +209,7 @@ export default class CommunityPluginIconHandler extends AbstractIconHandler<ICom
 			pluginId,
 			this.settings.default,
 			this.settings.data[pluginId],
+			canRender,
 		);
 
 		this.addIconToPluginNavItem(resultEl, iconConfig);
@@ -321,26 +339,30 @@ export default class CommunityPluginIconHandler extends AbstractIconHandler<ICom
 	}
 
 	private applyIconsForElementTree(rootEl: HTMLElement): void {
+		// 一次建好往下传：这里最多要走四条应用路径，各自默认建一个的话，
+		// 一次 observer 回调就会把注册表快照建四遍（装了大包时是四份上万条的 Set）
+		const canRender = createIconRenderable();
+
 		if (
 			this.isPluginListEnabled() &&
 			rootEl.matches(this.pluginNavItemSelector)
 		) {
-			this.applyIconToNavItem(rootEl);
+			this.applyIconToNavItem(rootEl, canRender);
 		}
 
 		if (
 			this.isSearchResultsEnabled() &&
 			rootEl.matches(this.searchResultItemSelector)
 		) {
-			this.applyIconToSearchResult(rootEl);
+			this.applyIconToSearchResult(rootEl, canRender);
 		}
 
 		if (this.isPluginListEnabled()) {
-			this.applyPluginListIconsInContainer(rootEl);
+			this.applyPluginListIconsInContainer(rootEl, canRender);
 		}
 
 		if (this.isSearchResultsEnabled()) {
-			this.applySearchResultIconsInContainer(rootEl);
+			this.applySearchResultIconsInContainer(rootEl, canRender);
 		}
 	}
 

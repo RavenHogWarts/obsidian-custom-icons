@@ -94,4 +94,43 @@ describe("resolveTabIcon", () => {
 			),
 		).toMatchObject({ id: "markdown", icon: "file-text" });
 	});
+
+	describe("图标画不出来时级联继续往下（图标包被停用 / 图标被删）", () => {
+		/** 假装 mdi 包被停用 */
+		const canRender = (icon?: string, type?: string) =>
+			Boolean(icon) && (type === "lucide" || !icon!.startsWith("CI-mdi-"));
+
+		const deadTabs: Record<string, ITabHeaderIconOverride> = {
+			"markdown::春节.md": {
+				id: "markdown::春节.md",
+				icon: "CI-mdi-star",
+				type: "svg",
+			},
+		};
+
+		it("失效的单标签覆盖回落到类型层", () => {
+			// 不传判定时保持旧行为
+			expect(
+				resolveTabIcon(deadTabs, data, "markdown", "春节.md"),
+			).toMatchObject({ icon: "CI-mdi-star" });
+			expect(
+				resolveTabIcon(deadTabs, data, "markdown", "春节.md", canRender),
+			).toMatchObject({ id: "markdown", icon: "file-text" });
+		});
+
+		it("两级都失效则返回 null，原生图标恢复可见", () => {
+			const deadData: Record<string, ITabHeaderIconOverride> = {
+				markdown: { id: "markdown", icon: "CI-mdi-f", type: "svg" },
+			};
+			expect(
+				resolveTabIcon(
+					deadTabs,
+					deadData,
+					"markdown",
+					"春节.md",
+					canRender,
+				),
+			).toBeNull();
+		});
+	});
 });

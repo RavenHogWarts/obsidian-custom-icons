@@ -1,5 +1,7 @@
 import { IRibbonIconOverride } from "@src/types/types";
 import { AbstractIconHandler } from "@src/util/IconHandler";
+import { createIconRenderable } from "@src/util/createIconRenderable";
+import { type IconRenderable } from "@src/util/iconRenderable";
 import setIcon, { cleanupIcon } from "@src/util/setIcon";
 
 interface IRibbonConfig {
@@ -72,24 +74,43 @@ export default class RibbonIconHandler extends AbstractIconHandler<IRibbonConfig
 	}
 
 	private applyToExistingActions(): void {
+		// 一轮 sweep 建一个（见 util/iconRenderable.ts）
+		const canRender = createIconRenderable();
 		this.getContainers().forEach((container) => {
 			const actions = container.querySelectorAll<HTMLElement>(
 				this.actionSelector,
 			);
 			actions.forEach((actionEl) => {
-				this.applyToAction(actionEl);
+				this.applyToAction(actionEl, canRender);
 			});
 		});
 	}
 
-	private applyToAction(actionEl: HTMLElement): void {
+	private applyToAction(
+		actionEl: HTMLElement,
+		canRender: IconRenderable = createIconRenderable(),
+	): void {
 		const label = actionEl.getAttribute("aria-label");
 		if (!label) return;
 
 		const override = this.settings?.data?.[label];
 
-		// 未分配（含分配被删除/重置）：若此前被我们替换过，还原原始图标
-		if (!override?.icon || !override.type) {
+		/*
+		 * 未分配（含分配被删除/重置），**或分配的图标现在画不出来**：
+		 * 若此前被我们替换过，还原原始图标。
+		 *
+		 * 后半句是图标包被停用 / 图标被删时的回退。不能指望下面那句
+		 * 「渲染失败就 restore」兜底——`setIcon` 的 WeakMap 去重会发现
+		 * {type, icon, color, size} 与上次完全一致而**直接跳过渲染**，
+		 * 于是元素里那个早已注销的旧 svg 原封不动留着，
+		 * `querySelector("svg")` 反而判定成功，残留图标就此固化。
+		 * Ribbon 没有默认层，回退的终点就是原生图标。
+		 */
+		if (
+			!override?.icon ||
+			!override.type ||
+			!canRender(override.icon, override.type)
+		) {
 			if (actionEl.hasAttribute(this.markerAttribute)) {
 				this.restoreAction(actionEl);
 			}

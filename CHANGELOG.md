@@ -21,6 +21,18 @@
 
 * 更新相关文档 ([a3212cf](https://github.com/Raven-Pensieve/obsidian-custom-icons/commit/a3212cf46abfa1099bc361a5c3e26241a76b41d0))
 
+## [2.8.0](https://github.com/Raven-Pensieve/obsidian-custom-icons/compare/2.7.0...2.8.0) (2026-08-27)
+
+
+### ✨ 新增功能 (Features)
+
+* 导出跨插件 API 与图标变更事件，供正文内联图标插件消费 ([1736f58](https://github.com/Raven-Pensieve/obsidian-custom-icons/commit/1736f580f3904812d65e56fd49676c92fb43c9e0))
+
+
+### 🐛 问题修复 (Bug Fixes)
+
+* 图标包停用后引用失效的项回落到下一级，不再残留旧图标或留白 ([0bd0803](https://github.com/Raven-Pensieve/obsidian-custom-icons/commit/0bd0803274d3042ff66fc6165a256b380920ec30))
+
 ## [2.7.0](https://github.com/Raven-Pensieve/obsidian-custom-icons/compare/2.6.0...2.7.0) (2026-08-26)
 
 

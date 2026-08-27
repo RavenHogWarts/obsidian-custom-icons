@@ -4,10 +4,16 @@ import * as React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { getLucideIcon } from "./getLucideIcons";
 
-// 存储元素当前的图标信息，用于避免不必要的重新渲染
+/**
+ * 存储元素当前的图标信息，用于避免不必要的重新渲染。
+ *
+ * `size` **必须进键**：`undefined`（尺寸交给 CSS）与 `16`（写死像素）是两种不同的
+ * 产物，同一元素在两种模式间切换时若不比对，会被误判「无变化」而跳过重绘。
+ * 与下方 `svg` 分支里那条「渲染失败不记录状态」的注释是同一类教训。
+ */
 const iconStateMap = new WeakMap<
 	HTMLElement,
-	{ type: IconType; icon: string; color?: string }
+	{ type: IconType; icon: string; color?: string; size?: number }
 >();
 
 function normalizeColor(color?: string): string | undefined {
@@ -23,6 +29,27 @@ function applyIconColor(el: HTMLElement | SVGElement, color?: string): void {
 	}
 
 	el.style.removeProperty("color");
+}
+
+/**
+ * 写 svg 的 width/height。
+ *
+ * `size` 为 `undefined` 时**移除**这两个属性而不是跳过：`obsidianSetIcon` 注册的图标
+ * 自带 `width`/`height`（用户导入的 SVG 经 `cleanSvg` 剥过，包图标则不一定），
+ * 只是「不写」的话它们会留在原处，`1em` 的 CSS 盒子就管不到实际尺寸。
+ */
+function applySvgSize(el: SVGElement, size?: number): void {
+	if (size === undefined) {
+		el.removeAttribute("width");
+		el.removeAttribute("height");
+		return;
+	}
+	if (!el.getAttribute("width")) {
+		el.setAttribute("width", String(size));
+	}
+	if (!el.getAttribute("height")) {
+		el.setAttribute("height", String(size));
+	}
 }
 
 function parseSvgMarkup(
@@ -50,6 +77,11 @@ function parseSvgMarkup(
 	return null;
 }
 
+/**
+ * @param size 省略 = **不写 width/height**，尺寸交给 CSS。
+ *   lucide-react 总会把 `size` 渲染成 width/height（省略则用它自己的默认 24），
+ *   所以这一档只能在产出后把两个属性摘掉，不能靠不传 prop 实现。
+ */
 function createLucideSvg(
 	ownerDocument: Document,
 	IconComponent: React.ComponentType<{
@@ -60,7 +92,7 @@ function createLucideSvg(
 	}>,
 	resolvedColor?: string,
 	className = "svg-icon",
-	size = 16,
+	size?: number,
 ): SVGElement | null {
 	const svgString = renderToStaticMarkup(
 		React.createElement(IconComponent, {
@@ -71,7 +103,12 @@ function createLucideSvg(
 		}),
 	);
 
-	return parseSvgMarkup(ownerDocument, svgString);
+	const svgElement = parseSvgMarkup(ownerDocument, svgString);
+	if (svgElement && size === undefined) {
+		svgElement.removeAttribute("width");
+		svgElement.removeAttribute("height");
+	}
+	return svgElement;
 }
 
 /**
@@ -82,17 +119,20 @@ function createLucideSvg(
  * @param options - 配置选项
  * @param options.append - 如果为 true，将图标作为子元素追加；否则替换元素内容
  * @param options.color - 图标颜色，留空时继承默认颜色
- * @param options.size - 图标尺寸（px），默认 16；如 Ribbon 按钮原生为 24
+ * @param options.size - 图标尺寸（px），默认 16；如 Ribbon 按钮原生为 24。
+ *   传 `null` = **不写 width/height**，尺寸完全交给 CSS（正文内联要 `1em` 跟着字号走，
+ *   写死像素就固定了）。跨插件 API 的 `renderTo` 省略 size 时走的就是这一档。
  * @returns 渲染图标的容器元素（仅当 append 为 true 时）
  */
 export default function (
 	el: HTMLElement,
 	iconType: IconType,
 	icon: string,
-	options?: { append?: boolean; color?: string; size?: number },
+	options?: { append?: boolean; color?: string; size?: number | null },
 ): HTMLElement | void {
 	const resolvedColor = normalizeColor(options?.color);
-	const size = options?.size ?? 16;
+	// null = 交给 CSS（不写尺寸属性）；undefined = 保持既有默认 16
+	const size = options?.size === null ? undefined : (options?.size ?? 16);
 
 	// 检查图标是否已经是目标图标，如果是则跳过渲染（仅对非 append 模式）
 	if (!options?.append) {
@@ -101,7 +141,8 @@ export default function (
 			currentState &&
 			currentState.type === iconType &&
 			currentState.icon === icon &&
-			currentState.color === resolvedColor
+			currentState.color === resolvedColor &&
+			currentState.size === size
 		) {
 			return; // 图标没有变化，跳过渲染
 		}
@@ -147,6 +188,7 @@ export default function (
 							type: iconType,
 							icon,
 							color: resolvedColor,
+							size,
 						});
 					}
 				}
@@ -177,12 +219,7 @@ export default function (
 
 			const svgElement = tempContainer.querySelector("svg");
 			if (svgElement) {
-				if (!svgElement.getAttribute("width")) {
-					svgElement.setAttribute("width", String(size));
-				}
-				if (!svgElement.getAttribute("height")) {
-					svgElement.setAttribute("height", String(size));
-				}
+				applySvgSize(svgElement, size);
 				svgElement.classList.add("svg-icon");
 				applyIconColor(svgElement, resolvedColor);
 
@@ -205,14 +242,10 @@ export default function (
 					type: iconType,
 					icon,
 					color: resolvedColor,
+					size,
 				});
 
-				if (!svgElement.getAttribute("width")) {
-					svgElement.setAttribute("width", String(size));
-				}
-				if (!svgElement.getAttribute("height")) {
-					svgElement.setAttribute("height", String(size));
-				}
+				applySvgSize(svgElement, size);
 				svgElement.classList.add("svg-icon");
 				applyIconColor(svgElement, resolvedColor);
 			}

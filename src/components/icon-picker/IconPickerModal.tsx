@@ -13,7 +13,7 @@ import {
 import { buildIconExistence } from "@src/util/iconExists";
 import { rankIcons } from "@src/util/iconSearch";
 import { decidePickerKey, nextSegmentIndex } from "./pickerKeys";
-import { buildIconSources } from "@src/util/iconSources";
+import { buildIconSources, IconSourcesOptions } from "@src/util/iconSources";
 import { hasLucideIcon } from "@src/util/getLucideIcons";
 import setIcon from "@src/util/setIcon";
 import { Ban, Star } from "lucide-react";
@@ -67,9 +67,12 @@ const toSegment = (
  * 不随弹窗交互变化的分组：Lucide、用户 SVG、每个已启用图标包各一段。
  * 来源构建与「全部」页共用 `buildIconSources`，此处只补上空态文案。
  */
-function buildStaticSegments(plugin: CIPlugin): Segment[] {
+function buildStaticSegments(
+	plugin: CIPlugin,
+	options?: IconSourcesOptions,
+): Segment[] {
 	const emptyText = LL.view.CustomIconLib.picker.emptySegment();
-	return buildIconSources(plugin).map((source) => ({
+	return buildIconSources(plugin, options).map((source) => ({
 		...source,
 		emptyText,
 	}));
@@ -155,6 +158,11 @@ export interface IconPickerModalProps {
 	 */
 	colorEditable?: boolean;
 	/**
+	 * 候选池范围。**本插件自己的入口一律不传**（默认含 Lucide 差集，即既有行为）；
+	 * 只有跨插件 API 会传 `{ lucideExtras: false }`，见 `IconSourcesOptions`。
+	 */
+	include?: IconSourcesOptions;
+	/**
 	 * @param color `undefined` = 未改动（调用方保留原值）；`""` = 显式清除
 	 */
 	onChange: (icon: string, type: IconType, color?: string) => void;
@@ -172,6 +180,7 @@ const IconPickerView: React.FC<IconPickerViewProps> = ({
 	type,
 	color,
 	colorEditable,
+	include,
 	onChange,
 	onClose,
 }) => {
@@ -192,8 +201,14 @@ const IconPickerView: React.FC<IconPickerViewProps> = ({
 	);
 	const [colorTouched, setColorTouched] = useState(false);
 
-	// Lucide / 我的 SVG / 各图标包：每次打开构建一次
-	const staticSegments = useMemo(() => buildStaticSegments(plugin), [plugin]);
+	// Lucide / 我的 SVG / 各图标包：每次打开构建一次。
+	// 依赖取 `include?.lucideExtras` 这个原始值而不是 `include` 对象——
+	// 调用方多半传字面量，按对象身份比对每次渲染都会重建上万条候选
+	const lucideExtras = include?.lucideExtras;
+	const staticSegments = useMemo(
+		() => buildStaticSegments(plugin, { lucideExtras }),
+		[plugin, lucideExtras],
+	);
 
 	/**
 	 * 收藏 / 最近里的键可能已经指不到任何图标（图标被删、被改名，或所属包被

@@ -11,7 +11,12 @@ describe("validatePackId", () => {
 		expect(validatePackId("ci")).toBe("reserved");
 		expect(validatePackId("CI")).toBe("reserved");
 		expect(validatePackId("ci-custom")).toBe("reserved");
-		expect(validatePackId("lucide")).toBe("reserved");
+	});
+
+	test("lucide 不再是保留字（Iconify 官方 lucide 集要装得上）", () => {
+		// 注册出来是 CI-lucide-<name>，与内置 lucide-<name> 前缀不同、不冲突
+		expect(validatePackId("lucide")).toBeNull();
+		expect(validatePackId("Lucide")).toBeNull();
 	});
 
 	test("非法格式", () => {

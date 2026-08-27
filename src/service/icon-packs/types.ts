@@ -29,8 +29,15 @@ export function validatePackId(id: string): string | null {
 		return "invalid";
 	}
 	const lower = id.toLowerCase();
-	// 保留字：与用户 SVG 的 CI- 前缀和 Obsidian 内置前缀冲突
-	if (lower === "ci" || lower.startsWith("ci-") || lower === "lucide") {
+	// 保留字：只排与用户 SVG 的 CI- 前缀真正冲突的形态。
+	//
+	// `lucide` 曾在这份名单里，已放开：它注册出来的是 `CI-lucide-<name>`，
+	// 与 Obsidian 内置的 `lucide-<name>` **前缀不同、不会冲突**——当初列为保留字
+	// 是偏保守的防御，代价却是 Iconify 官方的 `lucide` 集（1780 图标 / ISC）根本装不上
+	// （Iconify 安装路径不传 packId，packId 即 prefix = "lucide"，直接抛 reserved）。
+	// 放开后正文内联图标想用全量 Lucide 的用户就走既有图标包路径，
+	// 见 dev/ecosystem/跨插件API导出方案.md §3.2。
+	if (lower === "ci" || lower.startsWith("ci-")) {
 		return "reserved";
 	}
 	return null;

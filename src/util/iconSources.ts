@@ -1,6 +1,6 @@
 import CIPlugin from "@src/main";
 import { LL } from "@src/i18n/i18n";
-import { getLucideIconNames } from "./getLucideIcons";
+import { getLucideIconCatalog, getLucideIconNames } from "./getLucideIcons";
 import { IconRef } from "./iconRef";
 
 /**
@@ -32,21 +32,47 @@ export function makeIconSource(
 	};
 }
 
+/** 构建选项 */
+export interface IconSourcesOptions {
+	/**
+	 * 是否包含 **Obsidian 未内置的那批 Lucide**（差集）。
+	 *
+	 * **默认 `true`，即本插件自己界面的既有行为**：那批图标虽不在注册表里，但本插件
+	 * 的 `setIcon` 走 `lucide-react` 现场渲染，画得出来；图标只是存进设置，渲染始终
+	 * 经本插件，所以对内没有任何问题。
+	 *
+	 * 传 `false` 只服务**跨插件消费方**：它会把选中的 id **写进用户文件**，而差集的 id
+	 * 在本插件被禁用后就画不出来了。详见 dev/ecosystem/跨插件API导出方案.md §3.2。
+	 */
+	lucideExtras?: boolean;
+}
+
 /**
  * 构建全部图标来源分组。
  *
  * 只读取内存缓存（`getPackIconIds` 走 `getCachedPack`），不产生 IO / 网络；
  * 调用方应当每次打开界面构建一次而不是每次渲染都建。
  */
-export function buildIconSources(plugin: CIPlugin): IconSource[] {
+export function buildIconSources(
+	plugin: CIPlugin,
+	options: IconSourcesOptions = {},
+): IconSource[] {
 	const picker = LL.view.CustomIconLib.picker;
 	const lib = plugin.settings.customIconLib;
+
+	// 只有显式传 false 才收窄到注册表里有的那批（`builtin` 为真 = Obsidian 原生内置）
+	const lucideNames =
+		options.lucideExtras === false
+			? getLucideIconCatalog()
+					.filter((entry) => entry.builtin)
+					.map((entry) => entry.name)
+			: getLucideIconNames();
 
 	const sources: IconSource[] = [
 		makeIconSource(
 			"lucide",
 			picker.segment.lucide(),
-			getLucideIconNames().map((id) => ({ type: "lucide" as const, id })),
+			lucideNames.map((id) => ({ type: "lucide" as const, id })),
 		),
 		makeIconSource(
 			"svg",

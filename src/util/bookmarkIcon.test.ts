@@ -102,4 +102,34 @@ describe("resolveBookmarkIcon", () => {
 		const icon = resolveBookmarkIcon("1", "file", cfg);
 		expect(icon?.color).toBeTruthy();
 	});
+
+	describe("图标画不出来时级联继续往下（图标包被停用 / 图标被删）", () => {
+		/** 假装 mdi 包被停用 */
+		const canRender = (icon?: string, type?: string) =>
+			Boolean(icon) && (type === "lucide" || !icon!.startsWith("CI-mdi-"));
+
+		const cfg: IBookmarksConfig = {
+			...emptyCfg,
+			items: { "123": { id: "123", icon: "CI-mdi-star", type: "svg" } },
+			types: { file: { id: "file", icon: "file-text", type: "lucide" } },
+		};
+
+		it("失效的单项覆盖回落到类型层", () => {
+			// 不传判定时保持旧行为
+			expect(resolveBookmarkIcon("123", "file", cfg)).toMatchObject({
+				icon: "CI-mdi-star",
+			});
+			expect(
+				resolveBookmarkIcon("123", "file", cfg, canRender),
+			).toMatchObject({ icon: "file-text" });
+		});
+
+		it("两级都失效则返回 null，原生图标恢复可见", () => {
+			const dead: IBookmarksConfig = {
+				...cfg,
+				types: { file: { id: "file", icon: "CI-mdi-f", type: "svg" } },
+			};
+			expect(resolveBookmarkIcon("123", "file", dead, canRender)).toBeNull();
+		});
+	});
 });

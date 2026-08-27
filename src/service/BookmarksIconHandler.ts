@@ -8,6 +8,8 @@ import {
 	resolveBookmarkIcon,
 } from "@src/util/bookmarkIcon";
 import { AbstractIconHandler } from "@src/util/IconHandler";
+import { createIconRenderable } from "@src/util/createIconRenderable";
+import { type IconRenderable } from "@src/util/iconRenderable";
 import setIcon, { cleanupIcon } from "@src/util/setIcon";
 import { EventRef, Menu, WorkspaceLeaf } from "obsidian";
 
@@ -178,6 +180,8 @@ export default class BookmarksIconHandler extends AbstractIconHandler<IBookmarks
 
 	private applyToAll(): void {
 		const items = this.getInstance()?.items;
+		// 一轮 sweep 建一个（见 util/iconRenderable.ts）
+		const canRender = createIconRenderable();
 
 		this.getBookmarkLeaves().forEach((leaf) => {
 			const doms = this.getItemDoms(leaf);
@@ -189,23 +193,32 @@ export default class BookmarksIconHandler extends AbstractIconHandler<IBookmarks
 						self,
 						this.resolveKind(item, self),
 						this.keyOf(item),
+						canRender,
 					);
 				});
 				return;
 			}
 			// 降级：内部形态变动（itemDoms 缺失）时退回扫 DOM，
 			// 类型只能由 mod-collapsible 粗判 → 仅类型默认层生效，单项覆盖失效。
-			this.applyViaDom(leaf);
+			this.applyViaDom(leaf, canRender);
 		});
 	}
 
-	private applyViaDom(leaf: WorkspaceLeaf): void {
+	private applyViaDom(
+		leaf: WorkspaceLeaf,
+		canRender: IconRenderable = createIconRenderable(),
+	): void {
 		leaf.view.containerEl
 			?.querySelectorAll<HTMLElement>(this.rowSelector)
 			.forEach((row) => {
 				const self = row.querySelector<HTMLElement>(this.selfSelector);
 				if (!self) return;
-				this.applyToRow(self, this.resolveKind(undefined, self));
+				this.applyToRow(
+					self,
+					this.resolveKind(undefined, self),
+					undefined,
+					canRender,
+				);
 			});
 	}
 
@@ -223,8 +236,9 @@ export default class BookmarksIconHandler extends AbstractIconHandler<IBookmarks
 		self: HTMLElement,
 		kind: BookmarkKind,
 		key?: string,
+		canRender: IconRenderable = createIconRenderable(),
 	): void {
-		const resolved = resolveBookmarkIcon(key, kind, this.settings);
+		const resolved = resolveBookmarkIcon(key, kind, this.settings, canRender);
 		const existing = self.querySelector<HTMLElement>(
 			`:scope > .${this.iconClass}`,
 		);

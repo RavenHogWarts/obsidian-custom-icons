@@ -367,3 +367,60 @@ describe("inheritance", () => {
 		expect(resolveFileIcon("A/sub/note.md", cfg)?.icon).toBe("file");
 	});
 });
+
+describe("图标画不出来时级联继续往下（图标包被停用 / 图标被删）", () => {
+	/** 假装 mdi 包被停用：它的图标一律画不出来，其余照常 */
+	const canRender = (icon?: string, type?: string) =>
+		Boolean(icon) && (type === "lucide" || !icon!.startsWith("CI-mdi-"));
+
+	const cfg: IFileExplorerConfig = {
+		...emptyCfg,
+		folderDefault: { id: "", icon: "star", type: "lucide", color: "" },
+		fileDefault: { id: "", icon: "file", type: "lucide", color: "" },
+		folders: { Work: { id: "Work", icon: "CI-mdi-home", type: "svg" } },
+		extensions: { md: { id: "md", icon: "CI-mdi-file", type: "svg" } },
+		files: {
+			"Work/a.md": { id: "Work/a.md", icon: "CI-mdi-doc", type: "svg" },
+		},
+	};
+
+	it("文件夹：失效的单项覆盖回落到 folderDefault", () => {
+		// 不传判定时保持旧行为——那条死引用照样赢下这一级
+		expect(resolveFolderIcon("Work", cfg)?.icon).toBe("CI-mdi-home");
+		expect(resolveFolderIcon("Work", cfg, canRender)?.icon).toBe("star");
+	});
+
+	it("文件：单项与扩展名两级都失效，一路落到 fileDefault", () => {
+		expect(resolveFileIcon("Work/a.md", cfg, canRender)?.icon).toBe("file");
+	});
+
+	it("连兜底层都失效则返回 null——调用方据此移除图标节点，不留空白占位", () => {
+		const dead: IFileExplorerConfig = {
+			...cfg,
+			folderDefault: { id: "", icon: "CI-mdi-x", type: "svg", color: "" },
+		};
+		expect(resolveFolderIcon("Work", dead, canRender)).toBeNull();
+	});
+
+	it("继承跳过失效的祖先，继续上溯到还画得出来的那个", () => {
+		const inherit: IFileExplorerConfig = {
+			...emptyCfg,
+			inherit: { subfolder: true, file: false },
+			folders: {
+				A: { id: "A", icon: "box", type: "lucide" },
+				"A/B": { id: "A/B", icon: "CI-mdi-dead", type: "svg" },
+			},
+		};
+		expect(resolveFolderIcon("A/B/C", inherit, canRender)?.icon).toBe("box");
+		expect(
+			findNearestConfiguredAncestor("A/B/C", inherit.folders, canRender)
+				?.icon,
+		).toBe("box");
+	});
+
+	it("重新启用图标包后立刻恢复——设置从未被改写", () => {
+		expect(resolveFolderIcon("Work", cfg, () => true)?.icon).toBe(
+			"CI-mdi-home",
+		);
+	});
+});

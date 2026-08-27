@@ -5,6 +5,10 @@ import {
 	IconType,
 } from "@src/types/types";
 import { normalizeIconColor } from "@src/util/communityPluginIcon";
+import {
+	alwaysRenderable,
+	type IconRenderable,
+} from "@src/util/iconRenderable";
 
 /**
  * 书签图标解析工具。
@@ -43,10 +47,21 @@ export function isBookmarkKind(value: string): value is BookmarkKind {
 	return (BOOKMARK_KINDS as readonly string[]).includes(value);
 }
 
+/**
+ * 这一级「配了图标，且那个图标现在画得出来」。
+ * `canRender` 的作用见 `util/iconRenderable.ts`：画不出来就当这一级没配，
+ * 让级联落到类型级 / 原生外观，而不是留一块空白。
+ */
 function hasIcon(
-	override?: IBookmarkIconOverride | IIcon,
+	override: IBookmarkIconOverride | IIcon | undefined,
+	canRender: IconRenderable,
 ): override is IBookmarkIconOverride {
-	return Boolean(override && override.icon && override.type);
+	return Boolean(
+		override &&
+			override.icon &&
+			override.type &&
+			canRender(override.icon, override.type),
+	);
 }
 
 function toIcon(id: string, source: IBookmarkIconOverride | IIcon): IIcon {
@@ -69,12 +84,14 @@ export function resolveBookmarkIcon(
 	key: string | undefined,
 	kind: BookmarkKind,
 	cfg: IBookmarksConfig,
+	canRender: IconRenderable = alwaysRenderable,
 ): IIcon | null {
 	const itemOverride = key ? cfg.items?.[key] : undefined;
-	if (hasIcon(itemOverride)) return toIcon(key as string, itemOverride);
+	if (hasIcon(itemOverride, canRender))
+		return toIcon(key as string, itemOverride);
 
 	const typeOverride = cfg.types?.[kind];
-	if (hasIcon(typeOverride)) return toIcon(kind, typeOverride);
+	if (hasIcon(typeOverride, canRender)) return toIcon(kind, typeOverride);
 
 	return null;
 }

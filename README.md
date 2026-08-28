@@ -2,91 +2,100 @@ English | [中文](https://github.com/Raven-Pensieve/obsidian-custom-icons/blob/
 
 # Custom Icons
 
-Enhance your workspace with customizable icons — files & folders, tab headers, ribbon actions, community plugins and more.
+Icons for every surface of your Obsidian workspace — files and folders, tab headers, bookmarks, ribbon actions, community plugin settings — plus a built-in icon library backed by the full Iconify catalogue.
 
 ![GitHub Socialify](https://socialify.git.ci/Raven-Pensieve/obsidian-custom-icons/image?description=1&font=Rokkitt&forks=1&issues=1&language=1&name=1&owner=1&pattern=Floating+Cogs&pulls=1&stargazers=1&theme=Auto)
 
-## Features
+## Icon surfaces
 
-Since v2.x, the v1.0 remaster is complete: the classic pre-1.0 features (sidebar/ribbon, folder and file icons) are all reimplemented natively — the plugin no longer generates CSS snippets.
+Each surface is a tab under **Settings → Custom Icons** with its own on/off switch. Native icons are hidden rather than removed, so disabling a feature restores Obsidian's own appearance.
 
-### Icon surfaces
+| Surface | What you can do |
+| --- | --- |
+| **File explorer** | A default folder icon and a fallback file icon; per-extension rules (batch add, compound suffixes such as `excalidraw.md` win over `md`); named extension groups with presets (images, video, audio, documents, archives, code); per-item overrides via right-click in the tree; optional inheritance so subfolders and unmatched files follow the nearest ancestor folder. Overrides follow renames and are cleaned up on delete. |
+| **Tab headers** | Sidebar tool tabs and editor tabs, popout windows included. Two-level resolution: a per-tab override wins, a per-view-type mapping is the fallback. Right-click an active tab to set or reset. |
+| **Bookmarks** | All six bookmark kinds (file, folder, group, search, graph, URL). Per-item overrides win over a per-kind default; items are keyed by a stable id, so renaming or moving a bookmark keeps its icon. |
+| **Ribbon** | Icons for the left ribbon actions, identified by tooltip text, restorable to the original at any time. |
+| **Community plugins** | Give plugins that ship without an icon one (a fix for Obsidian 1.11+): a shared default, a random icon per plugin or for all at once, and icons in settings search results (Obsidian 1.13+). |
 
-- **Community plugin icons** — add icons to community plugins without one (fix for Obsidian 1.11+), assign a default or random icon (per plugin or all at once), and show icons in the settings search results (Obsidian 1.13+).
-- **Ribbon icons** — customize the icons of the left ribbon actions (identified by tooltip text), and restore the originals at any time.
-- **File explorer icons** — icons for folders and files, resolved per item with cascading rules:
-  - a default folder icon and a fallback file icon (leave empty to hide icons);
-  - per-extension rules with batch add; compound suffixes take precedence (`excalidraw.md` over `md`);
-  - per-item overrides via right-click → "Set icon" / "Reset icon" directly in the file tree;
-  - optional inheritance: subfolders, and files matching no extension rule, follow the nearest ancestor folder's icon (color included);
-  - overrides follow renames and are cleaned up on deletion automatically.
-- **Tab header icons** — customize workspace tab headers (sidebar tool tabs and editor tabs, popout windows included) with two-level resolution: per-tab overrides take priority, a per-view-type mapping acts as fallback, native icons are kept otherwise (hidden, not removed — restored automatically when disabled). Right-click an active tab to set or reset its icon.
+Colours are set alongside every icon, and batch actions (randomize, clear) apply to whatever the current filter shows.
 
-### Custom icon library
+## Icon library
 
-Open it from the ribbon button or via the command **"Custom Icons: Open custom icon library"**.
+Open it from the ribbon button or the command **"Open custom icon library"**.
 
-- **Custom SVG icons** — paste SVG code or upload `.svg` files (batch upload supported; file names become icon IDs).
-- **Icon packs** — install whole icon sets from the built-in [Iconify](https://iconify.design) catalog (220+ sets) or from any npm package shipping loose SVG files (path globs supported, popular presets included). Preview before installing; enable/disable, re-download or uninstall at any time. Packs are stored locally and work fully offline after installation.
-- **Lucide browser** — browse all Lucide icons bundled with the plugin, with a filter separating icons already built into Obsidian from the extras.
+- **Icon packs** — install whole sets from the built-in [Iconify](https://iconify.design) catalogue (220+ sets), or from any npm package that ships loose SVG files (path globs, popular presets included). Preview before installing; enable, disable, re-download or uninstall at any time. Packs are stored in the plugin folder and work offline once installed.
+- **My SVG** — paste SVG source or upload `.svg` files in bulk (file names become icon IDs). Organize into groups, sort, multi-select, and export/import the library as JSON to move it between vaults.
+- **Lucide** — browse every Lucide icon bundled with the plugin, with a filter separating the ones Obsidian already ships from the extras.
+- **All** — search Lucide, your own SVGs and every installed pack at once, grouped by source.
 
-All library icons are registered as regular Obsidian global icons (prefixed `CI-`), take effect immediately, and can be used by any other plugin (see FAQ).
+Favorites, recently used and grid density are remembered across sessions and shared with the icon picker used throughout the plugin.
 
-### Experimental
-
-- **Always load this plugin first** — automatically keeps this plugin at the front of the community plugin load order, so icons never go missing because of load order. Reorders only, never adds or removes entries; takes effect on the next restart.
+Library icons are registered as ordinary Obsidian global icons with the ID `CI-<icon-id>`, take effect immediately without a reload, and can be used by any other plugin.
 
 ## Usage
 
 ![Usage](docs/Usage.EN.png)
 
-Icons are configured in two places:
+Icons are configured in two places: the settings tabs above, and in place — right-click a file, folder, bookmark or an active tab header. If anything looks wrong, run **"Reapply all icons"** from the command palette to re-register and reapply everything.
 
-- **Settings → Custom Icons** — one tab per surface (community plugins, ribbon, file explorer, tab headers) plus experimental options.
-- **In place** — right-click a file/folder in the file explorer, or an active tab header, to set or reset its icon.
+### Experimental
 
-If icons ever look wrong, run **"Custom Icons: Reapply all icons"** from the command palette to re-register and reapply everything.
+**Always load this plugin first** keeps this plugin at the front of the community plugin load order, so other plugins never render before its icons are registered. It only reorders entries, never adds or removes them, and takes effect on the next restart.
 
 ## Installation
-### Community plugin market installation
 
-[Click to install](obsidian://show-plugin?id=custom-sidebar-icons), or:
+### Community plugin market
 
-1. Open Obsidian and go to `Settings > Community Plugins`.
-2. Search for "Custom Icons".
-3. Click "Install".
+[Click to install](obsidian://show-plugin?id=custom-sidebar-icons), or open `Settings → Community Plugins`, search for "Custom Icons" and install.
 
-### BRAT (Recommended for Beta Users)
+### BRAT (beta versions)
 
-1. Install [BRAT](https://github.com/TfTHacker/obsidian42-brat) plugin
+1. Install [BRAT](https://github.com/TfTHacker/obsidian42-brat)
 2. Click "Add Beta plugin" in BRAT settings
 3. Enter `Raven-Pensieve/obsidian-custom-icons`
-4. Enable the plugin
 
-## Upgrading from 0.x
+## For plugin developers
 
-v1.0 was a breaking remaster and v2.x has brought the classic pre-1.0 features back with native implementations. The old CSS-based configuration — including the auto-generated `CustomIcon-AutoGen` CSS snippet — is no longer used or migrated. After upgrading, remove that snippet from your vault and set your icons up again in the new settings page.
+Custom Icons exposes a cross-plugin API (contract v1) on its plugin instance. Copy [`docs/custom-icons-api.d.ts`](docs/custom-icons-api.d.ts) into your own repository — there is no npm package, deliberately: no build coupling, and the runtime guard is the `version` field anyway.
+
+```ts
+const provider = app.plugins.getPlugin("custom-sidebar-icons")?.api;
+if (provider?.version === 1) {
+    provider.renderTo(el, "CI-mdi-home");   // the only way to draw the Lucide extras
+    provider.describe("CI-mdi-home");       // source, short name, pack id
+    provider.catalog();                     // all candidates, grouped by source
+    provider.openPicker({ onPick });        // reuse this plugin's icon picker
+}
+
+// Required: icon sets change without the plugin list changing
+this.registerEvent(
+    this.app.workspace.on("custom-icons:changed", () => this.invalidate()),
+);
+```
+
+Do not cache the API reference (the plugin can be disabled and re-enabled), and do not split `CI-<packId>-<name>` yourself — both segments may contain hyphens, so ask `describe()`.
+
+[Inline Icons](https://github.com/Raven-Pensieve/obsidian-inline-icons) is a reference consumer: it renders icons inside note bodies using this registry.
 
 ## FAQ
 
-### Can other plugins use my custom SVG icons?
+### My icon shows blank inside another plugin
 
-Yes. Library icons are registered as **regular Obsidian global icons** with the id `CI-<icon-id>`. Any plugin can render them with `setIcon(el, "CI-my-icon")`, and newly added SVGs take effect **immediately — no app reload required**.
+Obsidian's `setIcon` renders once. If that plugin rendered its icon **before** Custom Icons loaded, the spot stays blank. In order:
 
-### My icon shows blank inside another plugin?
-
-Obsidian's `setIcon` is a one-shot render: if that plugin rendered the icon **before** Custom Icons was loaded (plugin load order varies by user), the spot stays blank. Try in order:
-
-1. Run the command **"Custom Icons: Reapply all icons"** (refreshes icons on surfaces managed by this plugin);
-2. Reopen the affected view / panel;
-3. Enable **Settings → Experimental → "Always load this plugin first"** and restart (see below — the root fix);
+1. Run **"Reapply all icons"**;
+2. Reopen the affected view;
+3. Enable **Settings → Experimental → "Always load this plugin first"** and restart — this is the root fix, since community plugins load in the order of the array in `.obsidian/community-plugins.json`;
 4. Reload that plugin, or restart Obsidian.
 
-**Advanced: always load this plugin first.** Community plugins load in the order of the array in `.obsidian/community-plugins.json`. Moving `"custom-sidebar-icons"` to the front of the array (then restarting Obsidian) makes it register icons before any other plugin loads — completely avoiding blank icons on one-shot surfaces such as ribbon actions. Or enable **"Always load this plugin first"** under **Settings → Experimental** of this plugin — it automatically re-enforces the front position whenever the plugin loads (reorders only, never adds/removes entries; takes effect on next restart; experimental). Note: when reordering manually, never remove entries; enabling new plugins may rewrite the array. Ribbon actions can also be assigned icons directly in Settings → Ribbon of this plugin.
+### Upgrading from 0.x
+
+v1.0 was a breaking remaster; the classic pre-1.0 features have all been reimplemented natively since, and the plugin no longer generates CSS snippets. The old CSS-based configuration, including the auto-generated `CustomIcon-AutoGen` snippet, is neither used nor migrated. Delete that snippet from your vault and set your icons up again in the settings page.
 
 ## License
 
-This project is licensed under the GPL-3.0 license - see the [LICENSE](LICENSE) file for details.
+GPL-3.0 — see [LICENSE](LICENSE).
 
 ## Star History
 

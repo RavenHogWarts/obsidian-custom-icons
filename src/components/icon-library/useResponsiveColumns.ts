@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useLayoutEffect, useState } from "react";
 
 /**
  * 与 CSS `repeat(auto-fill, minmax(minColumnWidth, 1fr))` 等价的列数计算。
@@ -24,6 +24,10 @@ export function computeColumns(
  * 观测滚动容器宽度，动态返回当前应渲染的列数。
  * 用于把响应式 auto-fill 网格转换为「固定列数 + 行虚拟化」。
  *
+ * 首次计算放在 useLayoutEffect：挂载当帧、浏览器绘制之前就把初始值 1 修正为
+ * 实际列数。若用 useEffect，首帧会按 1 列绘制——卡片被拉满整行、字形巨大，
+ * 下一帧才缩回 N 列，视觉上就是「初次加载闪一张大图」。
+ *
  * @param ref 滚动容器（内容宽度 = clientWidth - 左右 padding）
  * @param minColumnWidth 单列最小宽度（对齐原 CSS 的 minmax 下限）
  * @param gap 列间距（像素，需与行内联样式的 gap 一致）
@@ -35,7 +39,7 @@ export function useResponsiveColumns(
 ): number {
 	const [columns, setColumns] = useState(1);
 
-	useEffect(() => {
+	useLayoutEffect(() => {
 		const el = ref.current;
 		if (!el) {
 			return;

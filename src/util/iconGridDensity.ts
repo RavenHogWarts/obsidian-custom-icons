@@ -29,8 +29,8 @@ export function compactGridMetrics(density: IconGridDensity): IconGridMetrics {
 }
 
 /**
- * 带操作按钮的网格（我的 SVG）的几何：同款方形图块，列宽略宽一档
- * （用户自导入的图标量少，值得更大的字形）。
+ * 带操作按钮的网格（我的 SVG）的几何：与只读网格共用同一套方形图块
+ * 几何，保持各页观感一致（两函数并存是历史分层，值刻意保持相等）。
  */
 export function cardGridMetrics(density: IconGridDensity): IconGridMetrics {
 	switch (density) {

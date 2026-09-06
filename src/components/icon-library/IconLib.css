@@ -265,12 +265,12 @@
 
 /*
  * Lucide / 包详情只读网格（ci-vgrid--compact）：这是「浏览 + 复制名称」的图标墙。
- * 统一卡片结构：固定高度图标区 + 自然换行的名称区——名称完整显示不截断；
- * 包裹层 flex + 卡片 flex:1 撑满行高，行内所有卡片严格等高，
- * 图标处于同一水平线，名称区顶部对齐。
+ * 卡片本身已是「字形铺满」的方形图块（见 IconCard.css），这里只剩布局职责：
+ * 包裹层 flex + 卡片 flex:1 撑满行高，行内所有卡片严格等高。
  *
  * 收藏置顶条（.ci-lib__favorites-grid）与「全部」页的分组网格
- * （.ci-lib__group-grid）沿用同一套紧凑图块外观，四个页面观感一致。
+ * （.ci-lib__group-grid）沿用同一套图块外观，四个页面观感一致；
+ * content-visibility 让这两处非虚拟化网格里视口外的卡片跳过渲染。
  */
 .ci-vgrid--compact .ci-vgrid__row > div {
 	display: flex;
@@ -281,43 +281,7 @@
 .ci-lib__group-grid .ci-lib-icon__card {
 	flex: 1;
 	content-visibility: auto;
-	contain-intrinsic-size: auto 88px;
-	aspect-ratio: auto;
-	justify-content: flex-start;
-	gap: var(--size-4-1);
-	padding: var(--size-4-2);
-}
-
-.ci-vgrid--compact .ci-lib-icon__card-icon,
-.ci-lib__favorites-grid .ci-lib-icon__card-icon,
-.ci-lib__group-grid .ci-lib-icon__card-icon {
-	flex: none;
-	height: 2.25rem; /* 固定高度图标区：行内所有卡片的图标同处一水平线 */
-	max-height: none;
-
-	svg {
-		width: 1.75rem;
-		height: 1.75rem;
-		transition: color 0.15s ease;
-	}
-}
-
-/* 悬停时整块上浮（沿用基础卡片），字形点亮为强调色 */
-.ci-vgrid--compact .ci-lib-icon__card:hover .ci-lib-icon__card-icon svg,
-.ci-lib__favorites-grid .ci-lib-icon__card:hover .ci-lib-icon__card-icon svg,
-.ci-lib__group-grid .ci-lib-icon__card:hover .ci-lib-icon__card-icon svg {
-	color: var(--interactive-accent);
-}
-
-/* 名称作为副标题：更小更淡，自然换行完整显示（kebab 名在连字符处断行） */
-.ci-vgrid--compact .ci-lib-icon__card-name,
-.ci-lib__favorites-grid .ci-lib-icon__card-name,
-.ci-lib__group-grid .ci-lib-icon__card-name {
-	flex: none;
-	margin-top: 0;
-	padding: 2px var(--size-4-1);
-	font-size: var(--font-ui-smaller);
-	line-height: 1.25;
+	contain-intrinsic-size: auto 96px;
 }
 
 /* ------------------------------ 虚拟化网格 ------------------------------ */

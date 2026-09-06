@@ -25,7 +25,7 @@ describe("iconGridDensity", () => {
 		expect(widths[1]).toBeLessThan(widths[2]);
 	});
 
-	test("卡片网格每档都比同档紧凑网格更宽（要放名称与操作按钮）", () => {
+	test("卡片网格每档都比同档紧凑网格更宽（我的 SVG 图标量少，值得更大字形）", () => {
 		for (const density of ICON_GRID_DENSITIES) {
 			expect(cardGridMetrics(density).minColumnWidth).toBeGreaterThan(
 				compactGridMetrics(density).minColumnWidth,
@@ -33,14 +33,12 @@ describe("iconGridDensity", () => {
 		}
 	});
 
-	test("卡片为方卡，行高与列宽同量级；紧凑网格行高略小于列宽", () => {
+	test("图块为正方形：行高估算与列宽一致（无名称行）", () => {
 		for (const density of ICON_GRID_DENSITIES) {
 			const card = cardGridMetrics(density);
-			expect(card.estimateRowHeight).toBeGreaterThanOrEqual(
-				card.minColumnWidth,
-			);
+			expect(card.estimateRowHeight).toBe(card.minColumnWidth);
 			const grid = compactGridMetrics(density);
-			expect(grid.estimateRowHeight).toBeLessThan(grid.minColumnWidth);
+			expect(grid.estimateRowHeight).toBe(grid.minColumnWidth);
 		}
 	});
 

@@ -1,16 +1,17 @@
+/*
+ * 方形图块：无名称行，字形铺满整卡。操作按钮悬浮在右上角（不占版面），
+ * 名称退到图标区的 aria-label 与悬停 tooltip 里。
+ */
 .ci-lib-icon__card {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	justify-content: space-between;
-	border: 1px solid var(--background-modifier-border);
-	border-radius: var(--radius-m);
-	padding: var(--size-4-3);
-	padding-top: calc(var(--size-4-3) + 1.5rem); /* 为操作按钮预留空间 */
-	background-color: var(--background-secondary);
-	transition: all 0.2s ease;
 	position: relative;
 	aspect-ratio: 1;
+	border: 1px solid var(--background-modifier-border);
+	border-radius: var(--radius-m);
+	background-color: var(--background-secondary);
+	/* 沿圆角边缘的硬边界：兜底裁掉字形越界过多的部分（见下方 svg 注释），
+	   不产生滚动容器 */
+	overflow: clip;
+	transition: all 0.2s ease;
 
 	&:hover {
 		border-color: var(--interactive-accent);
@@ -19,52 +20,37 @@
 	}
 }
 
-/* 只读卡片（无操作按钮）：无需为按钮预留顶部空间 */
-.ci-lib-icon__card--readonly {
-	padding-top: var(--size-4-3);
-}
-
+/*
+ * 图标区铺满整卡：inset 0 占满 + 百分比 padding 留呼吸空间。
+ * 百分比 padding 相对卡片宽度，字形随之在密度档间等比缩放，不必按档位
+ * 各写一版尺寸；非正方形 SVG 靠 preserveAspectRatio 默认的 meet 居中缩放，
+ * 不会拉伸变形。
+ *
+ * svg 允许越界绘制：满幅设计的图标（笔画尖角略超 viewBox）在默认
+ * overflow: hidden 下会被视口切平四角——小尺寸时无感，放大后明显。
+ * 越界墨迹落进 20% 的 padding 缓冲区；劣质图标超界过多时由卡片本体的
+ * overflow: clip 兜底裁在格子边缘内，不会渗到相邻卡片。
+ */
 .ci-lib-icon__card-icon {
-	flex: 1;
+	position: absolute;
+	inset: 0;
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	width: 100%;
-	max-height: 60%; /* 限制图标区域最大高度，避免与按钮重叠 */
+	padding: 20%;
 
 	svg {
-		width: 2rem;
-		height: 2rem;
+		width: 100%;
+		height: 100%;
+		overflow: visible;
 		color: var(--text-normal);
+		transition: color 0.15s ease;
 	}
 }
 
-.ci-lib-icon__card-name {
-	font-size: var(--font-ui-small);
-	color: var(--text-muted);
-	text-align: center;
-	width: 100%;
-	/* 允许换行以完整显示长名称（kebab 名在连字符处自然断行），
-	   居中对齐下 nowrap+ellipsis 会左右截断且省略号失效 */
-	white-space: normal;
-	overflow-wrap: break-word;
-	line-height: 1.3;
-	margin-top: var(--size-4-2);
-	background: transparent;
-	border: none;
-	padding: var(--size-4-1) var(--size-4-2);
-	border-radius: var(--radius-s);
-	cursor: pointer;
-	transition: all 0.2s ease;
-
-	&:hover {
-		background-color: var(--background-modifier-hover);
-		color: var(--text-normal);
-	}
-
-	&:active {
-		background-color: var(--background-modifier-active-hover);
-	}
+/* 悬停时整块上浮（沿用基础卡片），字形点亮为强调色 */
+.ci-lib-icon__card:hover .ci-lib-icon__card-icon svg {
+	color: var(--interactive-accent);
 }
 
 /* 操作按钮组容器 */
@@ -146,11 +132,11 @@
 	color: var(--color-yellow);
 }
 
-/* 键盘可达：图标区现在是可聚焦的 role="button" */
+/* 键盘可达：图标区铺满整卡，聚焦环沿卡片圆角向内描一圈 */
 .ci-lib-icon__card-icon:focus-visible {
 	outline: none;
-	box-shadow: 0 0 0 2px var(--background-modifier-border-focus);
-	border-radius: var(--radius-s);
+	box-shadow: inset 0 0 0 2px var(--background-modifier-border-focus);
+	border-radius: var(--radius-m);
 }
 
 /*

@@ -21,6 +21,18 @@
 
 * 更新相关文档 ([a3212cf](https://github.com/Raven-Pensieve/obsidian-custom-icons/commit/a3212cf46abfa1099bc361a5c3e26241a76b41d0))
 
+## [2.8.1](https://github.com/Raven-Pensieve/obsidian-custom-icons/compare/2.8.0...2.8.1) (2026-09-06)
+
+
+### ⚡ 性能优化 (Performance)
+
+* 优化虚拟网格首次加载 ([7a74c1e](https://github.com/Raven-Pensieve/obsidian-custom-icons/commit/7a74c1e5d94a0647948c1e4d7373b042801c5925))
+
+
+### 📝 文档 (Documentation)
+
+* 更新相关文档表述 ([f29f4a6](https://github.com/Raven-Pensieve/obsidian-custom-icons/commit/f29f4a6be4a38245b55985c6af7a17f7c2918510))
+
 ## [2.8.0](https://github.com/Raven-Pensieve/obsidian-custom-icons/compare/2.7.0...2.8.0) (2026-08-27)
 
 

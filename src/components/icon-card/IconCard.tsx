@@ -65,7 +65,7 @@ export const IconCard = memo(function IconCard({
 	const card = LL.view.CustomIconLib.card;
 
 	// hover 浮层只留星标与编辑：删除、复制 SVG 源码等下沉到右键菜单，
-	// 既降低视觉噪音，也让卡片在紧凑密度下放得下
+	// 浮层悬浮在图块右上角，不占版面
 	const hasActions = Boolean(onEdit || onToggleFavorite);
 
 	useEffect(() => {
@@ -88,25 +88,22 @@ export const IconCard = memo(function IconCard({
 	);
 
 	/** 复制成功走卡片内 ✓ 微反馈；Notice 只留给失败 */
-	const copy = useCallback(
-		async (text: string, failedMessage: string) => {
-			try {
-				await navigator.clipboard.writeText(text);
-				setCopied(true);
-				if (timerRef.current !== null) {
-					window.clearTimeout(timerRef.current);
-				}
-				timerRef.current = window.setTimeout(
-					() => setCopied(false),
-					COPIED_FEEDBACK_MS,
-				);
-			} catch (err) {
-				console.error("Failed to copy to clipboard:", err);
-				new Notice(failedMessage);
+	const copy = useCallback(async (text: string, failedMessage: string) => {
+		try {
+			await navigator.clipboard.writeText(text);
+			setCopied(true);
+			if (timerRef.current !== null) {
+				window.clearTimeout(timerRef.current);
 			}
-		},
-		[],
-	);
+			timerRef.current = window.setTimeout(
+				() => setCopied(false),
+				COPIED_FEEDBACK_MS,
+			);
+		} catch (err) {
+			console.error("Failed to copy to clipboard:", err);
+			new Notice(failedMessage);
+		}
+	}, []);
 
 	const copyName = useCallback(() => {
 		void copy(id, card.copyNameFailed());
@@ -133,9 +130,9 @@ export const IconCard = memo(function IconCard({
 	);
 
 	/**
-	 * 修饰键点击在卡片**任意位置**都生效——包括字形与名称之外的留白。
+	 * 修饰键点击在图块**任意位置**都生效——图标区铺满整卡，只剩边缝与按钮区。
 	 *
-	 * 走捕获阶段并 stopPropagation：这样内部的字形 / 名称点击处理不会再跑一遍
+	 * 走捕获阶段并 stopPropagation：这样图标区的点击处理不会再跑一遍
 	 * （否则同一次点击会先选中、又复制名称）。操作按钮区排除在外，
 	 * 免得 Ctrl+点击星标变成了选中卡片。
 	 */
@@ -162,8 +159,7 @@ export const IconCard = memo(function IconCard({
 
 	// 用户导入的 SVG 存的是裸 id，实际注册 id 带 CI- 前缀；
 	// 包图标的 id 本身已是 CI-{packId}-{name}，lucide 的名字即 id
-	const fullId =
-		type === "svg" && !id.startsWith("CI-") ? `CI-${id}` : null;
+	const fullId = type === "svg" && !id.startsWith("CI-") ? `CI-${id}` : null;
 
 	const handleContextMenu = (e: React.MouseEvent) => {
 		e.preventDefault();
@@ -181,9 +177,7 @@ export const IconCard = memo(function IconCard({
 				item
 					.setTitle(card.copyFullId())
 					.setIcon("clipboard-list")
-					.onClick(() =>
-						void copy(fullId, card.copyNameFailed()),
-					),
+					.onClick(() => void copy(fullId, card.copyNameFailed())),
 			);
 		}
 
@@ -234,7 +228,7 @@ export const IconCard = memo(function IconCard({
 
 	return (
 		<div
-			className={`ci-lib-icon__card${hasActions ? "" : " ci-lib-icon__card--readonly"}${copied ? " is-copied" : ""}${selected ? " is-selected" : ""}${onModifierClick ? " is-selectable" : ""}`}
+			className={`ci-lib-icon__card${copied ? " is-copied" : ""}${selected ? " is-selected" : ""}${onModifierClick ? " is-selectable" : ""}`}
 			onClickCapture={handleRootCapture}
 			onContextMenu={handleContextMenu}
 		>
@@ -287,6 +281,10 @@ export const IconCard = memo(function IconCard({
 				</span>
 			)}
 
+			{/*
+			  图标区铺满整卡（方形图块），名称不再可见——改由 aria-label 提供给
+			  读屏与辅助技术，悬停 tooltip 里带名称与「点击复制」提示补足可视线索。
+			*/}
 			<div
 				ref={iconRef}
 				className="ci-lib-icon__card-icon clickable-icon"
@@ -297,20 +295,12 @@ export const IconCard = memo(function IconCard({
 						handleActivate(e);
 					}
 				}}
-				title={card.copyNameTooltip()}
+				// title={`${id} · ${card.copyNameTooltip()}`}
 				role="button"
 				tabIndex={0}
 				aria-label={id}
 				aria-selected={selected}
 			></div>
-			<button
-				className="ci-lib-icon__card-name clickable-icon"
-				onClick={handleActivate}
-				title={id}
-				aria-label={id}
-			>
-				{id}
-			</button>
 		</div>
 	);
 });

@@ -25,11 +25,9 @@ describe("iconGridDensity", () => {
 		expect(widths[1]).toBeLessThan(widths[2]);
 	});
 
-	test("卡片网格每档都比同档紧凑网格更宽（我的 SVG 图标量少，值得更大字形）", () => {
+	test("两套网格几何完全一致（统一的方形图块，各页观感相同）", () => {
 		for (const density of ICON_GRID_DENSITIES) {
-			expect(cardGridMetrics(density).minColumnWidth).toBeGreaterThan(
-				compactGridMetrics(density).minColumnWidth,
-			);
+			expect(cardGridMetrics(density)).toEqual(compactGridMetrics(density));
 		}
 	});
 
